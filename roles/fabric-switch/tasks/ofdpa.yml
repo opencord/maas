@@ -1,0 +1,22 @@
+---
+- name: Openflow Agent Debian Archive
+  get_url:
+    url: http://github.com/ciena/ZeroTouchProvisioning/raw/master/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb
+    validate_certs: false
+    dest: /mnt/flash2/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb
+
+- name: OpenFlow Agent Stopped
+  service: name=ofdpa state=stopped
+
+- name: Openflow Agent
+  apt: deb="/mnt/flash2/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb" force=true
+
+- name: OpenFlow Agent Started
+  service: name=ofdpa state=started
+
+- name: Mark Persist Openflow Agent
+  command: persist /etc/accton/ofdpa.conf
+
+- name: Persist Openflow Agent
+  command: savepersist
+  failed_when: false

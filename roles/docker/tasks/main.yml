@@ -1,0 +1,38 @@
+- name: Apt Information
+  become: yes
+  apt: name={{ item }} state=latest force=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+
+- name: Docker Apt Key
+  become: yes
+  apt_key:
+    keyserver: hkp://p80.pool.sks-keyservers.net:80
+    id: 58118E89F3A912897C070ADBF76221572C52609D
+
+- name: Docker repository
+  become: yes
+  apt_repository:
+    repo: deb https://apt.dockerproject.org/repo ubuntu-trusty main
+    update_cache: yes
+    state: present
+
+- name: Docker Engine
+  become: yes
+  apt:
+    name: docker-engine
+    state: latest
+    force: yes
+
+- name: Docker Compose
+  become: yes
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.4.1/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+
+- name: Docker Compose Permissions
+  become: yes
+  file:
+    path: /usr/local/bin/docker-compose
+    mode: 0755

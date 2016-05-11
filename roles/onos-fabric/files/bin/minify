@@ -1,0 +1,29 @@
+#!/bin/bash
+
+PROG=$(basename $0)
+
+usage() {
+    echo "$PROG: [options]"
+    echo ""
+    echo "    -h | --help       display this message"
+}
+
+FILE=
+while [ $# -gt 0 ]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit
+            ;;
+        *)
+            FILE=$1
+            ;;
+    esac
+    shift
+done
+
+if [ "$FILE x" == " x" ]; then
+    sed -e 's|//.*$||g' -e '/^\s*$/d' # <&0
+else
+    cat $FILE | sed -e 's|//.*$||g' -e '/^\s*$/d'
+fi

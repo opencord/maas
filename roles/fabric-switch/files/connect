@@ -1,0 +1,17 @@
+#!/bin/bash
+
+BG=0
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    -bg|-background)
+      BG=1
+  esac
+  shift
+done
+
+if [ $BG -eq 1 ]; then
+  nohup brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller={{ controller_ip }} 2>&1 > connect.log &
+else
+  brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller={{ controller_ip }}
+fi

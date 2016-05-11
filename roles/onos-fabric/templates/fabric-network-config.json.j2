@@ -1,0 +1,218 @@
+// This is a commented JSON data file. The comments must stripped from the
+// file before passing it to a JSON parser. This can be done various way
+// including the JavaScript JSON.minify() function or a simple sed script
+// such as "catting" this file through sed -e '|s//.*$||g'.
+
+
+// This file represents the network configuration for the cord demo pod number
+// two (2).
+{
+    "ports" : {
+
+        // Leaf-1/port-1 connected to cord-r2-s1/eth0
+        "of:0000000000000021/1" : {
+            "interfaces" : [
+                {
+                    "ips" : [ "10.3.1.254/24" ] // Represents a fake gateway
+                                                // for this subnet. ONOS will
+                                                // ARP this and respond.
+                }
+            ]
+        },
+
+        // Leaf-1/port-2 connected to cord-r2-s2/eth0
+        "of:0000000000000021/2" : {
+            "interfaces" : [
+                {
+                    "ips" : [ "10.3.1.254/24" ] // Represents a fake gateway
+                                                // for this subnet. ONOS will
+                                                // ARP this and respond.
+                },
+                {
+                    "vlan" : "1000" // cross-connect s-tag 1000 to Tibit OLT
+                },
+                // Need to specify the public IP for the vSG
+                {
+                    "ips" : [ "10.3.1.130/32" ] // vSG public IP address /32
+                }
+            ]
+        },
+
+	// Leaf-1/port-129 connected to Tibit OLT
+        // The physical port is port 25, but we are using a break out cable and thus the switch
+        // create virtual ports
+        "of:0000000000000021/129" : {
+            "interfaces" : [
+                {
+                    "name" : "tibit-olt", // unused
+                    "vlan" : "1000" // cross-connect s-tag 42 to vSG
+                }
+            ]
+        },
+
+        // Leaf-2/port-3 connected to cord-r2-s3/eth0
+        "of:0000000000000022/3" : {
+            "interfaces" : [
+                {
+                    "ips" : [ "10.3.2.254/24" ] // Represents a fake gateway
+                                                // for this subnet. ONOS will
+                                                // ARP this and respond.
+                }
+            ]
+        },
+
+        // Leaf-2/port-4 connected to cord-r2-s4/eth0
+        "of:0000000000000022/4" : {
+            "interfaces" : [
+                {
+                    "ips" : [ "10.3.2.254/24" ] // Represents a fake gateway
+                                                // for this subnet. ONOS will
+                                                // ARP this and respond.
+                }
+            ]
+        }
+    },
+
+    "devices" : {
+        "of:0000000000000021" : {
+            "segmentrouting" : {
+                "name" : "leaf-1",
+                "nodeSid" : 101,
+                "routerIp" : "10.3.1.254",
+                "routerMac" : "cc:37:ab:7c:b9:d6",
+                "isEdgeRouter" : true,
+                "adjacencySids" : []
+            }
+        },
+        "of:0000000000000022" : {
+            "segmentrouting" : {
+                "name" : "leaf-2",
+                "nodeSid" : 102,
+                "routerIp" : "10.3.2.254",
+                "routerMac" : "cc:37:ab:7c:ba:da",
+                "isEdgeRouter" : true,
+                "adjacencySids" : []
+            }
+        },
+        "of:0000000000000011" : {
+            "segmentrouting" : {
+                "name" : "spine-1",
+                "nodeSid" : 103,
+                "routerIp" : "10.2.30.1",
+                "routerMac" : "cc:37:ab:7c:be:68",
+                "isEdgeRouter" : false,
+                "adjacencySids" : []
+            }
+        },
+        "of:0000000000000012" : {
+            "segmentrouting" : {
+                "name" : "spine-2",
+                "nodeSid" : 104,
+                "routerIp" : "10.2.30.2",
+                "routerMac" : "cc:37:ab:7c:bf:ee",
+                "isEdgeRouter" : false,
+                "adjacencySids" : []
+            }
+        }
+    },
+    "links": {
+        // spine 1/1 connected to leaf 1/31
+        "of:0000000000000011/1-of:0000000000000021/31": {
+            "basic": {}
+        },
+
+        // spine 1/2 connected to leaf 2/31
+        "of:0000000000000011/2-of:0000000000000022/31": {
+            "basic": {}
+        },
+
+        // spine 2/1 connected to leaf 1/32
+        "of:0000000000000012/1-of:0000000000000021/32": {
+            "basic": {}
+        },
+
+        // spine 2/2 connected to leaf 2/32
+        "of:0000000000000012/2-of:0000000000000022/32": {
+            "basic": {}
+        },
+
+        // leaf 1/31 connected to spine 1/1
+        "of:0000000000000021/31-of:0000000000000011/1": {
+            "basic": {}
+        },
+
+        // leaf 1/32 connected to spine 2/1
+        "of:0000000000000021/32-of:0000000000000012/1": {
+            "basic": {}
+        },
+
+        // leaf 2/31 connected to spine 1/2
+        "of:0000000000000022/31-of:0000000000000011/2": {
+            "basic": {}
+        },
+
+        // leaf 2/23 connected to spine 2/2
+        "of:0000000000000022/32-of:0000000000000012/2": {
+            "basic": {}
+        }
+    },
+    "hosts" : {
+        // cord-r2-s1 iface eth0
+        "3c:fd:fe:9e:93:10/-1" : {
+            "basic": {
+                "ips": ["10.3.1.1"],                  // host IP on fabric
+                "location": "of:0000000000000021/1"   // link back to fabric leaf-1/port-1
+            }
+        },
+
+        // cord-r2-s2 iface eth0
+        "3c:fd:fe:9e:8a:88/-1" : {
+            "basic": {
+                "ips": ["10.3.1.2"],                 // host IP on fabric
+                "location": "of:0000000000000021/2"  // link back to fabric leaf-1/port-2
+            }
+        },
+
+       // fa:16:3e:94:7e:c5
+       // fa:16:3e:94:7e:c5
+       // OLD: 02:42:0a:03:01:82
+
+        "fa:16:3e:94:7e:c5/-1" : { // vSG1
+            "basic": {
+                "ips": ["10.3.1.130"], // vSG1 public IP address
+                "location": "of:0000000000000001/5"
+            }
+        },
+
+	// OLD: 02:42:0a:03:01:83
+        "fa:16:3e:91:82:6a/-1" : { // vSG1 VM
+            "basic" : {
+                "ips": ["10.3.1.131"],
+                "location": "of:0000000000000001/5"
+             }
+         },
+
+        // cord-r2-s3 iface eth0
+        "3c:fd:fe:9e:94:98/-1" : {
+            "basic": {
+                "ips": ["10.3.2.1"],                 // host IP on fabric
+                "location": "of:0000000000000022/3"  // link back to fabric leaf-2/port-3
+            }
+        },
+
+        // cord-r2-s4 iface eth0
+        "3c:fd:fe:9e:97:98/-1" : {
+            "basic": {
+                "ips": ["10.3.2.2"],                 // host IP on fabric
+                "location": "of:0000000000000022/4"  // link back to fabric leaf-2/port-4
+            }
+        }
+    },
+    "apps" : {
+        "org.onosproject.core" : {
+            "core" : {
+                "linkDiscoveryMode" : "STRICT" // enable strict link validation
+            }    
+        }
+    }
+}

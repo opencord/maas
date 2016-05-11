@@ -1,0 +1,13 @@
+automation:
+  image: ciena/cord-maas-automation:0.1-prerelease
+  container_name: automation
+  labels:
+    - "lab.solution=CORD"
+    - "lab.component=automation"
+  restart: always
+  environment:
+    # need to explicitly set the resolver, else go will skip the /etc/hosts file
+    - "GODEBUG=netdns=go"
+  volumes:
+    - ".:/mappings"
+  command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]

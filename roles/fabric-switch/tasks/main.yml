@@ -1,0 +1,45 @@
+---
+- name: Verify controller_ip Set
+  fail: msg="Please set variable 'controller_ip'. This can be set via a variable file or via the command line using the '--extra-vars' option."
+  when: controller_ip is not defined
+
+- name: Verify switch_id Set
+  fail: msg="Please set variable 'switch_id'. This can be set via a host specific variable file or via the command line using the '--extra-vars' option."
+  when: switch_id is not defined
+
+- name: Openflow Agent Version
+  shell: ofdpa --version
+  register: ofdpa_version
+  changed_when: false
+
+- name: Version I.12.1.1+1.1 Openflow Agent
+  include: ofdpa.yml
+  when: ofdpa_version.stdout.find('version I.12.1.1+1.1') == -1
+
+- name: Utilities Scripts
+  template:
+    src: files/{{ item }}
+    dest: /root
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - purge
+    - killit
+    - connect
+    - reset
+  register: utils
+
+- name: Mark Persistent
+  command: persist {{ item }}
+  with_items:
+    - purge
+    - killit
+    - connect
+    - reset
+  when: utils.changed
+
+- name: Persist
+  command: savepersist
+  when: utils.changed
+  failed_when: false

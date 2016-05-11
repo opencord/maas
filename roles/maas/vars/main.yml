@@ -1,0 +1,38 @@
+maas:
+    admin_email: admin@cord.lab
+    user: cord
+    user_password: cord
+    user_email: cord@cord.lab
+    user_sshkey: "{{ lookup('file', 'files/cord_id_rsa.pub') }}"
+
+    # CHANGE:
+    #   'domain' specifies the domain name configured in to MAAS
+    domain: cord.lab
+
+interfaces:
+    # CHANGE:
+    #   'external'   specifies the interface on which the head node is
+    #                connected to the internet
+    #   'management' specifies the interface on which the head node will
+    #                service DHCP and PXE boot requests
+    external: eth3
+    management: eth2
+
+networks:
+    # CHANGE:
+    #   'management' specifies the network that MAAS will allocate
+    #                via DHCP over the 'management' interface specified
+    #                above
+    #   'bridge'     specifies the network that MAAS will allocate
+    #                via DHCP to the VM created in support of XOS
+    #                on the head node.
+    #   'fabric'     specifies the network that will be assigned to
+    #                the leaf - spine fabric
+    management: 10.6.0.0/24
+    bridge: 172.18.0.0/24
+    fabric: 10.6.1.0/24
+
+    # CHANGE:
+    #   'bridge' name of the bride to create that is used when connecting
+    #            the VMs created in support of XOS
+    bridge_name: mgmtbr

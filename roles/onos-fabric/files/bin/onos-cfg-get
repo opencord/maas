@@ -1,0 +1,4 @@
+#!/bin/bash
+
+curl -sLl -X GET --header "Accept: application/json" "http://karaf:karaf@localhost:8181/onos/v1/network/configuration" | python -m json.tool
+

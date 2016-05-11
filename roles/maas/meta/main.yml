@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: David Bainbridge
+  description: Ubuntu MAAS from Canonical
+  min_ansible_version: 2
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+  categories:
+    - development
+    - system
+
+dependencies: [docker]

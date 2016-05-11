@@ -1,0 +1,20 @@
+---
+fabric:
+  network: 10.6.1
+  spine1:
+    of_id: of:0000000000000011
+  spine2:
+    of_id: of:0000000000000012
+  leaf1:
+    of_id: of:0000000000000021
+  leaf2:
+    of_id: of:0000000000000022
+  hosts:
+    cord-r6-s1:
+      mac: 3c:fd:fe:9e:94:30
+      ip: 10.6.1.1
+      location:
+        leaf: 1
+        port: 1
+  
+  

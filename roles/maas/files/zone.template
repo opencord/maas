@@ -1,0 +1,25 @@
+; Zone file modified: {{modified}}.
+; Note that the modification time of this file doesn't reflect
+; the actual modification time.  MAAS controls the modification time
+; of this file to be able to force the zone to be reloaded by BIND.
+$TTL    300
+@   IN    SOA {{domain}}. nobody.example.com. (
+              {{serial}} ; serial
+              600 ; Refresh
+              1800 ; Retry
+              604800 ; Expire
+              300 ; TTL
+              )
+
+    IN  NS  {{domain}}.
+{{for type, directive in generate_directives.items()}}
+{{for iterator_values, rdns, hostname in directive}}
+$GENERATE {{iterator_values}} {{rdns}} IN {{type}} {{hostname}}
+{{endfor}}
+{{endfor}}
+
+{{for type, mapping in mappings.items()}}
+{{for item_from, item_to in mapping}}
+{{item_from}} IN {{type}} {{item_to}}
+{{endfor}}
+{{endfor}}

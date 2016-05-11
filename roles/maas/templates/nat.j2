@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Add rules to configure NAT
+
+REPORT_CHANGED=0
+if [ $# -gt 0 ]; then
+    REPORT_CHANGED=1
+fi
+CHANGED='false'
+
+iptables --table nat --check POSTROUTING --out-interface {{ interfaces.external }} -j MASQUERADE &>> /dev/null
+if [ $? -ne 0 ]; then
+    iptables --table nat --append POSTROUTING --out-interface {{ interfaces.external }} -j MASQUERADE
+    CHANGED='true'
+fi
+
+iptables --check FORWARD --in-interface {{ interfaces.management }} -j ACCEPT &>> /dev/null
+if [ $? -ne 0 ]; then
+    iptables --append FORWARD --in-interface {{ interfaces.management }} -j ACCEPT
+    CHANGED='true'
+fi
+
+if [ $REPORT_CHANGED -ne 0 ]; then
+    echo -n $CHANGED
+fi

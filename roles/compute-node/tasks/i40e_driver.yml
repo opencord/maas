@@ -1,0 +1,40 @@
+---
+- name: Copy i40e Interface Driver
+  unarchive:
+    src=files/i40e-1.4.25.tar.gz
+    dest={{ ansible_env.HOME }}
+    owner=ubuntu
+    group=ubuntu
+
+- name: Build i40e Driver
+  command: make
+  args:
+    chdir: i40e-1.4.25/src
+    creates: "{{ ansible_env.HOME }}/i40e-1.4.25/src/i40e/i40e.ko"
+
+- name: Unload i40e Driver
+  become: yes
+  modprobe: name=i40e state=absent
+
+- name: Install i40e Driver
+  become: yes
+  command: make install
+  args:
+    chdir: i40e-1.4.25/src
+
+- name: Load i40e Driver
+  become: yes
+  modprobe: name=i40e state=present
+
+- name: Persist i40e Driver Loadi
+  become: yes
+  lineinfile:
+    dest=/etc/modules
+    line="i40e"
+    state=present
+    insertafter=EOF
+
+- name: Remove Build Files
+  file:
+    path={{ ansible_env.HOME }}/i40e-1.4.25
+    state=absent

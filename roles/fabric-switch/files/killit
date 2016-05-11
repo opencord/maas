@@ -1,0 +1,3 @@
+#!/bin/bash
+
+killall -9 brcm-indigo-ofdpa-ofagent

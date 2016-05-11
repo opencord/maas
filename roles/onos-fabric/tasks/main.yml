@@ -1,0 +1,45 @@
+---
+- name: User Local bin directory
+  file:
+    path={{ ansible_env.HOME }}/bin
+    state=directory
+    owner=ubuntu
+    group=ubuntu
+    mode=0755
+
+- name: Copy Utility Commands
+  copy:
+    src=files/bin/{{ item }}
+    dest={{ ansible_env.HOME }}/bin
+    owner=ubuntu
+    group=ubuntu
+    mode=0755
+  with_items:
+    - minify
+    - onos-cfg-get
+    - onos-cfg-post
+    - onos-cfg-delete
+    - ping-test.sh
+
+- name: Include Utility Commands in User Path
+  lineinfile:
+    dest={{ ansible_env.HOME }}/.bashrc
+    line="PATH=$HOME/bin:$PATH"
+    state=present
+    insertafter=EOF
+
+- name: Custom ONOS
+  unarchive:
+    src=files/onos-1.6.0.ubuntu.tar.gz
+    dest={{ ansible_env.HOME }}
+    owner=ubuntu
+    group=ubuntu
+
+- name: ONOS Fabric Configuration
+  template:
+    src=templates/fabric-network-config.json.j2
+    dest={{ ansible_env.HOME }}/fabric-network.config.json
+    owner=ubuntu
+    group=ubuntu
+    mode=0644
+    

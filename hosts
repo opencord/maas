@@ -1,0 +1,8 @@
+[switches]
+spine-1
+spine-2
+leaf-1
+leaf-2
+
+[switches:vars]
+ansible_ssh_user=root

@@ -1,0 +1,15 @@
+harvester:
+    image: ciena/cord-maas-dhcp-harvester:0.1-prerelease
+    container_name: harvester
+    restart: always
+    labels:
+        - "lab.solution=cord"
+        - "lab.component=harvester"
+    volumes:
+        - "/var/lib/maas/dhcp:/dhcp"
+        - "/etc/bind/maas:/bind"
+        - "/etc/bind/maas:/key"
+        - "/etc/dhcp:/etc/dhcp"
+    ports:
+        - "8954:8954"
+    command: [ "--server", "{{ ip_address.stdout }}", "--port", "954", "--key", "/key/rndc.conf.maas", "--zone", "cord.lab", "--update", "--verify", "--timeout", "1s", "--repeat", "5m", "--quiet", "2s", "--workers", "10", "--filter", "^(?!cord)" ]
