@@ -145,16 +145,19 @@
   register: mgmt_ip_address
   changed_when: false
 
+# Currently the onie image is being stored in **Dropbox** on a personal account, which is not really what we want to 
+# have in production, but it works for the time being.
 - name: Switch Boot Resources
-  copy:
-    src=files/{{ item }}
-    dest=/var/www/html/{{ item }}
+  become: yes
+  get_url:
+    url={{ item.url }}
+    dest=/var/www/html/{{ item.dest }}
     owner=root
     group=root
     mode=0644
   with_items:
-    - onie-installer-x86_64-accton_as5712_54x-r0
-    - onie-installer-x86_64-accton_as6712_32x-r0
+    - { url : "https://www.dropbox.com/s/eqxs4kx84omtkha/onie-installer-x86_64-accton_as6712_32x-r0?dl=1", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
+    - { url : "https://www.dropbox.com/s/eqxs4kx84omtkha/onie-installer-x86_64-accton_as6712_32x-r0?dl=1", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
 
 - name: Wait for MAAS to Intialize (start)
   pause:
