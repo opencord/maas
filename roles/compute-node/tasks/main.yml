@@ -49,18 +49,26 @@
   command: modinfo --field=version i40e
   register: i40e_version
   changed_when: False
+  tags:
+    - interface_config
 
 - name: Update i40e Driver
   include: tasks/i40e_driver.yml
   when: i40e_version.stdout != '1.4.25'
+  tags:
+    - interface_config
 
 - name: Consistent Interface Naming
   become: yes
   script: files/rename_ifaces.sh {{ fabric_ip }}
   register: ifaces_changed
   changed_when: ifaces_changed.stdout != "false"
+  tags:
+    - interface_config
 
 - name: Reboot Required
   become: yes
   command: /sbin/reboot
   when: ifaces_changed.stdout != "false"
+  tags:
+    - interface_config

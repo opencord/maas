@@ -20,14 +20,14 @@
   become: yes
   docker:
     name: automation
-    image: cord/maas-automation:0.1-prerelease
+    image: ciena/cord-maas-automation:0.1-prerelease
     state: absent
 
 - name: Stop DHCP Harvester Container
   become: yes
   docker:
     name: harvester
-    image: cord/maas-dhcp-harvester:0.1-prerelease
+    image: ciena/cord-maas-dhcp-harvester:0.1-prerelease
     state: absent
 
 - name: MAAS Repository
@@ -145,7 +145,7 @@
   register: mgmt_ip_address
   changed_when: false
 
-# Currently the onie image is being stored in **Dropbox** on a personal account, which is not really what we want to 
+# Currently the onie image is being stored in **Dropbox** on a personal account, which is not really what we want to
 # have in production, but it works for the time being.
 - name: Switch Boot Resources
   become: yes
@@ -194,3 +194,21 @@
   register: dns_template_changed
   changed_when: dns_template_changed.stdout == 'true'
 
+- name: Custom Automation Compose Configurations
+  become: yes
+  template:
+    src: templates/{{ item }}.j2
+    dest: /etc/maas/{{ item }}
+    owner: maas
+    group: maas
+    mode: 0644
+  with_items:
+    - automation-compose.yml
+    - harvest-compose.yml
+
+- name: Automation
+  become: yes
+  command: docker-compose -f /etc/maas/{{ item }} up -d
+  with_items:
+    - automation-compose.yml
+    - harvest-compose.yml

@@ -52,7 +52,7 @@ function guess_type {
         i40e)
             RESULT="I40G"
             ;;
-        igb)
+        igb|e1000)
             RESULT="ETH"
             ;;
         *) ;;

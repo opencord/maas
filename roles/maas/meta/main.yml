@@ -1,14 +1,15 @@
 ---
 galaxy_info:
-  author: David Bainbridge
-  description: Ubuntu MAAS from Canonical
-  min_ansible_version: 2
+  author: Ciena Blueplanet
+  description: Services required to bare metal boot CORD POD
+  company: Ciena Blueplanet
+  license: Apache 2.0
+  min_ansible_version: 2.0
   platforms:
     - name: Ubuntu
       versions:
         - trusty
-  categories:
-    - development
-    - system
-
-dependencies: [docker]
+  galaxy_tags:
+    - cord
+dependencies:
+  - { role : compute-node }
