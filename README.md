@@ -72,6 +72,12 @@ best practices for a CORD POD. This role is meant to be applied to a head node i
    _Additionally configuration variables, including network IP addressing information can be found in 
    the file `vars/main.yml`._
 
+### Configuration
+
+    - When working with virtual machines, or really any machine that does not have a real 40G interface it is
+      sometimes useful to not attempt to rename / reconfigure the machines interfaces. This can be accomplished
+      by adding the `--skip-tags=interface_config` command line option to your ansible-playbook command line.
+
 ### Comments
 
    - `iptables` rules will be established to `NAT` traffic out interface `eth3`
@@ -82,4 +88,4 @@ best practices for a CORD POD. This role is meant to be applied to a head node i
 
 ### Dependencies
 
-This role depends on the `docker` role.
+This role depends on the `compute-node` role.
