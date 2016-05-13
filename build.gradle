@@ -49,7 +49,7 @@ task tagBarImage(type: Exec) {
 
 task publishBarImage(type: Exec) {
     dependsOn tagBarImage
-    commandLine '/usr/bin/docker', 'tag', 'bar', "$targetReg/bar:$targetTag"
+    commandLine '/usr/bin/docker', 'push', "$targetReg/bar:$targetTag"
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
