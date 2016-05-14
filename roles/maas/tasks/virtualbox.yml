@@ -1,0 +1,38 @@
+- name: VirtualBox Power Support
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - amtterm
+    - wsmancli
+
+- name: VirtualBox Power Script
+  become: yes
+  copy:
+    src: files/amt.template
+    dest: /etc/maas/templates/power/amt.template
+    owner: maas
+    group: maas
+    mode: 0755
+
+- name: Ensure SSH Directory
+  become: yes
+  file:
+    path: /var/lib/maas/.ssh
+    state: directory
+    owner: maas
+    group: maas
+    mode: 0700
+
+- name: VirtualBox SSH Support
+  become: yes
+  copy:
+    src: files/{{ item.src }}
+    dest: /var/lib/maas/.ssh/{{ item.dest }}
+    owner: maas
+    group: maas
+    mode: 0600
+  with_items:
+    - { src: cord_id_rsa, dest: id_rsa }
+    - { src: cord_id_rsa.pub, dest: id_rsa.pub }
+    - { src: ssh_config, dest: config }
+

@@ -8,29 +8,29 @@
 - name: Set Default Password
   become: yes
   user:
-    name=ubuntu
+    name={{ ansible_user }}
     password="$6$TjhJuOgh8xp.v$z/4GwFbn5koVmkD6Ex9wY7bgP7L3uP2ujZkZSs1HNdzQdz9YclbnZH9GvqMC/M1iwC0MceL05.13HoFz/bai0/"
 
 - name: Authorize SSH Key
   become: yes
   authorized_key:
     key="{{ pub_ssh_key }}"
-    user=ubuntu
+    user={{ ansible_user }}
     state=present
 
 - name: Verify Private SSH Key
   become: yes
   stat:
-    path=/home/ubuntu/.ssh/id_rsa
+    path=/home/{{ ansible_user }}/.ssh/id_rsa
   register: private_key
 
-- name: Ensure Private SSH Key
+- name: Ensure SSH Key
   become: yes
   copy:
     src=files/{{ item }}
-    dest=/home/ubuntu/.ssh/{{ item }}
-    owner=ubuntu
-    group=ubuntu
+    dest=/home/{{ ansible_user }}/.ssh/{{ item }}
+    owner={{ ansible_user }}
+    group={{ ansible_user }}
     mode=0600
   with_items:
     - id_rsa
@@ -49,6 +49,7 @@
   command: modinfo --field=version i40e
   register: i40e_version
   changed_when: False
+  failed_when: False
   tags:
     - interface_config
 

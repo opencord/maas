@@ -1,0 +1,48 @@
+#!/bin/bash
+
+POWER_ADDRESS={{power_address}}
+POWER_CHANGE={{power_change}}
+POWER_PASS={{power_pass}}
+POWER_MAC={{mac_address}}
+IP_ADDRESS={{ip_address}}
+BOOT_MODE={{boot_mode}}
+
+get_uuid () {
+    local DATA=$(echo -n "$1" | sed -e 's/://g')
+    echo $(ssh $POWER_PASS@$POWER_ADDRESS vboxmanage list vms | grep "$DATA" | awk '{print $NF}' | sed -e 's/[{}]//g')
+}
+
+query_state () {
+    local state=$(ssh $POWER_PASS@$POWER_ADDRESS vboxmanage showvminfo $1 | grep "^State" | grep -i running | wc -l)
+    if [ $state -eq 1 ]; then
+        echo 'on'
+    else
+        echo 'off'
+    fi
+}
+
+power_on () {
+    ssh $POWER_PASS@$POWER_ADDRESS vboxmanage startvm $1
+    return 0
+}
+
+power_off () {
+    ssh $POWER_PASS@$POWER_ADDRESS vboxmanage controlvm $1 poweroff
+    return 0
+}
+
+main () {
+    case "${POWER_CHANGE}" in
+    'on')
+        power_on "$1"
+        ;;
+    'off')
+        power_off "$1"
+        ;;
+    'query')
+        query_state "$1"
+        ;;
+    esac
+}
+
+main "$(get_uuid $POWER_MAC)" "$POWER_CHANGE"

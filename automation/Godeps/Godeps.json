@@ -1,0 +1,18 @@
+{
+	"ImportPath": "_/Users/dbainbri/src/develop/mf",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"github.com/ciena/maas-flow"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/juju/gomaasapi",
+			"Rev": "e173bc8d8d3304ff11b0ded5f6d4eea0cb560a40"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2015.12.06-2-g03c9f3e",
+			"Rev": "03c9f3ee4c14c8e51ee521a6a7d0425658dd6f64"
+		}
+	]
+}

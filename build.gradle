@@ -24,32 +24,46 @@ ext {
 
 }
 
-// ~~~~~~~~~~~~~~~~~ Example helper tasks ~~~~~~~~~~~~~~~~~~~~
-
-task buildFooImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', "foo", "./foo"
+task buildBootstrapImage(type: Exec) {
+    commandLine '/usr/bin/docker', 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
 }
 
-task tagFooImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'tag', 'foo', "$targetReg/foo:$targetTag"
+task tagBootstrapImage(type: Exec) {
+   dependsOn buildBootstrapImage
+   commandLine '/usr/bin/docker', 'tag', 'cord-maas-bootstrap', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
-task publishFooImage(type: Exec) {
-    dependsOn tagFooImage
-    commandLine '/usr/bin/docker', 'push', "$targetReg/foo:$targetTag"
+task publishBootstrapImage(type: Exec) {
+    dependsOn tagBootstrapImage
+    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
-task buildBarImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', "bar", "./bar"
+task buildAutomationImage(type: Exec) {
+    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-automation", "./automation"
 }
 
-task tagBarImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'tag', 'bar', "$targetReg/bar:$targetTag"
+task tagAutomationImage(type: Exec) {
+    dependsOn buildAutomationImage
+    commandLine '/usr/bin/docker', 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
 }
 
-task publishBarImage(type: Exec) {
-    dependsOn tagBarImage
-    commandLine '/usr/bin/docker', 'push', "$targetReg/bar:$targetTag"
+task publishAutomationImage(type: Exec) {
+    dependsOn tagAutomationImage
+    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-automation:$targetTag"
+}
+
+task buildHarvesterImage(type: Exec) {
+    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-dhcp-harvester", "./harvester"
+}
+
+task tagHarvesterImage(type: Exec) {
+    dependsOn buildHarvesterImage
+    commandLine '/usr/bin/docker', 'tag', 'cord-maas-dhcp-harvester', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
+}
+
+task publishHarvesterImage(type: Exec) {
+    dependsOn tagHarvesterImage
+    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,18 +73,40 @@ task fetch(type: Exec) {
     // this is where we fetch upstream artifacts that we do not need internet for the build phase"
     // Placeholdr example:
     commandLine "/usr/bin/docker", "pull", "golang:alpine"
+    commandLine "/usr/bin/docker", "pull", "python:2.7-alpine"
 }
 
 // To be used to generate all needed binaries that need to be present on the target
 // as docker images in the local docker runner.
 task buildImages {
-    dependsOn buildFooImage
-    dependsOn buildBarImage
-    println "This is where we build the docker images for MAAS"
+    dependsOn buildBootstrapImage
+    dependsOn buildHarvesterImage
+    dependsOn buildAutomationImage
+}
+
+task tagImages {
+    dependsOn tagBootstrapImage
+    dependsOn tagHarvesterImage
+    dependsOn tagAutomationImage
 }
 
 task publish {
-    // this is where we publish the properly tagged image into the target registry
-    dependsOn publishFooImage
-    dependsOn publishBarImage
+    dependsOn publishBootstrapImage
+    dependsOn publishHarvesterImage
+    dependsOn publishAutomationImage
 }
+
+// ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
+
+// This task will invoke the ansible configuration on the vagrant head node. The ansible deployment is
+// executed remotely to the head node as this is a more realistic scenario for a production deployment.
+// The assumption is that this task is executed from the maasdev virtual machine as it access the head 
+// node virtual box over a private network.
+//
+// TODO: Currently the deployment of the head node does not use the locally built docker containers, it
+//       should be modified to do so. This likely means that we need to configure docker on the head node
+//       to access the docker registry on the maasdev virtual box.
+task deployMaas(type: Exec) {
+  commandLine '/usr/bin/ansible-playbook', '-i', '10.100.198.202,', '--skip-tags=switch_support,interface_config', 'dev-head-node.yml'
+}
+

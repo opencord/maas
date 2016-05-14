@@ -158,6 +158,8 @@
   with_items:
     - { url : "https://www.dropbox.com/s/eqxs4kx84omtkha/onie-installer-x86_64-accton_as6712_32x-r0?dl=1", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
     - { url : "https://www.dropbox.com/s/eqxs4kx84omtkha/onie-installer-x86_64-accton_as6712_32x-r0?dl=1", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
+  tags:
+    - switch_support
 
 - name: Wait for MAAS to Intialize (start)
   pause:
@@ -166,7 +168,7 @@
 
 - name: Configure MAAS
   become: yes
-  command: docker run -ti ciena/cord-maas-bootstrap:0.1-prerelease --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
+  command: docker run ciena/cord-maas-bootstrap:0.1-prerelease --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
   register: maas_config_result
   changed_when: maas_config_result.stdout.find("CHANGED") != -1
   failed_when: "'ERROR' in maas_config_result.stdout"
@@ -193,6 +195,33 @@
   script: files/update_dns_template.sh {{ networks.management }} {{ maas.domain }}
   register: dns_template_changed
   changed_when: dns_template_changed.stdout == 'true'
+
+- name: Ensure Nameserver
+  become: yes
+  lineinfile:
+    dest: /etc/resolvconf/resolv.conf.d/head
+    state: present
+    insertafter: EOF
+    line: "nameserver {{ mgmt_ip_address.stdout }}" 
+  register: ns_nameserver
+
+- name: Ensure Domain Search
+  become: yes
+  lineinfile:
+    dest: /etc/resolvconf/resolv.conf.d/base
+    state: present
+    insertafter: EOF
+    line: 'search cord.lab'
+  register: ns_search
+
+- name: Ensure DNS
+  become: yes
+  command: resolvconf -u
+  when: ns_nameserver.changed or ns_search.changed
+
+- name: Ensure VirtualBox Power Management
+  include: virtualbox.yml
+  when: virtualbox_support is defined
 
 - name: Custom Automation Compose Configurations
   become: yes
