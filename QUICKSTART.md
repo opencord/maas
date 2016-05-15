@@ -152,6 +152,101 @@ You can login to MAAS using the username `cord` and the password `cord`.
 
 Browse around the UI and get familiar with MAAS via documentation at `http://maas.io`
 
-## Create and Boot Compute Node
+** WAIT **
+
+Before moving on MAAS need to download boot images for Ubuntu. These are the files required to PXE boot
+additional servers. This can take several minutes. To view that status of this operation you can visit
+the URL `http://localhost:8888/MAAS/images/`. When the downloading of images is complete it is possible to 
+go to the next step.
+
+### What Just Happened?
+
+The preposed configuration for a CORD POD is has the following network configuration on the head node:
+
+   - eth0 / eth1 - 40G interfaces, not relevant for the test environment.
+   - eth2 - the interface on which the head node supports PXE boots and is an internally interface to which all
+            the compute nodes connected
+   - eth3 - WAN link. the head node will NAT from eth2 to eth3
+   - mgmtbr - Not associated with a physical network and used to connect in the VM created by the openstack
+              install that is part of XOS
+
+The Ansible scripts configurate MAAS to support DHCP/DNS/PXE on the eth2 and mgmtbr interfaces.
+
+### Create and Boot Compute Node
+To create a compute node you use the following vagrant command. This command will create a VM that PXE boots
+to the interface on which the MAAS server is listenting. **This task is executed on your host machine and not
+in the development virtual machine.**
+```
+vagrant up computenode
+```
+
+Vagrant will create a UI for this VM which should display so that the boot process of the compute node can be
+visually monitored.
+
+The compute node Vagrant machine it s bit different that most Vagrant machine because it is not created
+with a user account to which Vagrant can connect, which is the normal behavior of Vagrant. Instead the
+Vagrant files is configued with a _dummy_ `communicator` which will fail causing the following error
+to be displayed, but the compute node Vagrant machine will still have been created correctly.
+```
 The requested communicator 'none' could not be found.
 Please verify the name is correct and try again.
+```
+
+The compute node VM will boot, register with MAAS, and then be shut off. After this is complete an entry
+for the node will be in the MAAS UI at `http://localhost:8888/MAAS/#/nodes`. It will be given a random
+hostname made up, in the Canonical way, of a adjective and an noun, such as `popular-feast.cord.lab`. _The 
+name will be different for everyone._ The new node will be in the `New` state.
+
+For _real_ hosts, automation that leverages the MAAS APIs will transition the node fron `New` through the states of `Commissioning` and `Acquired` to `Deployed`.
+
+#### Bad News
+For hosts that support IPMI, which includes the hosts recommended for the CORD POD, MAAS will automatically
+discover remote power management information. However, MAAS is not able to detect or manage power for 
+VirtualBox machines.
+
+A work-a-round has been created to support VirtualBox based VMs. This is accomplished by overriding the
+support script for the `Intel AMT` power support module; but unfortunately it is not fully autmated at this
+point.
+
+The work-a-round uses SSH from the MAAS head node to the machine that is running VirtualBox. To enable this,
+assuming that VirtualBox is running on a Linux based system, you can copy the MAAS ssh public key from
+`/var/lib/maas/.ssh/id_rsa.pub` on the head known to your accounts `authorized_keys` files. You can verify
+that this is working by issueing the following commands from your host machine:
+```
+vagrant ssh headnode
+sudo su - maas
+ssh yourusername@host_ip_address
+```
+
+If you are able to accomplish these commands the VirtualBox power management should opperate correctly.
+
+To utilize this work-a-round the power management settings must be manual configured on the node. To 
+accomplish this the VirtualBox ID for the compute node must first be discovered. To accomplish this issue
+the following command on the machine on which VirtualBox is running:
+```
+vboxmanage list vms
+```
+
+This will return to a list of all VMs being managed by VirtualBox. In this list will be an entry similar
+to the following for the compute node:
+```
+"maas_computenode_1463279637475_74274" {d18af821-91af-4d20-b3b2-67ed85e23c13}
+```
+
+The importnt part of this entry is the last 12 characters of the VM ID, `67ed85e23c13` in this example. This
+will be used as a fake MAC address for power management.
+
+To set the power settings for the compute node visit the MAAS UI page for the compute node. From there select
+the `Power type` to `Intel AMT`. This will display the additional fields: `MAC Address`, `Power Password`, and `Power Address`. The values of these fields should be set as follows:
+
+   - MAC Address - the previously discovered last 12 characters of the VM ID, formatted liek a MAC address,
+                   `67:ed:85:e2:3c:13` from teh example above.
+   - Power Password - the user name to use to ssh from the head node to the host on which VirtualBox is 
+                      executing.
+   - Power Address - the IP address of the host on which VirtualBox is executing.
+
+Once this information is saved the autmation will eventually start the the compute node should transition
+to `Deloyed` state. This will include several reboots and shutdowns of the compute node.
+
+### Complete
+Once the compute node is in the `Deployed` state, this task is complete.
