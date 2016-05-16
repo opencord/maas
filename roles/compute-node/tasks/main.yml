@@ -10,6 +10,7 @@
   user:
     name={{ ansible_user }}
     password="$6$TjhJuOgh8xp.v$z/4GwFbn5koVmkD6Ex9wY7bgP7L3uP2ujZkZSs1HNdzQdz9YclbnZH9GvqMC/M1iwC0MceL05.13HoFz/bai0/"
+  when: '"{{ ansible_user }}" == "ubuntu"'
 
 - name: Authorize SSH Key
   become: yes

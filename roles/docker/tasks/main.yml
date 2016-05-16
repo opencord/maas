@@ -25,14 +25,36 @@
     state: latest
     force: yes
 
+- name: Docker Exposed vi TCP
+  become: yes
+  lineinfile:
+    dest=/etc/default/docker
+    state=present
+    insertafter='#DOCKER_OPTS'
+    line='DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock"'
+  register: docker_config
+
+- name: Docker Restart
+  become: yes
+  service:
+    name=docker
+    state=restarted
+  when: docker_config.changed
+
+- debug: msg="{{ ansible_user }}"
+
+- name: Enable Docker for User
+  become: yes
+  user:
+    name={{ ansible_user }}
+    group=docker
+    append=yes
+
 - name: Docker Compose
   become: yes
   get_url:
-    url: https://github.com/docker/compose/releases/download/1.4.1/docker-compose-Linux-x86_64
-    dest: /usr/local/bin/docker-compose
-
-- name: Docker Compose Permissions
-  become: yes
-  file:
-    path: /usr/local/bin/docker-compose
-    mode: 0755
+    url=https://github.com/docker/compose/releases/download/1.7.1/docker-compose-Linux-x86_64
+    dest=/usr/local/bin/docker-compose
+    owner=root
+    group=root
+    mode=0755
