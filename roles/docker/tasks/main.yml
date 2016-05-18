@@ -41,8 +41,6 @@
     state=restarted
   when: docker_config.changed
 
-- debug: msg="{{ ansible_user }}"
-
 - name: Enable Docker for User
   become: yes
   user:
