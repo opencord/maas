@@ -4,6 +4,14 @@
   apt: name={{ item }} state=present
   with_items:
     - build-essential 
+    - git
+    - python-pip
+
+- name: Ensure Docker Ansible Support
+  become: yes
+  pip:
+    name=docker-py
+    version=0.3.1
 
 - name: Set Default Password
   become: yes
@@ -71,7 +79,7 @@
 - name: Reboot Required
   become: yes
   command: /sbin/reboot
-  async: 0
+  async: 1
   poll: 0
   ignore_errors: true
   when: ifaces_changed.stdout != "false"
@@ -79,4 +87,4 @@
     - interface_config
 
 - name: Wait For Restart
-  local_action: wait_for host={{ ansible_host }} state=started port=22 delay=30 timeout=600
+  local_action: wait_for host={{ ansible_host }} state=started port=22 delay=30 search_regex=OpenSSH timeout=600
