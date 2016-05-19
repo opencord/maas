@@ -20,7 +20,6 @@
   command: cp -r /tmp/ansible.maas/{{ item }} /etc/maas/ansible/{{ item }}
   with_items:
     - roles
-    - compute-node.yml
 
 - name: Ensure Compute Node Playbook
   become: yes
