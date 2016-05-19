@@ -113,9 +113,9 @@ Additionally, you can publish all the images by issuing the following command:
 Once you have built, tagged, and published the utility Docker images this task is complete.
 
 ## Deploy Bare Metal Provisioning Capabilities
-There are two parts to deploying bare metal: deploying the head node PXE server (`MAAS`) and test PXE
-booting a compute node. These tasks are accomplished utilizing additionally Vagrant machines as well
-as executing `gradle` tasks in the Vagrant development machine.
+There are three parts to deploying bare metal: deploying the head node PXE server (`MAAS`), PXE
+booting a compute node, and post deployment provisioning of the compute node. These tasks are accomplished
+utilizing additionally Vagrant machines as well as executing `gradle` tasks in the Vagrant development machine.
 
 ### Create and Deploy MAAS into Head Node
 The first task is to create the Vagrant base head node. This will create an additional Ubutu virtual
@@ -129,9 +129,11 @@ vagrant up headnode
 ### Deploy MAAS
 Canonical MAAS provides the PXE and other bare metal provisioning services for CORD and will be deployed on the
 head node via `Ansible`. To initiate this deployment issue the following `gradle` command. This `gradle` command
-exexcutes `ansible-playbook -i 10.100.198.202, --skip-tags=switch_support,interface_config`. The IP address,
-`10.100.198.202` is the IP address assigned to the head node on a private network. The `skip-tags` option
-excludes Ansible tasks not required when utilizing the Vagrant based head node.
+exexcutes `ansible-playbook -i 10.100.198.202, --skip-tags=switch_support,interface_config --extra-vars=external_iface=eth0`.
+The IP address, `10.100.198.202` is the IP address assigned to the head node on a private network. The
+`skip-tags` option excludes Ansible tasks not required when utilizing the Vagrant based head node. The
+`extra-vars` option overrides the default role vars for the external interface and is needed for the virtualbox
+based environment. Traffic from the compute nodes will be NAT-ed through this interface on the head node.
 
 ```
 ./gradlew deployMaas
@@ -239,7 +241,7 @@ will be used as a fake MAC address for power management.
 To set the power settings for the compute node visit the MAAS UI page for the compute node. From there select
 the `Power type` to `Intel AMT`. This will display the additional fields: `MAC Address`, `Power Password`, and `Power Address`. The values of these fields should be set as follows:
 
-   - MAC Address - the previously discovered last 12 characters of the VM ID, formatted liek a MAC address,
+   - MAC Address - the previously discovered last 12 characters of the VM ID, formatted like a MAC address,
                    `67:ed:85:e2:3c:13` from teh example above.
    - Power Password - the user name to use to ssh from the head node to the host on which VirtualBox is 
                       executing.
@@ -248,5 +250,25 @@ the `Power type` to `Intel AMT`. This will display the additional fields: `MAC A
 Once this information is saved the autmation will eventually start the the compute node should transition
 to `Deloyed` state. This will include several reboots and shutdowns of the compute node.
 
+### Post Deployment Provisioning of the Compute Node
+Once the node is in the `Deployed` state, it can be provisioned for use in a CORD POD. Eventually, this action
+will be automated and triggered when a node moves to the `Deployed` state. Currently, this must be manually 
+invoked. The post deployment provisioning consists of configuring the networking on the node to comply with
+best practices of a CORD POD installation and leverages an Ansible play boot to accomplish the provisioning.
+
+To provision the compute node `ssh` to the head node,  change to the `/etc/maas/ansible` directory, and invoke
+the playbook on the new compute node. To ssh to the head node, you can use `vagrant ssh headnode` from the 
+host system for the virtual machines. Once __on__ the head node the following commands can invoke the
+provisioning of the compute node, __the name of the compute node is an example name, the actual name in the
+deployment can be found in the nodes list of the MAAS UI.__:
+
+```
+cd /etc/maas/ansible
+ansible-playbook -i popular-feast.cord.lab, compute-node.yml --skip-tags=interface_config
+```
+
+_NOTE: the `skip-tags` option is required for the virtualbox based environement_
+
 ### Complete
-Once the compute node is in the `Deployed` state, this task is complete.
+Once the compute node is in the `Deployed` state and post deployment provisioning on the compute node is
+complete, this task is complete.
