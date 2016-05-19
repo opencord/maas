@@ -1,0 +1,10 @@
+- name: Ansible Repository
+  become: yes
+  apt_repository:
+    repo="ppa:ansible/ansible"
+
+- name: Ensure Ansible
+  become: yes
+  apt:
+    name=ansible
+    state=latest

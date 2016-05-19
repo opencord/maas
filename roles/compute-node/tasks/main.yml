@@ -88,3 +88,5 @@
 
 - name: Wait For Restart
   local_action: wait_for host={{ ansible_host }} state=started port=22 delay=30 search_regex=OpenSSH timeout=600
+  tags:
+    - interface_config

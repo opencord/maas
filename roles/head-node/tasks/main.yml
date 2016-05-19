@@ -1,0 +1,32 @@
+- name: Ensure MAAS Ansible Config Directory
+  become: yes
+  file:
+    path=/etc/maas/ansible
+    owner=maas
+    group=maas
+    state=directory
+
+- name: Ensure Ansible Compute Config Files
+  become: yes
+  git:
+    repo=http://gerrit.opencord.org/maas
+    dest=/tmp/ansible.maas
+    clone=yes
+    force=yes
+    update=yes
+
+- name: Ensure Ansible Roles
+  become_user: maas
+  command: cp -r /tmp/ansible.maas/{{ item }} /etc/maas/ansible/{{ item }}
+  with_items:
+    - roles
+    - compute-node.yml
+
+- name: Ensure Compute Node Playbook
+  become: yes
+  copy:
+    src=files/compute-node.yml
+    dest=/etc/maas/ansible/compute-node.yml
+    owner=maas
+    group=maas
+    mode=0644
