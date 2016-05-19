@@ -166,6 +166,14 @@
     seconds=30
   changed_when: false
 
+- name: MAAS Accepting API Requests
+  action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
+  register: api_test
+  until: api_test.status_code is defined and api_test.status_code == 403
+  retries: 6
+  delay: 10
+  failed_when: api_test.status_code is not defined or api_test.status_code != 403
+
 - name: Configure MAAS
   become: yes
   command: docker run ciena/cord-maas-bootstrap:0.1-prerelease --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
