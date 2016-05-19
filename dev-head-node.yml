@@ -1,8 +1,8 @@
-- hosts: 10.100.198.202
+- hosts: all
   remote_user: vagrant
   serial: 1
   vars:
     virtualbox_support: 1
     ansible_ssh_pass: vagrant
   roles:
-    - maas
+    - head-node
