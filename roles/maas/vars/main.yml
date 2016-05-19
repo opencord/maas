@@ -1,13 +1,13 @@
 maas:
-    admin_email: admin@cord.lab
-    user: cord
-    user_password: cord
-    user_email: cord@cord.lab
+    admin_email: "{{ admin_email | default('admin@cord.lab') }}"
+    user: "{{ maas_user | default('cord') }}"
+    user_password: "{{ maas_password | default('cord') }}"
+    user_email: "{{ maas_email | default('cord@cord.lab') }}"
     user_sshkey: "{{ lookup('file', 'files/cord_id_rsa.pub') }}"
 
     # CHANGE:
     #   'domain' specifies the domain name configured in to MAAS
-    domain: cord.lab
+    domain: "{{ domain | default('cord.lab') }}"
 
 interfaces:
     # CHANGE:
@@ -15,8 +15,8 @@ interfaces:
     #                connected to the internet
     #   'management' specifies the interface on which the head node will
     #                service DHCP and PXE boot requests
-    external: eth3
-    management: eth2
+    external: "{{ external_iface | default('eth3') }}"
+    management: "{{ management_iface | default('eth2') }}"
 
 networks:
     # CHANGE:
@@ -28,11 +28,11 @@ networks:
     #                on the head node.
     #   'fabric'     specifies the network that will be assigned to
     #                the leaf - spine fabric
-    management: 10.6.0.0/24
-    bridge: 172.18.0.0/24
-    fabric: 10.6.1.0/24
+    management: "{{ management_network | default('10.6.0.0/24') }}"
+    bridge: "{{ bridge_network | default('172.18.0.0/24') }}"
+    fabric: "{{ fabric_network | default('10.6.1.0/24') }}"
 
     # CHANGE:
     #   'bridge' name of the bride to create that is used when connecting
     #            the VMs created in support of XOS
-    bridge_name: mgmtbr
+    bridge_name: "{{ bridge_name | default('mgmtbr') }}"
