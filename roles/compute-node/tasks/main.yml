@@ -96,6 +96,6 @@
 
 - name: Wait For Restart
   local_action: wait_for port=22 host={{ inventory_hostname }} search_regex=OpenSSH delay=30 timeout=600 connect_timeout=15
-  when: ifaces_changed.stdout != "false"
+  when: ifaces_changed.stdout.find("true") != -1
   tags:
     - interface_config
