@@ -6,7 +6,7 @@ repository. There are three high level tasks that can be exercised:
    - Deploy the bare metal provisioning capabilities to a virtual machine (head node) and PXE boot a compute node
 
 **Prerequisite: Vagrant is installed and operationally.**
-_Note: This quick start guide has only been tested againt Vagrant + VirtualBox, specially on MacOS._
+_Note: This quick start guide has only been tested against Vagrant + VirtualBox, specially on MacOS._
 
 ## Create Development Environment
 The development environment is required for the other tasks in this repository. The other tasks could technically
@@ -27,13 +27,14 @@ To connect to the development machine the following vagrant command can be used.
 vagrant ssh maasdev -- -L 8888:10.100.198.202:80
 ```
 
-__Ignore the extra options at the end of this command after the `--`. These are used for port forwarding and
-will be explaned later in the section on Verifing MAAS.__
+__Enter the complete command specified above, including the options `-- -L 8888:10.100.198.202:80`. These are used
+for port forwarding in order to make the MAAS UI visible from you local host and will be explained further in the
+section on Verifying MAAS.__
 
 ### Complete
 Once you have created and connected to the development environment this task is complete. The `maas` repository
 files can be found on the development machine under `/maasdev`. This directory is mounted from the host machine
-so changes made to files in this directory will be reflected on the host machine and vis vera.
+so changes made to files in this directory will be reflected on the host machine and vice-versa.
 
 ## Build / Tag / Publish Docker Images
 Bare metal provisioning leverages three (3) utilities built and packaged as Docker container images. These 
@@ -129,10 +130,10 @@ vagrant up headnode
 ### Deploy MAAS
 Canonical MAAS provides the PXE and other bare metal provisioning services for CORD and will be deployed on the
 head node via `Ansible`. To initiate this deployment issue the following `gradle` command. This `gradle` command
-exexcutes `ansible-playbook -i 10.100.198.202, --skip-tags=switch_support,interface_config --extra-vars=external_iface=eth0`.
+executes `ansible-playbook -i 10.100.198.202, --skip-tags=switch_support,interface_config --extra-vars=external_iface=eth0`.
 The IP address, `10.100.198.202` is the IP address assigned to the head node on a private network. The
 `skip-tags` option excludes Ansible tasks not required when utilizing the Vagrant based head node. The
-`extra-vars` option overrides the default role vars for the external interface and is needed for the virtualbox
+`extra-vars` option overrides the default role vars for the external interface and is needed for the VirtualBox
 based environment. Traffic from the compute nodes will be NAT-ed through this interface on the head node.
 
 ```
@@ -142,7 +143,7 @@ based environment. Traffic from the compute nodes will be NAT-ed through this in
 This task can take some time so be patient. It should complete without errors, so if an error is encountered
 something when horrible wrong (tm). 
 
-### Verifing MAAS
+### Verifying MAAS
 
 After the Ansible script is complete the MAAS install can be validated by viewing the MAAS UI. When we
 connected to the `maasdev` Vagrant machine the flags `-- -L 8888:10.100.198.202:80` were added to the end of
@@ -150,7 +151,7 @@ the `vagrant ssh` command. These flags inform Vagrant to expose port `80` on mac
 as port `8888` on your local machine. Essentially, expose the MAAS UI on port `8888` on your local machine.
 To view the MAAS UI simply browser to `http://localhost:8888/MAAS`. 
 
-You can login to MAAS using the username `cord` and the password `cord`.
+You can login to MAAS using the user name `cord` and the password `cord`.
 
 Browse around the UI and get familiar with MAAS via documentation at `http://maas.io`
 
@@ -163,7 +164,7 @@ go to the next step.
 
 ### What Just Happened?
 
-The preposed configuration for a CORD POD is has the following network configuration on the head node:
+The proposed configuration for a CORD POD is has the following network configuration on the head node:
 
    - eth0 / eth1 - 40G interfaces, not relevant for the test environment.
    - eth2 - the interface on which the head node supports PXE boots and is an internally interface to which all
@@ -172,22 +173,22 @@ The preposed configuration for a CORD POD is has the following network configura
    - mgmtbr - Not associated with a physical network and used to connect in the VM created by the openstack
               install that is part of XOS
 
-The Ansible scripts configurate MAAS to support DHCP/DNS/PXE on the eth2 and mgmtbr interfaces.
+The Ansible scripts configure MAAS to support DHCP/DNS/PXE on the eth2 and mgmtbr interfaces.
 
 ### Create and Boot Compute Node
 To create a compute node you use the following vagrant command. This command will create a VM that PXE boots
-to the interface on which the MAAS server is listenting. **This task is executed on your host machine and not
+to the interface on which the MAAS server is listening. **This task is executed on your host machine and not
 in the development virtual machine.**
 ```
 vagrant up computenode
 ```
 
-Vagrant will create a UI for this VM which should display so that the boot process of the compute node can be
-visually monitored.
+Vagrant will create a UI, which will popup on your screen, so that the PXE boot process of the compute node can be
+visually monitored. After an initial PXE boot of the compute node it will automatically be shutdown.
 
 The compute node Vagrant machine it s bit different that most Vagrant machine because it is not created
 with a user account to which Vagrant can connect, which is the normal behavior of Vagrant. Instead the
-Vagrant files is configued with a _dummy_ `communicator` which will fail causing the following error
+Vagrant files is configured with a _dummy_ `communicator` which will fail causing the following error
 to be displayed, but the compute node Vagrant machine will still have been created correctly.
 ```
 The requested communicator 'none' could not be found.
@@ -199,7 +200,8 @@ for the node will be in the MAAS UI at `http://localhost:8888/MAAS/#/nodes`. It 
 hostname made up, in the Canonical way, of a adjective and an noun, such as `popular-feast.cord.lab`. _The 
 name will be different for everyone._ The new node will be in the `New` state.
 
-For _real_ hosts, automation that leverages the MAAS APIs will transition the node fron `New` through the states of `Commissioning` and `Acquired` to `Deployed`.
+For _real_ hosts, automation that leverages the MAAS APIs will transition the node from `New` through the
+states of `Commissioning` and `Acquired` to `Deployed`.
 
 #### Bad News
 For hosts that support IPMI, which includes the hosts recommended for the CORD POD, MAAS will automatically
@@ -207,20 +209,20 @@ discover remote power management information. However, MAAS is not able to detec
 VirtualBox machines.
 
 A work-a-round has been created to support VirtualBox based VMs. This is accomplished by overriding the
-support script for the `Intel AMT` power support module; but unfortunately it is not fully autmated at this
+support script for the `Intel AMT` power support module; but unfortunately it is not fully automated at this
 point.
 
 The work-a-round uses SSH from the MAAS head node to the machine that is running VirtualBox. To enable this,
 assuming that VirtualBox is running on a Linux based system, you can copy the MAAS ssh public key from
 `/var/lib/maas/.ssh/id_rsa.pub` on the head known to your accounts `authorized_keys` files. You can verify
-that this is working by issueing the following commands from your host machine:
+that this is working by issuing the following commands from your host machine:
 ```
 vagrant ssh headnode
 sudo su - maas
 ssh yourusername@host_ip_address
 ```
 
-If you are able to accomplish these commands the VirtualBox power management should opperate correctly.
+If you are able to accomplish these commands the VirtualBox power management should operate correctly.
 
 To utilize this work-a-round the power management settings must be manual configured on the node. To 
 accomplish this the VirtualBox ID for the compute node must first be discovered. To accomplish this issue
@@ -235,20 +237,21 @@ to the following for the compute node:
 "maas_computenode_1463279637475_74274" {d18af821-91af-4d20-b3b2-67ed85e23c13}
 ```
 
-The importnt part of this entry is the last 12 characters of the VM ID, `67ed85e23c13` in this example. This
+The important part of this entry is the last 12 characters of the VM ID, `67ed85e23c13` in this example. This
 will be used as a fake MAC address for power management.
 
 To set the power settings for the compute node visit the MAAS UI page for the compute node. From there select
-the `Power type` to `Intel AMT`. This will display the additional fields: `MAC Address`, `Power Password`, and `Power Address`. The values of these fields should be set as follows:
+the `Power type` to `Intel AMT`. This will display the additional fields: `MAC Address`, `Power Password`, and
+`Power Address`. The values of these fields should be set as follows:
 
    - MAC Address - the previously discovered last 12 characters of the VM ID, formatted like a MAC address,
-                   `67:ed:85:e2:3c:13` from teh example above.
+                   `67:ed:85:e2:3c:13` from the example above.
    - Power Password - the user name to use to ssh from the head node to the host on which VirtualBox is 
                       executing.
    - Power Address - the IP address of the host on which VirtualBox is executing.
 
-Once this information is saved the autmation will eventually start the the compute node should transition
-to `Deloyed` state. This will include several reboots and shutdowns of the compute node.
+Once this information is saved the automation will eventually start the the compute node should transition
+to `Deployed` state. This will include several reboots and shutdowns of the compute node.
 
 ### Post Deployment Provisioning of the Compute Node
 Once the node is in the `Deployed` state, it can be provisioned for use in a CORD POD. Eventually, this action
@@ -267,7 +270,7 @@ cd /etc/maas/ansible
 ansible-playbook -i popular-feast.cord.lab, compute-node.yml --skip-tags=interface_config
 ```
 
-_NOTE: the `skip-tags` option is required for the virtualbox based environement_
+_NOTE: the `skip-tags` option is required for the VirtualBox based environment_
 
 ### Complete
 Once the compute node is in the `Deployed` state and post deployment provisioning on the compute node is
