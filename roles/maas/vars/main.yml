@@ -1,3 +1,6 @@
+accton_as5712_54x: 'http://178.33.61.6/putstorage/DownloadFileHash/AA90EC2D3A5A4A5QQWE3332069EWQS/onie-installer-x86_64-accton_as6712_32x-r0'
+accton_as6712_32x: 'http://178.33.61.6/putstorage/DownloadFileHash/AA90EC2D3A5A4A5QQWE3332069EWQS/onie-installer-x86_64-accton_as6712_32x-r0'
+
 maas:
     admin_email: "{{ admin_email | default('admin@cord.lab') }}"
     user: "{{ maas_user | default('cord') }}"
@@ -15,8 +18,9 @@ interfaces:
     #                connected to the internet
     #   'management' specifies the interface on which the head node will
     #                service DHCP and PXE boot requests
-    external: "{{ external_iface | default('eth3') }}"
+    fabric: "{{ fabric_iface | default('eth0') }}"
     management: "{{ management_iface | default('eth2') }}"
+    external: "{{ external_iface | default('eth3') }}"
 
 networks:
     # CHANGE:

@@ -81,6 +81,7 @@ function generate_persistent_names {
     done
 }
 
+# 40G_LIST ETH_LIST FAB_IFACE EXT_IFACE MGT_IFACE
 function generate_interfaces {
     OUT=$IFACES_FILE
     rm -rf $OUT
@@ -93,14 +94,13 @@ function generate_interfaces {
     echo "" >> $OUT
 
     IDX=0
-    FIRST=1
     for i in $(cat $1); do
-        if [ $FIRST -eq 1 ]; then
+        if [ "eth$IDX" == "$3" ]; then
             echo "auto eth$IDX" >> $OUT
             echo "iface eth$IDX inet static" >> $OUT
-            echo "    address $IP" >> $OUT
-            echo "    network $NETWORK" >> $OUT
-            echo "    netmask $NETMASK" >> $OUT
+            echo "    address $FAB_IP" >> $OUT
+            echo "    network $FAB_NETWORK" >> $OUT
+            echo "    netmask $FAB_NETMASK" >> $OUT
             FIRST=0
         else
             echo "iface eth$IDX inet manual" >> $OUT
@@ -109,12 +109,27 @@ function generate_interfaces {
         IDX=$(expr $IDX + 1)
     done
 
-    FIRST=1
     for i in $(cat $2); do
-        if [ $FIRST -eq 1 ]; then
+        if [ "eth$IDX" == "$4" ]; then
+            if [ "$EXT_IP" == "dhcp" ]; then
+		echo "auto eth$IDX" >> $OUT
+                echo "iface eth$IDX inet dhcp" >> $OUT
+            elif [ "$EXT_IP" == "manual" ]; then
+		echo "iface eth$IDX inet manual" >> $OUT
+            else
+		echo "auto eth$IDX" >> $OUT
+                echo "iface eth$IDX inet static" >> $OUT
+                echo "    address $EXT_IP" >> $OUT
+                echo "    network $EXT_NETWORK" >> $OUT
+                echo "    netmask $EXT_NETMASK" >> $OUT
+                echo "    broadcast $EXT_BROADCAST" >> $OUT
+                echo "    gateway $EXT_GW" >> $OUT
+		echo "    dns-nameservers 8.8.8.8 8.8.4.4" >> $OUT
+		echo "    dns-search cord.lab" >> $OUT
+            fi
+        elif [ "eth$IDX" == "$5" ]; then
             echo "auto eth$IDX" >> $OUT
             echo "iface eth$IDX inet dhcp" >> $OUT
-            FIRST=0
         else
             echo "iface eth$IDX inet manual" >> $OUT
         fi
@@ -123,11 +138,24 @@ function generate_interfaces {
     done
 }
 
-ADDR=$1
-IP=$(echo $ADDR | cut -d/ -f1)
-MASKBITS=$(echo $ADDR | cut -d/ -f2)
-NETWORK=$(network $IP $MASKBITS)
-NETMASK=$(netmask $MASKBITS)
+FAB_IFACE=$1
+FAB_ADDR=$2
+FAB_IP=$(echo $FAB_ADDR | cut -d/ -f1)
+FAB_MASKBITS=$(echo $FAB_ADDR | cut -d/ -f2)
+FAB_NETWORK=$(network $FAB_IP $FAB_MASKBITS)
+FAB_NETMASK=$(netmask $FAB_MASKBITS)
+
+EXT_IFACE=$3
+EXT_ADDR=$4
+if [ "$EXT_ADDR" != "dhcp" ]; then
+    EXT_IP=$(echo $EXT_ADDR | cut -d/ -f1)
+    EXT_MASKBITS=$(echo $EXT_ADDR | cut -d/ -f2)
+    EXT_NETWORK=$(network $EXT_IP $EXT_MASKBITS)
+    EXT_NETMASK=$(netmask $EXT_MASKBITS)
+    EXT_BROADCAST=$(broadcast $EXT_IP $EXT_MASKBITS)
+    EXT_GW=$(first $EXT_ADDR)
+fi
+MGT_IFACE=$5
 
 LIST_ETH=$(mktemp -u)
 LIST_40G=$(mktemp -u)
@@ -149,26 +177,27 @@ for i in $IFACES; do
     esac
 done
 
-RESULT="false"
+CHANGED="false"
 
-generate_interfaces $LIST_40G $LIST_ETH
+generate_interfaces $LIST_40G $LIST_ETH $FAB_IFACE $EXT_IFACE $MGT_IFACE
+
 diff /etc/network/interfaces $IFACES_FILE 2>&1 > /dev/null
 if [ $? -ne 0 ]; then
-  RESULT="true"
+  CHANGED="true"
   cp /etc/network/interfaces /etc/network/interfaces.1
   cp $IFACES_FILE /etc/network/interfaces
 fi
 
-generate_persistent_names $LIST_40G $LIST_ETH
+generate_persistent_names $LIST_40G $LIST_ETH $FAB_IFACE $EXT_IFACE
 if [ -r /etc/udev/rules.d/70-persistent-net.rules ]; then
   diff /etc/udev/rules.d/70-persistent-net.rules $NAMES_FILE 2>&1 > /dev/null
   if [ $? -ne 0 ]; then
-    RESULT="true"
+    CHANGED="true"
     cp /etc/udev/rules.d/70-persistent-net.rules /etc/udev/rules.d/70-persistent-net.rules.1
     cp $NAMES_FILE /etc/udev/rules.d/70-persistent-net.rules
   fi
 else
-  RESULT="true"
+  CHANGED="true"
   cp $NAMES_FILE /etc/udev/rules.d/70-persistent-net.rules
 fi
 
@@ -177,4 +206,4 @@ rm -rf $NAMES_FILE
 rm -rf $LIST_ETH
 rm -rf $LIST_40G
 
-echo -n $RESULT
+echo -n $CHANGED

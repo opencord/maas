@@ -155,11 +155,23 @@
     owner=root
     group=root
     mode=0644
+    validate_certs=no
   with_items:
-    - { url : "https://www.dropbox.com/s/eqxs4kx84omtkha/onie-installer-x86_64-accton_as6712_32x-r0?dl=1", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
-    - { url : "https://www.dropbox.com/s/eqxs4kx84omtkha/onie-installer-x86_64-accton_as6712_32x-r0?dl=1", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
+    - { url : "{{ accton_as6712_32x }}", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
+    - { url : "{{ accton_as5712_54x }}", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
   tags:
     - switch_support
+
+- name: Restart MAAS Services
+  service:
+    name={{ item }}
+    state=restarted
+  with_items:
+    - maas-proxy
+    - maas-regiond
+    - maas-clusterd
+    - maas-dhcpd
+    - bind9
 
 - name: Wait for MAAS to Intialize (start)
   pause:
@@ -170,8 +182,8 @@
   action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
   register: api_test
   until: api_test.status_code is defined and api_test.status_code == 403
-  retries: 6
-  delay: 10
+  retries: 5
+  delay: 60
   failed_when: api_test.status_code is not defined or api_test.status_code != 403
 
 - name: Configure MAAS

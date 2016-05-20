@@ -1,4 +1,12 @@
 ---
+- name: Verify Manditory Variables
+  fail: msg="Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+    - fabric_ip
+  tags:
+    - interface_config
+
 - name: Applications
   become: yes
   apt: name={{ item }} state=latest force=yes 
@@ -70,16 +78,16 @@
 
 - name: Consistent Interface Naming
   become: yes
-  script: files/rename_ifaces.sh {{ fabric_ip }}
+  script: files/rename_ifaces.sh {{ compute_node.interfaces.fabric }} {{ compute_node.addresses.fabric }} {{ compute_node.interfaces.external }} {{ compute_node.addresses.external }} {{ compute_node.interfaces.management }}
   register: ifaces_changed
-  changed_when: ifaces_changed.stdout != "false"
+  changed_when: ifaces_changed.stdout.find("true") != -1
   tags:
     - interface_config
 
 - name: Reboot Required
   become: yes
   command: /sbin/reboot
-  async: 1
+  async: 0
   poll: 0
   ignore_errors: true
   when: ifaces_changed.stdout != "false"
@@ -87,6 +95,7 @@
     - interface_config
 
 - name: Wait For Restart
-  local_action: wait_for host={{ ansible_host }} state=started port=22 delay=30 search_regex=OpenSSH timeout=600
+  local_action: wait_for port=22 host={{ inventory_hostname }} search_regex=OpenSSH delay=30 timeout=600 connect_timeout=15
+  when: ifaces_changed.stdout != "false"
   tags:
     - interface_config

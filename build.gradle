@@ -107,6 +107,6 @@ task publish {
 //       should be modified to do so. This likely means that we need to configure docker on the head node
 //       to access the docker registry on the maasdev virtual box.
 task deployMaas(type: Exec) {
-  commandLine '/usr/bin/ansible-playbook', '-i', '10.100.198.202,', '--skip-tags=switch_support,interface_config', 'dev-head-node.yml', '--extra-vars=external_iface=eth0' 
+  commandLine '/usr/bin/ansible-playbook', '-i', '10.100.198.202,', '--skip-tags=switch_support,interface_config', 'dev-head-node.yml', '--extra-vars=external_iface=eth0 fabric_ip=10.1.1.1/24' 
 }
 
