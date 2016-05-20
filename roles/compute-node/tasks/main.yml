@@ -90,7 +90,7 @@
   async: 0
   poll: 0
   ignore_errors: true
-  when: ifaces_changed.stdout != "false"
+  when: ifaces_changed.stdout.find("true") != -1
   tags:
     - interface_config
 
