@@ -71,7 +71,7 @@ function generate_persistent_names {
 
     IDX=0
     for i in $(cat $1 | sort); do
-        echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"eth*\", NAME=\"eth$IDX\"" >> $OUT
+        echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"*\", NAME=\"eth$IDX\"" >> $OUT
         IDX=$(expr $IDX + 1)
     done
 
