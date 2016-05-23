@@ -17,7 +17,7 @@
 
 - name: Ensure Ansible Roles
   become_user: maas
-  command: cp -r /tmp/ansible.maas/{{ item }} /etc/maas/ansible/{{ item }}
+  command: cp -r /tmp/ansible.maas/{{ item }} /etc/maas/ansible owner=maas group=maas
   with_items:
     - roles
 

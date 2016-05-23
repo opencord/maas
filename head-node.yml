@@ -1,7 +1,4 @@
 - hosts: all
-  remote_user: ubuntu
   serial: 1
-  vars:
-    ansible_ssh_pass: ubuntu
   roles:
     - head-node

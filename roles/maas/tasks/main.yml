@@ -163,6 +163,7 @@
     - switch_support
 
 - name: Restart MAAS Services
+  become: yes
   service:
     name={{ item }}
     state=restarted
