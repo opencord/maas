@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.yaml.snakeyaml.Yaml
 
 ext {
 
@@ -22,6 +23,9 @@ ext {
     // The tag used to tag the docker images push to the target registry
     targetTag = project.hasProperty('targetTag') ? project.getProperty('targetTag') : 'candidate'
 
+    // Deployment target config file (yaml format); this can be overwritten from the command line
+    // using the -PdeployConfig=<file-path> syntax.
+    deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
 }
 
 task buildBootstrapImage(type: Exec) {
@@ -98,15 +102,66 @@ task publish {
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
 
-// This task will invoke the ansible configuration on the vagrant head node. The ansible deployment is
-// executed remotely to the head node as this is a more realistic scenario for a production deployment.
-// The assumption is that this task is executed from the maasdev virtual machine as it access the head 
-// node virtual box over a private network.
-//
-// TODO: Currently the deployment of the head node does not use the locally built docker containers, it
-//       should be modified to do so. This likely means that we need to configure docker on the head node
-//       to access the docker registry on the maasdev virtual box.
-task deployMaas(type: Exec) {
-  commandLine '/usr/bin/ansible-playbook', '-i', '10.100.198.202,', '--skip-tags=switch_support,interface_config', 'dev-head-node.yml', '--extra-vars=external_iface=eth0 fabric_ip=10.1.1.1/24' 
+List.metaClass.asParam = { prefix, sep ->
+  if (delegate.size() == 0) {
+    ""
+  }
+  String result = "--" + prefix + "="
+  String p = ""
+  delegate.each {
+    result += p + "${it}"
+    p = sep
+  }
+  result
 }
 
+List.metaClass.p = { value, name ->
+  if (value != null && value != "") {
+      delegate << name + "=" + value
+  } else {
+      delegate
+  }
+}
+
+List.metaClass.p = { spec ->
+  if (spec != null && spec != "") {
+      delegate += spec
+  } else {
+      delegate
+  }
+}
+
+task deploy (type: Exec) {
+    println "Using deployment config: $deployConfig"
+    File configFile = new File(deployConfig)
+    def yaml = new Yaml()
+    def config = yaml.load(configFile.newReader())
+
+    executable = "ansible-playbook"
+    args = ["-i", config.seedNode.ip + ',']
+
+    if ( config.seedNode.user != null && config.seedNode.user != "" ) {
+        args = args << "--user=$config.seedNode.user"
+    }
+
+    def extraVars = []
+    if (config.seedNode) {
+        extraVars = extraVars.p(config.seedNode.extraVars)
+            .p(config.seedNode.password, "ansible_ssh_pass")
+            .p(config.seedNode.sudoPassword, "ansible_sudo_pass")
+            .p(config.seedNode.fabric_ip, "fabric_ip")
+	    .p(config.seedNode.management_ip, "management_ip")
+	    .p(config.seedNode.external_ip, "external_ip")
+    }
+
+    if (config.otherServers) {
+        extraVars = extraVars.p(config.otherServers.location, "prov_location")
+        .p(config.otherServers.rolesPath, "prov_role_path")
+        .p(config.otherServers.role, "prov_role")
+    }
+
+    def skipTags = [].p(config.seedNode.skipTags)
+
+    args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
+    println args
+}

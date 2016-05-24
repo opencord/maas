@@ -1,0 +1,36 @@
+# Deployment configuration for a phyical hardware POD
+---
+seedNode:
+  ip: '47.135.132.21'
+  # User name and password used by Ansible to connect to the host for remote
+  # provisioning
+  user: 'ubuntu'
+  password: 'ubuntu'
+
+  # Network address information for the head node:
+  #
+  # fabric_ip     - the IP address and mask bits to be used to configure the network
+  #                 interface connected to the leaf - spine fabric
+  #
+  # management_ip - the IP address and mask bits to be used to configure the network
+  #                 interface connecting the head node to the POD internal
+  #                 management network. The head node will deliver DHCP addresses to 
+  #                 the other compute nodes over this interface
+  #
+  # external_ip   - the IP address and mask bits to be used to configure the network
+  #                 interface connecting the head node (and the POD) to the 
+  #                 Internet. All traffic in the POD to external hosts will be 
+  #                 NAT-ed through this interface
+  fabric_ip: '10.6.1.1/24'
+  management_ip: '10.6.0.1/24'
+  external_ip: '47.135.132.21/24'
+
+otherNodes:
+  # Experimental
+  #
+  # Specifies the subnet and address range that will be used to allocate IP addresses
+  # to the compute nodes as they are deployed into the POD.
+  fabric:
+    network: 10.6.1.1/24
+    range_low: 10.6.1.2
+    range_high: 10.6.1.253

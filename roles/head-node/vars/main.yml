@@ -1,0 +1,9 @@
+provision:
+    # CHANGE:
+    #   'location'   git URL from which to clone a repository that contains the role
+    #                definitions to be used then provisioning a compute node
+    #   'role_path'  directory path within the repo that contains the roles.
+    #   'role'       name of the role to provision for new compute nodes
+    location: "{{ prov_location | default('http://gerrit.opencord.org/maas') }}"
+    role_path: "{{ prov_role_path | default('roles') }}"
+    role: "{{ prov_role | default('compute-node') }}"

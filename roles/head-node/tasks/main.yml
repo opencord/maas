@@ -9,7 +9,7 @@
 - name: Ensure Ansible Compute Config Files
   become: yes
   git:
-    repo=http://gerrit.opencord.org/maas
+    repo={{ provision.location }}
     dest=/tmp/ansible.maas
     clone=yes
     force=yes
@@ -17,20 +17,16 @@
 
 - name: Ensure Ansible Roles Exist
   become: yes
-  command: cp -rf /tmp/ansible.maas/{{ item }} /etc/maas/ansible
-  with_items:
-    - roles
+  command: cp -rf /tmp/ansible.maas/{{ provision.role_path }} /etc/maas/ansible
 
 - name: Ensure Ansible Roles Ownership
   become: yes
-  file: dest=/etc/maas/ansible/{{ item }} owner=maas group=maas recurse=yes
-  with_items:
-    - roles
+  file: dest=/etc/maas/ansible/{{ provision.role_path }} owner=maas group=maas recurse=yes
 
 - name: Ensure Compute Node Playbook
   become: yes
-  copy:
-    src=files/compute-node.yml
+  template:
+    src=files/compute-node.yml.j2
     dest=/etc/maas/ansible/compute-node.yml
     owner=maas
     group=maas
