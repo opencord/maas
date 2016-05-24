@@ -1,7 +1,7 @@
 ---
 - name: Install add-apt-repostory
   become: yes
-  apt: name=software-properties-common state=latest
+  apt: name=software-properties-common state=latest update_cache=yes
 
 - name: Add Oracle Java Repository
   become: yes
