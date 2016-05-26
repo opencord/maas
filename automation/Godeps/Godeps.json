@@ -6,6 +6,11 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/fzzy/radix/redis",
+			"Comment": "v0.5.6-2-g3528e87",
+			"Rev": "3528e87a910c6730810cec1be187f989d7d9442a"
+		},
+		{
 			"ImportPath": "github.com/juju/gomaasapi",
 			"Rev": "e173bc8d8d3304ff11b0ded5f6d4eea0cb560a40"
 		},

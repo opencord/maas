@@ -80,6 +80,27 @@ func (n *MaasNode) Hostname() string {
 	return hn
 }
 
+// IPs get the IP Addresses
+func (n *MaasNode) IPs() []string {
+	ifaceObj, _ := n.GetMap()["interface_set"]
+	ifaces, _ := ifaceObj.GetArray()
+	result := []string{}
+
+	for _, iface := range ifaces {
+		obj, _ := iface.GetMap()
+		linksObj, _ := obj["links"]
+		links, _ := linksObj.GetArray()
+		for _, link := range links {
+			linkObj, _ := link.GetMap()
+			ipObj, _ := linkObj["ip_address"]
+			ip, _ := ipObj.GetString()
+			result = append(result, ip)
+		}
+	}
+
+	return result
+}
+
 // MACs get the MAC Addresses
 func (n *MaasNode) MACs() []string {
 	macsObj, _ := n.GetMap()["macaddress_set"]

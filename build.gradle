@@ -43,7 +43,16 @@ task publishBootstrapImage(type: Exec) {
 }
 
 task buildAutomationImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-automation", "./automation"
+    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
+}
+
+task buildAutomationImageAnsible(type: Exec) {
+    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-automation:ansible", "-f", "./automation/Dockerfile.ansible", "./automation"
+}
+
+task buildAutomationImages {
+    dependsOn buildAutomationImage
+    dependsOn buildAutomationImageAnsible
 }
 
 task tagAutomationImage(type: Exec) {
@@ -51,9 +60,29 @@ task tagAutomationImage(type: Exec) {
     commandLine '/usr/bin/docker', 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
 }
 
+task tagAutomationImageAnsible(type: Exec) {
+    dependsOn buildAutomationImageAnsible
+    commandLine '/usr/bin/docker', 'tag', 'cord-maas-automation:ansible', "$targetReg/cord-maas-automation:$targetTag-ansible"
+}
+
+task tagAutomationImages {
+    dependsOn tagAutomationImage
+    dependsOn tagAutomationImageAnsible
+}
+
 task publishAutomationImage(type: Exec) {
     dependsOn tagAutomationImage
     commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-automation:$targetTag"
+}
+
+task publishAutomationImageAnsible(type: Exec) {
+    dependsOn tagAutomationImageAnsible
+    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-automation:$targetTag-ansible"
+}
+
+task publishAutomationImages {
+    dependsOn publishAutomationImage
+    dependsOn publishAutomationImageAnsible
 }
 
 task buildHarvesterImage(type: Exec) {
@@ -85,19 +114,23 @@ task fetch(type: Exec) {
 task buildImages {
     dependsOn buildBootstrapImage
     dependsOn buildHarvesterImage
-    dependsOn buildAutomationImage
+    dependsOn buildAutomationImages
 }
 
 task tagImages {
     dependsOn tagBootstrapImage
     dependsOn tagHarvesterImage
-    dependsOn tagAutomationImage
+    dependsOn tagAutomationImages
 }
 
 task publish {
     dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
-    dependsOn publishAutomationImage
+    dependsOn publishAutomationImages
+}
+
+task build {
+    dependsOn buildImages
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~

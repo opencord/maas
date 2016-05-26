@@ -26,6 +26,9 @@ const (
            }
 	}`
 	defaultMapping = "{}"
+	PROVISION_URL  = "PROVISION_URL"
+	PROVISION_TTL  = "PROVISION_TTL"
+	DEFAULT_TTL    = "30m"
 )
 
 var apiKey = flag.String("apikey", "", "key with which to access MAAS server")
@@ -92,6 +95,20 @@ func main() {
 		Preview:      *preview,
 		Verbose:      *verbose,
 		AlwaysRename: *always,
+		ProvTracker:  NewTracker(),
+		ProvisionURL: os.Getenv(PROVISION_URL),
+	}
+
+	var ttl string
+	if ttl = os.Getenv(PROVISION_TTL); ttl == "" {
+		ttl = "30m"
+	}
+
+	var err error
+	options.ProvisionTTL, err = time.ParseDuration(ttl)
+	if err != nil {
+		log.Printf("[warn] unable to parse specified duration of '%s', defaulting to '%s'",
+			ttl, DEFAULT_TTL)
 	}
 
 	// Determine the filter, this can either be specified on the the command

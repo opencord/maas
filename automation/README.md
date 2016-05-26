@@ -84,3 +84,43 @@ The state machine on which the MAAS automation is based is depicted below.
 Currently (January 26, 2016) the automation only supports a deployed target
 state and will not act on hosts that are in a failed, broken, or error state.
 ![](lifecycle.png)
+
+### Post Deployment Provisioning
+All the states in the state machine are defined and maintained by
+MAAS except the states Provisioning, ProvisionError, and Provisioned. These
+states are used to track the post-deployment provisioning that is part of the
+automation.
+
+Post deployment provisioning can be accomplished either by the specification of
+a script to execute or the specification of a URL to trigger.
+
+#### Executing a Script
+A script to execute to post deploy provision a node can be specified via the
+environment as `PROVISION_URL`. After a node is deployed this script will be
+executed with three (3) parameters:
+- node ID - the node ID that MAAS uses to track the node
+- name - the name of the node in MAAS
+- ip - the IP address assigned to the node
+
+It is important to note that when executing a script that the script is run
+within the docker container that is running the automation. Thus any script
+must be mounted as a volume into the container.
+
+#### Triggering a URL
+Alternatively the automation can trigger a URL to POST deploy provision a node.
+In this instance, automation will `POST` a `JSON` object to the specified URL
+with the values:
+- "id" - the node ID that MAAS uses to track the node
+- "name" - the name of the node in MAAS
+- "ip" - the IP address assigned to the node
+
+The provider specified should return "202 Accept" to acknowledge the acceptance
+of the request. The automation controller will poll for status on the
+provisioning so the provider should accept the request but not process it
+while the client is blocked.
+
+The automation controller will periodically poll for provisioning status for a
+given node by doing a `HTTP GET` on the specified provisioning URL appended with
+`/` and the `ID` of the node. The provider should either return `202 Accept` if
+the node is still being provisioned, `200 OK` if the provisioning is complete
+and successful, or any other response which will be treated as an error.
