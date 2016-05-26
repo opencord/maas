@@ -1,6 +1,6 @@
 # Deployment configuration for a phyical hardware POD
 ---
-seedNode:
+seedServer:
   ip: '47.135.132.21'
   # User name and password used by Ansible to connect to the host for remote
   # provisioning

@@ -3,7 +3,7 @@
 # This deployment configuration can be utilized with the head node created
 # via `vargrant up headnode` from the gerrit.opencord.org/maas repository.
 ---
-seedNode:
+seedServer:
   ip: '10.100.198.202'
 
   # User name and password used by Ansible to connect to the host for remote

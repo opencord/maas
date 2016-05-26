@@ -171,20 +171,20 @@ task deploy (type: Exec) {
     def config = yaml.load(configFile.newReader())
 
     executable = "ansible-playbook"
-    args = ["-i", config.seedNode.ip + ',']
+    args = ["-i", config.seedServer.ip + ',']
 
-    if ( config.seedNode.user != null && config.seedNode.user != "" ) {
-        args = args << "--user=$config.seedNode.user"
+    if ( config.seedServer.user != null && config.seedServer.user != "" ) {
+        args = args << "--user=$config.seedServer.user"
     }
 
     def extraVars = []
-    if (config.seedNode) {
-        extraVars = extraVars.p(config.seedNode.extraVars)
-            .p(config.seedNode.password, "ansible_ssh_pass")
-            .p(config.seedNode.sudoPassword, "ansible_sudo_pass")
-            .p(config.seedNode.fabric_ip, "fabric_ip")
-	    .p(config.seedNode.management_ip, "management_ip")
-	    .p(config.seedNode.external_ip, "external_ip")
+    if (config.seedServer) {
+        extraVars = extraVars.p(config.seedServer.extraVars)
+            .p(config.seedServer.password, "ansible_ssh_pass")
+            .p(config.seedServer.sudoPassword, "ansible_sudo_pass")
+            .p(config.seedServer.fabric_ip, "fabric_ip")
+	    .p(config.seedServer.management_ip, "management_ip")
+	    .p(config.seedServer.external_ip, "external_ip")
     }
 
     if (config.otherServers) {
@@ -193,7 +193,7 @@ task deploy (type: Exec) {
         .p(config.otherServers.role, "prov_role")
     }
 
-    def skipTags = [].p(config.seedNode.skipTags)
+    def skipTags = [].p(config.seedServer.skipTags)
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
     println args
