@@ -129,10 +129,6 @@ task publish {
     dependsOn publishAutomationImages
 }
 
-task build {
-    dependsOn buildImages
-}
-
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
 
 List.metaClass.asParam = { prefix, sep ->
