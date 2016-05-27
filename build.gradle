@@ -26,28 +26,30 @@ ext {
     // Deployment target config file (yaml format); this can be overwritten from the command line
     // using the -PdeployConfig=<file-path> syntax.
     deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
+
+    dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '$dockerPath'
 }
 
 task buildBootstrapImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
+    commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
 }
 
 task tagBootstrapImage(type: Exec) {
    dependsOn buildBootstrapImage
-   commandLine '/usr/bin/docker', 'tag', 'cord-maas-bootstrap', "$targetReg/cord-maas-bootstrap:$targetTag"
+   commandLine "$dockerPath/docker", 'tag', 'cord-maas-bootstrap', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
 task publishBootstrapImage(type: Exec) {
     dependsOn tagBootstrapImage
-    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
 task buildAutomationImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
+    commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
 }
 
 task buildAutomationImageAnsible(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-automation:ansible", "-f", "./automation/Dockerfile.ansible", "./automation"
+    commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation:ansible", "-f", "./automation/Dockerfile.ansible", "./automation"
 }
 
 task buildAutomationImages {
@@ -57,12 +59,12 @@ task buildAutomationImages {
 
 task tagAutomationImage(type: Exec) {
     dependsOn buildAutomationImage
-    commandLine '/usr/bin/docker', 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "$dockerPath/docker", 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
 }
 
 task tagAutomationImageAnsible(type: Exec) {
     dependsOn buildAutomationImageAnsible
-    commandLine '/usr/bin/docker', 'tag', 'cord-maas-automation:ansible', "$targetReg/cord-maas-automation:$targetTag-ansible"
+    commandLine "$dockerPath/docker", 'tag', 'cord-maas-automation:ansible', "$targetReg/cord-maas-automation:$targetTag-ansible"
 }
 
 task tagAutomationImages {
@@ -72,12 +74,12 @@ task tagAutomationImages {
 
 task publishAutomationImage(type: Exec) {
     dependsOn tagAutomationImage
-    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-automation:$targetTag"
 }
 
 task publishAutomationImageAnsible(type: Exec) {
     dependsOn tagAutomationImageAnsible
-    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-automation:$targetTag-ansible"
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-automation:$targetTag-ansible"
 }
 
 task publishAutomationImages {
@@ -86,17 +88,17 @@ task publishAutomationImages {
 }
 
 task buildHarvesterImage(type: Exec) {
-    commandLine '/usr/bin/docker', 'build', '-t', "cord-maas-dhcp-harvester", "./harvester"
+    commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-dhcp-harvester", "./harvester"
 }
 
 task tagHarvesterImage(type: Exec) {
     dependsOn buildHarvesterImage
-    commandLine '/usr/bin/docker', 'tag', 'cord-maas-dhcp-harvester', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
+    commandLine "$dockerPath/docker", 'tag', 'cord-maas-dhcp-harvester', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
 }
 
 task publishHarvesterImage(type: Exec) {
     dependsOn tagHarvesterImage
-    commandLine '/usr/bin/docker', 'push', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,8 +107,8 @@ task publishHarvesterImage(type: Exec) {
 task fetch(type: Exec) {
     // this is where we fetch upstream artifacts that we do not need internet for the build phase"
     // Placeholdr example:
-    commandLine "/usr/bin/docker", "pull", "golang:alpine"
-    commandLine "/usr/bin/docker", "pull", "python:2.7-alpine"
+    commandLine "$dockerPath/docker", "pull", "golang:alpine"
+    commandLine "$dockerPath/docker", "pull", "python:2.7-alpine"
 }
 
 // To be used to generate all needed binaries that need to be present on the target
@@ -192,5 +194,4 @@ task deploy (type: Exec) {
     def skipTags = [].p(config.seedServer.skipTags)
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
-    println args
 }

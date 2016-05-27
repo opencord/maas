@@ -18,6 +18,11 @@
 			"ImportPath": "gopkg.in/mgo.v2/bson",
 			"Comment": "r2015.12.06-2-g03c9f3e",
 			"Rev": "03c9f3ee4c14c8e51ee521a6a7d0425658dd6f64"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/consul",
+                        "Comment": "v0.6.4-341-g22938ab",
+                        "Rev": "22938ab8b3ca069e490a4897a8ec13308ac61605"
 		}
 	]
 }
