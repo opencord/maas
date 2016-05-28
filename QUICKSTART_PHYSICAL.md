@@ -65,7 +65,7 @@ Ansible commands directly from on the OtP host.*
 To clone the repository select a location on the outside the POD (OtP) host and
 issue the `git` command to download (clone) the repository.
 ```
-$ git clone http://gerrit.opencord.org/maasdev
+$ git clone http://gerrit.opencord.org/maas
 ```
 When this is complete, a listing (`ls`) of this directory should yield output
 similar to:

@@ -62,17 +62,45 @@
     group=root
     mode=0600
 
+- name: Verify Mellanox 40Gb NIC
+  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c ConnectX-3 || true
+  register: mlx_nic_present
+
+- name: Verify Intel 40Gb NIC
+  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c "XL710 for 40GbE QSFP+" || true
+  register: intel_nic_present
+
+- name: Fail install if no known NIC is present
+  when: mlx_nic_present.stdout == "0" and intel_nic_present.stdout == "0"
+  fail: msg="No known NICs are present on this compute node"
+
 - name: Verify i40e Driver
   command: modinfo --field=version i40e
   register: i40e_version
+  when: intel_nic_present.stdout == "1"
   changed_when: False
   failed_when: False
   tags:
     - interface_config
 
+- name: Verify mlx4 Driver
+  command: modinfo --field=version mlx4_core
+  register: mlx4_version
+  when: mlx_nic_present.stdout == "1"
+  changed_when: False
+  failed_when: False
+  tags:
+    - interface_config
+
+- name: Update mlx4 Driver
+  include: tasks/mlx4_driver.yml
+  when: mlx_nic_present.stdout == "1" and mlx4_version.stdout != '3.1-1.0.4'
+  tags:
+    - interface_config
+
 - name: Update i40e Driver
   include: tasks/i40e_driver.yml
-  when: i40e_version.stdout != '1.4.25'
+  when: intel_nic_present.stdout == "1" and i40e_version.stdout != '1.4.25'
   tags:
     - interface_config
 
