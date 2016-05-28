@@ -49,6 +49,9 @@ function guess_type {
     local DRIVER=$(ethtool -i $1 2>/dev/null | grep driver | awk '{print $2}')
     local RESULT="DNC"
     case $DRIVER in
+	mlx4_en)
+            RESULT="MLX4_EN"
+            ;;
         i40e)
             RESULT="I40G"
             ;;
@@ -170,7 +173,7 @@ for i in $IFACES; do
         ETH)
             echo "$(get_mac $i)" >> $LIST_ETH
             ;;
-        I40G)
+        I40G|MLX4_EN)
             echo "$(get_mac $i)" >> $LIST_40G
             ;;
         *) ;;
