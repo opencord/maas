@@ -49,6 +49,9 @@ function guess_type {
     local DRIVER=$(ethtool -i $1 2>/dev/null | grep driver | awk '{print $2}')
     local RESULT="DNC"
     case $DRIVER in
+	mlx4_en)
+            RESULT="MLX4_EN"
+            ;;
         i40e)
             RESULT="I40G"
             ;;
@@ -71,7 +74,7 @@ function generate_persistent_names {
 
     IDX=0
     for i in $(cat $1 | sort); do
-        echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"*\", NAME=\"eth$IDX\"" >> $OUT
+        echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", NAME=\"eth$IDX\"" >> $OUT
         IDX=$(expr $IDX + 1)
     done
 
@@ -170,7 +173,7 @@ for i in $IFACES; do
         ETH)
             echo "$(get_mac $i)" >> $LIST_ETH
             ;;
-        I40G)
+        I40G|MLX4_EN)
             echo "$(get_mac $i)" >> $LIST_40G
             ;;
         *) ;;
