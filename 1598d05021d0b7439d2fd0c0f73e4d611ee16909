@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9af53d3f_bf6177d5",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-05-28T00:24:11Z",
+      "side": 1,
+      "message": "nit: blank space at end",
+      "revId": "1598d05021d0b7439d2fd0c0f73e4d611ee16909",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af53d3f_9f5eb311",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-05-28T00:24:11Z",
+      "side": 1,
+      "message": "same nit",
+      "revId": "1598d05021d0b7439d2fd0c0f73e4d611ee16909",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af53d3f_7f9befc9",
+        "filename": "roles/compute-node/tasks/mlx4_driver.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-05-28T00:24:11Z",
+      "side": 1,
+      "message": "you link blank space",
+      "revId": "1598d05021d0b7439d2fd0c0f73e4d611ee16909",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9af53d3f_5fa02bf4",
+        "filename": "roles/compute-node/tasks/mlx4_driver.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-05-28T00:24:11Z",
+      "side": 1,
+      "message": "it is like littler",
+      "revId": "1598d05021d0b7439d2fd0c0f73e4d611ee16909",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
