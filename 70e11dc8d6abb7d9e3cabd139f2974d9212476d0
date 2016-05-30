@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9af53d3f_7f82cf53",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-05-30T02:31:51Z",
+      "side": 1,
+      "message": "Do you want to leave this debug statement in, or was it for you development purposes?",
+      "range": {
+        "startLine": 73,
+        "startChar": 2,
+        "endLine": 73,
+        "endChar": 7
+      },
+      "revId": "70e11dc8d6abb7d9e3cabd139f2974d9212476d0",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
