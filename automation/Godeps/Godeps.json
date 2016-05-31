@@ -1,6 +1,7 @@
 {
 	"ImportPath": "_/Users/dbainbri/src/develop/mf",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v72",
 	"Packages": [
 		"github.com/ciena/maas-flow"
 	],
@@ -21,8 +22,8 @@
 		},
 		{
 			"ImportPath": "github.com/hashicorp/consul",
-                        "Comment": "v0.6.4-341-g22938ab",
-                        "Rev": "22938ab8b3ca069e490a4897a8ec13308ac61605"
+			"Comment": "v0.6.4-341-g22938ab",
+			"Rev": "22938ab8b3ca069e490a4897a8ec13308ac61605"
 		}
 	]
 }

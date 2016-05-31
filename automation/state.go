@@ -77,7 +77,7 @@ var Transitions = map[string]map[string][]Action{
 const (
 	// defaultStateMachine Would be nice to drive from a graph language
 	defaultStateMachine string = `
-        (New)->(Commissioning)
+	(New)->(Commissioning)
         (Commissioning)->(FailedCommissioning)
         (FailedCommissioning)->(New)
         (Commissioning)->(Ready)
@@ -96,10 +96,16 @@ const (
         (Releasing)->(Ready)
         (DiskErasing)->(Ready)
         (Broken)->(Ready)
-	(Deployed)->(Provisioning)
-	(Provisioning)->(ProvisionError)
-	(ProvisionError)->(Provisioning)
-	(Provisioning)->(Provisioned)`
+        (Deployed)->(Provisioning)
+	(Provisioning)->|a|
+	|a|->(Execute Script)->|b|
+	|a|->(HTTP PUT)
+	(HTTP PUT)->(HTTP GET)
+	(HTTP GET)->(HTTP GET)
+	(HTTP GET)->|b|
+	|b|->(Provisioned)
+	|b|->(ProvisionError)
+        (ProvisionError)->(Provisioning)`
 )
 
 // updateName - changes the name of the MAAS node based on the configuration file
@@ -175,6 +181,11 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 				if len(ips) > 0 {
 					ip = ips[0]
 				}
+				macs := node.MACs()
+				mac := ""
+				if len(macs) > 0 {
+					mac = macs[0]
+				}
 				switch callout.Scheme {
 				// If the scheme is a file, then we will execute the refereced file
 				case "", "file":
@@ -184,7 +195,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 					record.State = Provisioning
 					record.Timestamp = time.Now().Unix()
 					options.ProvTracker.Set(node.ID(), record)
-					err = exec.Command(callout.Path, node.ID(), node.Hostname(), ip).Run()
+					err = exec.Command(callout.Path, node.ID(), node.Hostname(), ip, mac).Run()
 					if err != nil {
 						log.Printf("[error] Failed to execute '%s' : %s", options.ProvisionURL, err)
 					} else {
@@ -204,6 +215,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 						"id":   node.ID(),
 						"name": node.Hostname(),
 						"ip":   ip,
+						"mac":  mac,
 					}
 					hc := http.Client{}
 					var b []byte
