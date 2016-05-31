@@ -27,7 +27,7 @@ ext {
     // using the -PdeployConfig=<file-path> syntax.
     deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
 
-    dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '$dockerPath'
+    dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '/usr/bin'
 }
 
 task buildBootstrapImage(type: Exec) {
@@ -42,6 +42,20 @@ task tagBootstrapImage(type: Exec) {
 task publishBootstrapImage(type: Exec) {
     dependsOn tagBootstrapImage
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
+}
+
+task buildAllocationImage(type: Exec) {
+    commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-ip-allocator', './ip-allocator'
+}
+
+task tagAllocationImage(type: Exec) {
+   dependsOn buildBootstrapImage
+   commandLine "$dockerPath/docker", 'tag', 'cord-maas-ip-allocator', "$targetReg/cord-maas-ip-allocator:$targetTag"
+}
+
+task publishAllocationImage(type: Exec) {
+    dependsOn tagBootstrapImage
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-ip-allocator:$targetTag"
 }
 
 task buildAutomationImage(type: Exec) {
@@ -117,18 +131,21 @@ task buildImages {
     dependsOn buildBootstrapImage
     dependsOn buildHarvesterImage
     dependsOn buildAutomationImages
+    dependsOn buildAllocationImage
 }
 
 task tagImages {
     dependsOn tagBootstrapImage
     dependsOn tagHarvesterImage
     dependsOn tagAutomationImages
+    dependsOn tagAllocationImage
 }
 
 task publish {
     dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
     dependsOn publishAutomationImages
+    dependsOn publishAllocationImage
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
