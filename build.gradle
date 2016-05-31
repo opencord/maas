@@ -45,17 +45,17 @@ task publishBootstrapImage(type: Exec) {
 }
 
 task buildAllocationImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-ip-allocator', './ip-allocator'
+    commandLine "$dockerPath/docker", 'build', '-t', 'cord-ip-allocator', './ip-allocator'
 }
 
 task tagAllocationImage(type: Exec) {
-   dependsOn buildBootstrapImage
-   commandLine "$dockerPath/docker", 'tag', 'cord-maas-ip-allocator', "$targetReg/cord-maas-ip-allocator:$targetTag"
+   dependsOn buildAllocationImage
+   commandLine "$dockerPath/docker", 'tag', 'cord-ip-allocator', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
 task publishAllocationImage(type: Exec) {
-    dependsOn tagBootstrapImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-ip-allocator:$targetTag"
+    dependsOn tagAllocationImage
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
 task buildAutomationImage(type: Exec) {
