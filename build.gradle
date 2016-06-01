@@ -58,6 +58,20 @@ task publishAllocationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
+task buildProvisionerImage(type: Exec) {
+    commandLine "$dockerPath/docker", 'build', '-t', 'cord-provisioner', './ip-allocator'
+}
+
+task tagProvisionerImage(type: Exec) {
+   dependsOn buildProvisionerImage
+   commandLine "$dockerPath/docker", 'tag', 'cord-provisioner', "$targetReg/cord-provisioner:$targetTag"
+}
+
+task publishProvisionerImage(type: Exec) {
+    dependsOn tagProvisionerImage
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-provisioner:$targetTag"
+}
+
 task buildAutomationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
 }
@@ -132,6 +146,7 @@ task buildImages {
     dependsOn buildHarvesterImage
     dependsOn buildAutomationImages
     dependsOn buildAllocationImage
+    dependsOn buildProvisionerImage
 }
 
 task tagImages {
@@ -139,6 +154,7 @@ task tagImages {
     dependsOn tagHarvesterImage
     dependsOn tagAutomationImages
     dependsOn tagAllocationImage
+    dependsOn tagProvisionerImage
 }
 
 task publish {
@@ -146,6 +162,7 @@ task publish {
     dependsOn publishHarvesterImage
     dependsOn publishAutomationImages
     dependsOn publishAllocationImage
+    dependsOn publishProvisionerImage
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
