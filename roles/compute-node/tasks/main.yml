@@ -70,10 +70,6 @@
   shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c "XL710 for 40GbE QSFP+" || true
   register: intel_nic_present
 
-- name: Fail install if no known NIC is present
-  when: mlx_nic_present.stdout == "0" and intel_nic_present.stdout == "0"
-  fail: msg="No known NICs are present on this compute node"
-
 - name: Verify i40e Driver
   command: modinfo --field=version i40e
   register: i40e_version
