@@ -240,11 +240,12 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 									err)
 							} else {
 								defer resp.Body.Close()
-								if resp.StatusCode == 202 {
+								if resp.StatusCode == http.StatusAccepted {
 									record.State = Provisioning
 								} else {
 									record.State = ProvisionError
 								}
+								record.Timestamp = time.Now().Unix()
 								options.ProvTracker.Set(node.ID(), record)
 							}
 						}
@@ -287,16 +288,18 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 						node.Hostname(), err)
 				} else {
 					switch resp.StatusCode {
-					case 200: // OK - provisioning completed
+					case http.StatusOK: // provisioning completed
 						if options.Verbose {
 							log.Printf("[info] Marking node '%s' with ID '%s' as provisioned",
 								node.Hostname(), node.ID())
 						}
 						record.State = Provisioned
 						options.ProvTracker.Set(node.ID(), record)
-					case 202: // Accepted - in the provisioning state
+					case http.StatusAccepted: // in the provisioning state
 						// Noop, presumably alread in this state
 					default: // Consider anything else an erorr
+						log.Printf("[warn] Node '%s' with ID '%s' failed provisioning, will retry",
+							node.Hostname(), node.ID())
 						record.State = ProvisionError
 						options.ProvTracker.Set(node.ID(), record)
 					}

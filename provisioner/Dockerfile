@@ -32,6 +32,9 @@ RUN apt-get update && \
 	apt-get update -y  -m && \
 	apt-get install -y git ansible
 
+RUN mkdir -p /root/.ssh
+COPY ssh-config /root/.ssh/config
+
 RUN go get github.com/tools/godep
 ADD . $GOPATH/src/github.com/ciena/cord-provisioner
 

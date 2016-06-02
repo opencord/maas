@@ -101,5 +101,15 @@ func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	switch s.Status {
+	case Pending, Running:
+		w.WriteHeader(http.StatusAccepted)
+	case Complete:
+		w.WriteHeader(http.StatusOK)
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
 	w.Write(bytes)
 }
