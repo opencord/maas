@@ -59,7 +59,7 @@ task publishAllocationImage(type: Exec) {
 }
 
 task buildProvisionerImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'cord-provisioner', './ip-allocator'
+    commandLine "$dockerPath/docker", 'build', '-t', 'cord-provisioner', './provisioner'
 }
 
 task tagProvisionerImage(type: Exec) {

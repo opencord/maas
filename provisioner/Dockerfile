@@ -41,4 +41,4 @@ RUN $GOPATH/bin/godep restore
 WORKDIR $GOPATH
 RUN go install github.com/ciena/cord-provisioner
 
-ENTRYPOINT ["$GOPATH/bin/cord-provisioner"]
+ENTRYPOINT ["/go/bin/cord-provisioner"]

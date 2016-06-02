@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -48,13 +47,14 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 	var info RequestInfo
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
-	if err := decoder.Decode(&info); err != nil || !c.validateData(&info) {
-		log.Printf("ERROR: %v", err)
+	if err := decoder.Decode(&info); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if !c.validateData(&info) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	log.Printf("GOT: %v", info)
 
 	role, err := c.GetRole(&info)
 	if err != nil {

@@ -35,8 +35,10 @@ func main() {
 	    Listen:          %s
 	    Port:            %d
 	    RoleSelectorURL: %s
-	    DefaultRole:     %s`,
-		context.config.Listen, context.config.Port, context.config.RoleSelectorURL, context.config.DefaultRole)
+	    DefaultRole:     %s
+	    Script:          %s`,
+		context.config.Listen, context.config.Port, context.config.RoleSelectorURL,
+		context.config.DefaultRole, context.config.Script)
 
 	context.storage = NewMemoryStorage()
 
