@@ -33,7 +33,8 @@ func NewWorker(id int, workerQueue chan chan WorkRequest, statusChan chan Status
 		Work:        make(chan WorkRequest),
 		StatusChan:  statusChan,
 		WorkerQueue: workerQueue,
-		QuitChan:    make(chan bool)}
+		QuitChan:    make(chan bool),
+	}
 
 	return worker
 }
@@ -48,6 +49,9 @@ func (w *Worker) Start() {
 			case work := <-w.Work:
 				// Receive a work request.
 				w.StatusChan <- StatusMsg{&work, w.ID, Running, ""}
+				log.Printf("RUN: %s %s %s %s %s %s",
+					work.Script, work.Info.Id, work.Info.Name,
+					work.Info.Ip, work.Info.Mac, work.Role)
 				err := exec.Command(work.Script, work.Info.Id, work.Info.Name,
 					work.Info.Ip, work.Info.Mac, work.Role).Run()
 				if err != nil {
@@ -92,10 +96,11 @@ func NewDispatcher(numWorkers int, storage Storage) *Dispatcher {
 	return &d
 }
 
-func (d *Dispatcher) Dispatch(info *RequestInfo, role string) error {
+func (d *Dispatcher) Dispatch(info *RequestInfo, role string, script string) error {
 	d.WorkQueue <- WorkRequest{
-		Info: info,
-		Role: role,
+		Info:   info,
+		Script: script,
+		Role:   role,
 	}
 	return nil
 }

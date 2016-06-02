@@ -61,7 +61,7 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = c.dispatcher.Dispatch(&info, role)
+	err = c.dispatcher.Dispatch(&info, role, c.config.Script)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
