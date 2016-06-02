@@ -109,6 +109,8 @@ func main() {
 	if err != nil {
 		log.Printf("[warn] unable to parse specified duration of '%s', defaulting to '%s'",
 			ttl, DEFAULT_TTL)
+		options.ProvisionTTL, err = time.ParseDuration("30m")
+		checkError(err, "[error] unable to parse default TTL duration of '30m' : %s", err)
 	}
 
 	// Determine the filter, this can either be specified on the the command
@@ -154,6 +156,19 @@ func main() {
 	// Verify the specified period for queries can be converted into a Go duration
 	period, err := time.ParseDuration(*queryPeriod)
 	checkError(err, "[error] unable to parse specified query period duration: '%s': %s", queryPeriod, err)
+
+	log.Printf(`Configuration:
+	    MAAS URL:            %s
+	    MAAS API Version:    %s
+	    MAAS Query Interval: %s
+	    Node Filtter:        %s
+	    Node Name Mappings:  %s
+	    Preview:             %v
+	    Verbose:             %v
+	    Always Rename:       %v
+	    Provision URL:       %s `,
+		*maasURL, *apiVersion, *queryPeriod, *filterSpec, *mappings, options.Preview,
+		options.Verbose, options.AlwaysRename, options.ProvisionURL)
 
 	authClient, err := maas.NewAuthenticatedClient(*maasURL, *apiKey, *apiVersion)
 	if err != nil {
