@@ -9,10 +9,10 @@ import (
 )
 
 type Config struct {
-	Port         int    `default:"4242"`
-	Listen       string `default:"0.0.0.0"`
-	StartAddress string `default:"10.0.0.2" envconfig:"start_address"`
-	AddressCount uint   `default:"252" envconfig:"address_count"`
+	Port    int    `default:"4242"`
+	Listen  string `default:"0.0.0.0"`
+	Network string `default:"10.0.0.0/24"`
+	Skip    int    `default:"1"`
 }
 
 type Context struct {
@@ -31,11 +31,11 @@ func main() {
 	log.Printf(`Configuration:
 	    Listen:       %s
 	    Port:         %d
-	    StartAddress: %s
-	    AddressCount: %d`, config.Listen, config.Port, config.StartAddress, config.AddressCount)
+	    Network:      %s
+	    SKip:         %d`, config.Listen, config.Port, config.Network, config.Skip)
 
 	context.storage = &MemoryStorage{}
-	context.storage.Init(config.StartAddress, config.AddressCount)
+	context.storage.Init(config.Network, config.Skip)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/allocations/{mac}", context.ReleaseAllocationHandler).Methods("DELETE")

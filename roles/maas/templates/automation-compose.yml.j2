@@ -1,12 +1,28 @@
+allocator:
+  image: opencord/cord-ip-allocator:latest
+  labels:
+    - "lab.solution=CORD"
+    - "lab.component=allocator"
+  environment:
+    # need to explicitly set the resolver, else go will skip the /etc/hosts file
+    - "GODEBUG=netdns=go"
+    - "ALLOCATE_PORT=4242"
+    - "ALLOCATE_LISTEN=0.0.0.0"
+    - "ALLOCATE_NETWORK={{ networks.fabric }}"
+    - "ALLOCATE_SKIP=2"
+
 provisioner:
   image: opencord/cord-provisioner:latest
   container_name: provisioner
   labels:
     - "lab.solution=CORD"
     - "lab.component=provisioner"
+  links:
+    - allocator
   environment:
     # need to explicitly set the resolver, else go will skip the /etc/hosts file
     - "GODEBUG=netdns=go"
+    - "INTERFACE_CONFIG={{ interface_config }}"
     - "PROVISION_PORT=4243"
     - "PROVISION_LISTEN=0.0.0.0"
     - "PROVISION_DEFAULT_ROLE=compute-node"

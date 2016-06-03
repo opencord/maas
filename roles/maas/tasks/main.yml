@@ -282,6 +282,16 @@
     group: root
     mode: 0400
 
+- name: Initialize Interface Configuration Fact
+  set_fact:
+    interface_config: 0
+
+- name: Set Interface Configuration Fact
+  set_fact:
+    interface_config: 1
+  tags:
+    - interface_config
+
 - name: Custom Automation Compose Configurations
   become: yes
   template:

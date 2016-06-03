@@ -1,7 +1,14 @@
 package main
 
+import (
+	"math"
+	"net"
+	"strconv"
+	"strings"
+)
+
 type Storage interface {
-	Init(start string, count uint) error
+	Init(networkIn string, skip int) error
 	Get(mac string) (string, error)
 	GetAll() map[string]string
 	Put(mac, ip string) error
@@ -16,17 +23,38 @@ type MemoryStorage struct {
 	readIdx, writeIdx, size uint
 }
 
-func (s *MemoryStorage) Init(start string, count uint) error {
-	ip, err := ParseIP(start)
+func (s *MemoryStorage) Init(networkIn string, skip int) error {
+	_, network, err := net.ParseCIDR(networkIn)
 	if err != nil {
 		return err
 	}
+	start, _, err := net.ParseCIDR(network.String())
+	if err != nil {
+		return err
+	}
+
+	parts := strings.Split(network.String(), "/")
+	ip, err := ParseIP(start.String())
+	if err != nil {
+		return err
+	}
+	bits, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return err
+	}
+	hostCount := int(math.Pow(2, float64(32-bits))) - skip
 	s.readIdx = 0
 	s.writeIdx = 0
-	s.size = count
+	s.size = uint(hostCount)
 	s.allocated = make(map[string]IPv4)
-	s.available = make([]IPv4, count)
-	for i := uint(0); i < count; i += 1 {
+	s.available = make([]IPv4, hostCount)
+	for i := 0; i < skip; i += 1 {
+		ip, err = ip.Next()
+		if err != nil {
+			return err
+		}
+	}
+	for i := 0; i < hostCount; i += 1 {
 		s.available[i] = ip
 		ip, err = ip.Next()
 		if err != nil {
