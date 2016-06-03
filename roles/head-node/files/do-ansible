@@ -6,6 +6,20 @@ IP=$3
 MAC=$4
 ROLE=$5
 
-echo "PROVISION $ID $HOSTNAME $IP $MAC $ROLE" >> /etc/maas/ansible/logs/$ID.log
+LOG=/etc/maas/ansible/logs/$ID.log
 
-ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml --skip-tags=interface_config >> /etc/maas/ansible/logs/$ID.out
+echo "" >> $LOG
+echo "***** BEGIN *****" >> $LOG
+echo "PROVISION $ID $HOSTNAME $IP $MAC $ROLE" >> $LOG
+
+SKIP_TAGS=
+EXTRA_VARS=
+if [ "$INTERFACE_CONFIG" -eq 1 ]; then
+	FAB_IP=$(curl -s http://allocator:4242/allocations/$MAC | sed -e 's/[{}"]//g' | cut -d, -f2 | cut -d: -f2)
+	EXTRA_VARS="--extra-vars=fabric_ip=$FAB_IP"
+else
+	SKIP_TAGS="--skip-tags=interface_config"
+fi
+
+echo "ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS" >> $LOG
+ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS >> $LOG
