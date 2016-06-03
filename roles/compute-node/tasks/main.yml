@@ -65,10 +65,12 @@
 - name: Verify Mellanox 40Gb NIC
   shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c ConnectX-3 || true
   register: mlx_nic_present
+  changed_when: False
 
 - name: Verify Intel 40Gb NIC
   shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c "XL710 for 40GbE QSFP+" || true
   register: intel_nic_present
+  changed_when: False
 
 - name: Verify i40e Driver
   command: modinfo --field=version i40e

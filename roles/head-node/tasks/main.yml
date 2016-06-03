@@ -23,6 +23,24 @@
   become: yes
   file: dest=/etc/maas/ansible/{{ provision.role_path }} owner=maas group=maas recurse=yes
 
+- name: Ensure Ansible Provisioning Script
+  become: yes
+  copy:
+    dest=/etc/maas/ansible/do-ansible
+    src=files/do-ansible
+    owner=maas
+    group=maas
+    mode=0755
+
+- name: Ensure Provisioning Log Directory
+  become: yes
+  file:
+    path=/etc/maas/ansible/logs
+    state=directory
+    owner=maas
+    group=maas
+    mode=0755
+
 - name: Ensure Compute Node Playbook
   become: yes
   template:

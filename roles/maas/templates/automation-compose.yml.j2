@@ -1,13 +1,32 @@
+provisioner:
+  image: opencord/cord-provisioner:latest
+  container_name: provisioner
+  labels:
+    - "lab.solution=CORD"
+    - "lab.component=provisioner"
+  environment:
+    # need to explicitly set the resolver, else go will skip the /etc/hosts file
+    - "GODEBUG=netdns=go"
+    - "PROVISION_PORT=4243"
+    - "PROVISION_LISTEN=0.0.0.0"
+    - "PROVISION_DEFAULT_ROLE=compute-node"
+    - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
+  volumes:
+    - "/etc/maas/ansible:/etc/maas/ansible"
+
 automation:
-  image: ciena/cord-maas-automation:0.1-prerelease
+  image: opencord/cord-maas-automation:latest
   container_name: automation
   labels:
     - "lab.solution=CORD"
     - "lab.component=automation"
-  restart: always
+  links:
+    - provisioner
   environment:
     # need to explicitly set the resolver, else go will skip the /etc/hosts file
     - "GODEBUG=netdns=go"
+    - "PROVISION_URL=http://provisioner:4243/provision/"
+    - "PROVISION_TTL=30m"
   volumes:
-    - ".:/mappings"
+    - "/etc/maas:/mappings"
   command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]

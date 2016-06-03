@@ -20,14 +20,28 @@
   become: yes
   docker:
     name: automation
-    image: ciena/cord-maas-automation:0.1-prerelease
+    image: opencord/cord-maas-automation:latest
+    state: absent
+
+- name: Stop Provisioner Container
+  become: yes
+  docker:
+    name: provisioner
+    image: opencord/cord-provisioner:latest
     state: absent
 
 - name: Stop DHCP Harvester Container
   become: yes
   docker:
     name: harvester
-    image: ciena/cord-maas-dhcp-harvester:0.1-prerelease
+    image: opencord/cord-dhcp-harvester:latest
+    state: absent
+
+- name: Stop IP Allocator Container
+  become: yes
+  docker:
+    name: allocator
+    image: opencord/cord-ip-allocator:latest
     state: absent
 
 - name: MAAS Repository
@@ -173,11 +187,15 @@
     - maas-clusterd
     - maas-dhcpd
     - bind9
+  tags:
+    - maas_restart
 
 - name: Wait for MAAS to Intialize (start)
   pause:
     seconds=30
   changed_when: false
+  tags:
+    - maas_restart
 
 - name: MAAS Accepting API Requests
   action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
@@ -189,7 +207,7 @@
 
 - name: Configure MAAS
   become: yes
-  command: docker run ciena/cord-maas-bootstrap:0.1-prerelease --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
+  command: docker run opencord/cord-maas-bootstrap:latest --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
   register: maas_config_result
   changed_when: maas_config_result.stdout.find("CHANGED") != -1
   failed_when: "'ERROR' in maas_config_result.stdout"
@@ -243,6 +261,26 @@
 - name: Ensure VirtualBox Power Management
   include: virtualbox.yml
   when: virtualbox_support is defined
+
+- name: Ensure MAAS Ansible Config Directory
+  become: yes
+  file:
+    path=/etc/maas/ansible
+    owner=maas
+    group=maas
+    state=directory
+
+- name: Ensure SSH keys for Ansible
+  become: yes
+  command: cp /home/{{ ansible_user }}/.ssh/id_rsa /etc/maas/ansible/id_rsa
+
+- name: Ensure SSH Key Permissions
+  become: yes
+  file:
+    path: /etc/maas/ansible/id_rsa
+    owner: root
+    group: root
+    mode: 0400
 
 - name: Custom Automation Compose Configurations
   become: yes
