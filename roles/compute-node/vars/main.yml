@@ -2,7 +2,7 @@ pub_ssh_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
 
 compute_node:
     interfaces:
-        fabric: "{{ fabric_iface | default('eth0') }}"
+        fabric: "{{ fabric_iface | default('fabric') }}"
         management: "{{ management_iface | default('eth2') }}"
         external: "{{ external_iface | default('eth3') }}"
     addresses:
