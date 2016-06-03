@@ -9,11 +9,12 @@
 
 - name: Applications
   become: yes
-  apt: name={{ item }} state=latest force=yes 
+  apt: name={{ item }} state=latest force=yes
   with_items:
-    - build-essential 
+    - build-essential
     - git
     - python-pip
+    - ifenslave-2.6
 
 - name: Ensure Docker Ansible Support
   become: yes
@@ -109,6 +110,17 @@
   changed_when: ifaces_changed.stdout.find("true") != -1
   tags:
     - interface_config
+
+- name: Load modules at boot
+  become: yes
+  lineinfile:
+    dest: /etc/modules
+    line: "{{ item }}"
+  with_items:
+   - lp
+   - loop
+   - rtc
+   - bonding
 
 - name: Reboot Required
   become: yes
