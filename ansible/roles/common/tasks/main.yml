@@ -1,3 +1,21 @@
+- name: Ensure SSH Directory
+  file:
+    path: /home/{{ ansible_user }}/.ssh
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0700
+  tags: [common]
+
+- name: Ignore Known Hosts for SSH
+  copy:
+    src: files/ssh-config
+    dest: /home/{{ ansible_user }}/.ssh/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0600
+  tags: [common]
+
 - name: JQ is present
   apt:
     name: jq
