@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7afa4931_5eeef523",
+        "filename": "roles/compute-node/files/rename_ifaces.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-06-07T15:13:13Z",
+      "side": 1,
+      "message": "I am missing something. $1 contains all the 40G interfaces including FAB_IFACE, so doesn\u0027t that mean for FAB_IFACE we are going to get two entries?",
+      "revId": "54cdbb2c124c84a11b936487d42f1a776779ec73",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7afa4931_3ef3290c",
+        "filename": "roles/compute-node/vars/main.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-06-07T15:13:13Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be fabric0 or fab0? or is this set up to have just one interface that is called \"fabric\" and the other 40g interfaces are eth# and bonded?",
+      "revId": "54cdbb2c124c84a11b936487d42f1a776779ec73",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
