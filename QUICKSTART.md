@@ -131,13 +131,22 @@ vagrant up headnode
 Canonical MAAS provides the PXE and other bare metal provisioning services for CORD and will be deployed on the
 head node via `Ansible`. To initiate this deployment issue the following `gradle` command. This `gradle` command
 executes `ansible-playbook -i 10.100.198.202, --skip-tags=switch_support,interface_config --extra-vars=external_iface=eth0`.
+
 The IP address, `10.100.198.202` is the IP address assigned to the head node on a private network. The
 `skip-tags` option excludes Ansible tasks not required when utilizing the Vagrant based head node. The
 `extra-vars` option overrides the default role vars for the external interface and is needed for the VirtualBox
 based environment. Traffic from the compute nodes will be NAT-ed through this interface on the head node.
 
+The default MAAS deployment does not support power management for virtual box based hosts. As part of the MAAS
+installation support was added for power management, but it does require some additional configuration. This
+additional configuration is detailed below, but is mentioned here because when deploying the head node an
+additional parameter must be set. This parameter specified the username on the host machine that should be
+used when SSHing from the head node to the host machine to remotely execute the `vboxmanage` command. This
+is typically the username used when logging into your laptop or desktop development machine. This should
+be specified on the deploy command line using the `-PvboxUser` option.
+
 ```
-./gradlew deployMaas
+./gradlew -PvboxUser=<username> deploy
 ```
 
 This task can take some time so be patient. It should complete without errors, so if an error is encountered
@@ -200,22 +209,18 @@ for the node will be in the MAAS UI at `http://localhost:8888/MAAS/#/nodes`. It 
 hostname made up, in the Canonical way, of a adjective and an noun, such as `popular-feast.cord.lab`. _The 
 name will be different for everyone._ The new node will be in the `New` state.
 
-For _real_ hosts, automation that leverages the MAAS APIs will transition the node from `New` through the
-states of `Commissioning` and `Acquired` to `Deployed`.
+If you have properly configured power management for virtualbox (see below) the host will be automatically
+transitioned from `New` through the start of `Comissioning` and `Acquired` to `Deployed`.
 
-#### Bad News
-For hosts that support IPMI, which includes the hosts recommended for the CORD POD, MAAS will automatically
-discover remote power management information. However, MAAS is not able to detect or manage power for 
-VirtualBox machines.
+#### Virtual Box Power Management
+Virtual box power management is implemented via helper scripts that SSH to the virtual box host and 
+execute `vboxmanage` commands. For this to work The scripts must be configured with a username and host
+to utilize when SSHing and that account must allow SSH from the head node guest to the host using
+SSH keys such that no password entry is required.
 
-A work-a-round has been created to support VirtualBox based VMs. This is accomplished by overriding the
-support script for the `Intel AMT` power support module; but unfortunately it is not fully automated at this
-point.
-
-The work-a-round uses SSH from the MAAS head node to the machine that is running VirtualBox. To enable this,
-assuming that VirtualBox is running on a Linux based system, you can copy the MAAS ssh public key from
-`/var/lib/maas/.ssh/id_rsa.pub` on the head known to your accounts `authorized_keys` files. You can verify
-that this is working by issuing the following commands from your host machine:
+To enable SSH key based login, assuming that VirtualBox is running on a Linux based system, you can copy
+the MAAS ssh public key from `/var/lib/maas/.ssh/id_rsa.pub` on the head known to your accounts `authorized_keys`
+files. You can verify that this is working by issuing the following commands from your host machine:
 ```
 vagrant ssh headnode
 sudo su - maas
@@ -224,53 +229,9 @@ ssh yourusername@host_ip_address
 
 If you are able to accomplish these commands the VirtualBox power management should operate correctly.
 
-To utilize this work-a-round the power management settings must be manual configured on the node. To 
-accomplish this the VirtualBox ID for the compute node must first be discovered. To accomplish this issue
-the following command on the machine on which VirtualBox is running:
-```
-vboxmanage list vms
-```
-
-This will return to a list of all VMs being managed by VirtualBox. In this list will be an entry similar
-to the following for the compute node:
-```
-"maas_computenode_1463279637475_74274" {d18af821-91af-4d20-b3b2-67ed85e23c13}
-```
-
-The important part of this entry is the last 12 characters of the VM ID, `67ed85e23c13` in this example. This
-will be used as a fake MAC address for power management.
-
-To set the power settings for the compute node visit the MAAS UI page for the compute node. From there select
-the `Power type` to `Intel AMT`. This will display the additional fields: `MAC Address`, `Power Password`, and
-`Power Address`. The values of these fields should be set as follows:
-
-   - MAC Address - the previously discovered last 12 characters of the VM ID, formatted like a MAC address,
-                   `67:ed:85:e2:3c:13` from the example above.
-   - Power Password - the user name to use to ssh from the head node to the host on which VirtualBox is 
-                      executing.
-   - Power Address - the IP address of the host on which VirtualBox is executing.
-
-Once this information is saved the automation will eventually start the the compute node should transition
-to `Deployed` state. This will include several reboots and shutdowns of the compute node.
-
 ### Post Deployment Provisioning of the Compute Node
-Once the node is in the `Deployed` state, it can be provisioned for use in a CORD POD. Eventually, this action
-will be automated and triggered when a node moves to the `Deployed` state. Currently, this must be manually 
-invoked. The post deployment provisioning consists of configuring the networking on the node to comply with
-best practices of a CORD POD installation and leverages an Ansible play boot to accomplish the provisioning.
-
-To provision the compute node `ssh` to the head node,  change to the `/etc/maas/ansible` directory, and invoke
-the playbook on the new compute node. To ssh to the head node, you can use `vagrant ssh headnode` from the 
-host system for the virtual machines. Once __on__ the head node the following commands can invoke the
-provisioning of the compute node, __the name of the compute node is an example name, the actual name in the
-deployment can be found in the nodes list of the MAAS UI.__:
-
-```
-cd /etc/maas/ansible
-ansible-playbook -i popular-feast.cord.lab, compute-node.yml --skip-tags=interface_config
-```
-
-_NOTE: the `skip-tags` option is required for the VirtualBox based environment_
+Once the node is in the `Deployed` state, it will be provisioned for use in a CORD POD by the execution of 
+an `Ansible` playbook.
 
 ### Complete
 Once the compute node is in the `Deployed` state and post deployment provisioning on the compute node is
