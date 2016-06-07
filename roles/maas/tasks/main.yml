@@ -292,6 +292,21 @@
   tags:
     - interface_config
 
+- name: Default VirtualBox Host
+  become: no
+  set_fact: 
+    virtualbox_host: "{{ virtualbox.power_helper_host }}"
+  when: virtualbox_support is defined
+  changed_when: false
+
+- name: Override VirtualBox Host
+  become: no
+  set_fact:
+    virtualbox_host: "{{ discovered_vbox_host.stdout }}"
+  when: virtualbox_support is defined and virtualbox_host == ''
+  changed_when: false
+  
+
 - name: Custom Automation Compose Configurations
   become: yes
   template:

@@ -42,8 +42,12 @@ automation:
   environment:
     # need to explicitly set the resolver, else go will skip the /etc/hosts file
     - "GODEBUG=netdns=go"
-    - "PROVISION_URL=http://provisioner:4243/provision/"
-    - "PROVISION_TTL=30m"
+    - "AUTOMATION_PROVISION_URL=http://provisioner:4243/provision/"
+    - "AUTOMATION_PROVISION_TTL=30m"
+    - "AUTOMATION_POWER_HELPER_SCRIPT=/etc/maas/virtualbox/power_discovery"
+    - "AUTOMATION_POWER_HELPER_USER={{ virtualbox.power_helper_user }}"
+    - "AUTOMATION_POWER_HELPER_HOST={{ virtualbox_host }}"
   volumes:
     - "/etc/maas:/mappings"
+    - "/etc/maas/virtualbox:/etc/maas/virtualbox"
   command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]

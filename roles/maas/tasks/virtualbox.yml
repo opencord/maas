@@ -14,7 +14,34 @@
     group: maas
     mode: 0755
 
-- name: Ensure SSH Directory
+- name: Ensure SSH Discovery Directory
+  become: yes
+  file:
+    path: /etc/maas/virtualbox
+    state: directory
+    owner: maas
+    group: maas
+    mode: 0755
+
+- name: VirtualBox Power Discovery Support
+  become: yes
+  copy:
+    src: files/cord_id_rsa
+    dest: /etc/maas/virtualbox/id_rsa
+    owner: root
+    group: root
+    mode: 0600
+
+- name: VirtualBox Power Discovery Script
+  become: yes
+  copy:
+    src: files/power_discovery
+    dest: /etc/maas/virtualbox/power_discovery
+    owner: maas
+    group: maas
+    mode: 0755
+
+- name: Ensure SSH Power Script Directory
   become: yes
   file:
     path: /var/lib/maas/.ssh
@@ -23,7 +50,7 @@
     group: maas
     mode: 0700
 
-- name: VirtualBox SSH Support
+- name: VirtualBox Power Script Support
   become: yes
   copy:
     src: files/{{ item.src }}
@@ -35,4 +62,10 @@
     - { src: cord_id_rsa, dest: id_rsa }
     - { src: cord_id_rsa.pub, dest: id_rsa.pub }
     - { src: ssh_config, dest: config }
+
+- name: Discover VirtualBox Host
+  become: yes
+  shell: netstat -rn | grep "^0.0.0.0 " | cut -d " " -f10
+  register: discovered_vbox_host
+  changed_when: false
 

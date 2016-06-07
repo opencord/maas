@@ -1,0 +1,62 @@
+#!/bin/ash
+
+USERNAME=$1; shift
+HOSTIP=$1; shift
+SSH_KEY="-i /etc/maas/virtualbox/id_rsa"
+
+LIST=$(echo $* | awk '{print toupper($0)}')
+MATCH=
+
+best() {
+	local i
+	local BEST=
+	local BEST_CNT=0
+	for i in $MATCH; do
+		local CNT=$(echo $i | cut -d- -f2)
+		if [ $CNT > $BEST_CNT ]; then
+			BEST=$(echo $i | cut -d- -f1)
+			BEST_CNT=$CNT
+		fi
+	done
+	echo $BEST
+}
+
+inc() {
+	FOUND=$(echo $MATCH | grep "$1" |  wc -l)
+	if [ $FOUND -eq 0 ]; then
+		MATCH="$MATCH $1-1"
+	else
+		NEXT=
+		local i=
+		for  i in $MATCH; do
+			FOUND=$(echo $i | grep "$1" | wc -l)
+			if [ $FOUND -eq 1 ]; then
+				COUNT=$(echo $i | cut -d- -f2)
+				COUNT=$(expr $COUNT + 1)
+				NEXT="$NEXT $1-$COUNT"
+			else
+				NEXT="$NEXT $i"
+			fi
+		done
+		MATCH=$NEXT
+	fi
+}
+
+for i in $(ssh $SSH_KEY $USERNAME@$HOSTIP /usr/local/bin/vboxmanage list vms | awk '{print $NF}' | sed -e 's/[{}]//g'); do
+	for m in $(ssh $SSH_KEY $USERNAME@$HOSTIP /usr/local/bin/vboxmanage showvminfo --machinereadable $i | grep -i macaddress | cut -d= -f2 | sed -e 's/"//g' -e 's/\(..\)/\1:/g' -e 's/:$//g'); do
+		p=$(echo $i | cut -d- -f5)
+		for t in $LIST; do
+			if [ "$t" == "$m" ]; then
+				inc $p
+			fi
+		done
+	done
+done
+
+BEST=$(best)
+if [ "$BEST x" == " x" ]; then
+	echo "{}"
+else
+	MAC=$(echo $BEST | cut -d- -f5 | sed -e 's/"//g' -e 's/\(..\)/\1:/g' -e 's/:$//g')
+        echo "{\"name\":\"amt\",\"mac_address\":\"$MAC\",\"power_password\":\"$USERNAME\",\"power_address\":\"$HOSTIP\"}"
+fi

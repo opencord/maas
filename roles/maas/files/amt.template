@@ -9,11 +9,11 @@ BOOT_MODE={{boot_mode}}
 
 get_uuid () {
     local DATA=$(echo -n "$1" | sed -e 's/://g')
-    echo $(ssh $POWER_PASS@$POWER_ADDRESS vboxmanage list vms | grep "$DATA" | awk '{print $NF}' | sed -e 's/[{}]//g')
+    echo $(ssh $POWER_PASS@$POWER_ADDRESS vboxmanage list vms 2> /tmp/power_err.last | grep "$DATA" | awk '{print $NF}' | sed -e 's/[{}]//g')
 }
 
 query_state () {
-    local state=$(ssh $POWER_PASS@$POWER_ADDRESS vboxmanage showvminfo $1 | grep "^State" | grep -i running | wc -l)
+    local state=$(ssh $POWER_PASS@$POWER_ADDRESS vboxmanage showvminfo $1 2> /tmp/power_err.last | grep "^State" | grep -i running | wc -l)
     if [ $state -eq 1 ]; then
         echo 'on'
     else

@@ -1,6 +1,15 @@
 accton_as5712_54x: 'http://178.33.61.6/putstorage/DownloadFileHash/AA90EC2D3A5A4A5QQWE3332069EWQS/onie-installer-x86_64-accton_as6712_32x-r0'
 accton_as6712_32x: 'http://178.33.61.6/putstorage/DownloadFileHash/AA90EC2D3A5A4A5QQWE3332069EWQS/onie-installer-x86_64-accton_as6712_32x-r0'
 
+virtualbox:
+    # CHANGE:
+    #   'power_helper_user' specifies the user to use when SSHing to the host
+    #                       that is running virtualbox
+    #   'power_helper_host' specifies the IP address of host that is running
+    #                       virtualbox. will be dynamically set if empty string
+    power_helper_user: "{{ power_helper_user | default('cord') }}"
+    power_helper_host: "{{ power_helper_host | default('') }}"
+
 maas:
     admin_email: "{{ admin_email | default('admin@cord.lab') }}"
     user: "{{ maas_user | default('cord') }}"

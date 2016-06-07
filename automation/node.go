@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	maas "github.com/juju/gomaasapi"
+	"net/url"
 )
 
 // MaasNodeStatus MAAS lifecycle status for nodes
@@ -69,9 +71,26 @@ func (n *MaasNode) ID() string {
 	return id
 }
 
+func (n *MaasNode) PowerType() string {
+	ptype, _ := n.GetString("power_type")
+	return ptype
+}
+
 func (n *MaasNode) PowerState() string {
 	state, _ := n.GetString("power_state")
 	return state
+}
+
+func (n *MaasNode) UpdatePowerParameters(ptype string, params map[string]string) {
+	values := url.Values{}
+	values.Add("power_type", ptype)
+	for k, v := range params {
+		values.Add("power_parameters_"+k, v)
+	}
+	_, err := n.Update(values)
+	if err != nil {
+		log.Printf("[error] error updating power settings : %s", err.Error())
+	}
 }
 
 // Hostname get the hostname

@@ -26,6 +26,13 @@ type Transition struct {
 	Using   Action
 }
 
+type Power struct {
+	Name          string `json:"name"`
+	MacAddress    string `json:"mac_address"`
+	PowerPassword string `json:"power_password"`
+	PowerAddress  string `json:"power_address"`
+}
+
 // ProcessingOptions used to determine on what hosts to operate
 type ProcessingOptions struct {
 	Filter struct {
@@ -38,13 +45,16 @@ type ProcessingOptions struct {
 			Exclude []string
 		}
 	}
-	Mappings     map[string]interface{}
-	Verbose      bool
-	Preview      bool
-	AlwaysRename bool
-	ProvTracker  Tracker
-	ProvisionURL string
-	ProvisionTTL time.Duration
+	Mappings        map[string]interface{}
+	Verbose         bool
+	Preview         bool
+	AlwaysRename    bool
+	ProvTracker     Tracker
+	ProvisionURL    string
+	ProvisionTTL    time.Duration
+	PowerHelper     string
+	PowerHelperUser string
+	PowerHelperHost string
 }
 
 // Transitions the actual map
@@ -496,7 +506,40 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 		break
 	default:
 		// We are in a state from which we can't move forward.
-		log.Printf("ERROR: %s has invalid power state '%s'", node.Hostname(), state)
+		log.Printf("[warn]: %s has invalid power state '%s'", node.Hostname(), state)
+
+		// If a power helper script is set, we have an unknown power state, and
+		// we have not power type then attempt to use the helper script to discover
+		// and set the power settings
+		if options.PowerHelper != "" && node.PowerType() == "" {
+			cmd := exec.Command(options.PowerHelper,
+				append([]string{options.PowerHelperUser, options.PowerHelperHost},
+					node.MACs()...)...)
+			stdout, err := cmd.Output()
+			if err != nil {
+				log.Printf("[error] Failed while executing power helper script '%s' : %s",
+					options.PowerHelper, err)
+				return err
+			}
+			power := Power{}
+			err = json.Unmarshal(stdout, &power)
+			if err != nil {
+				log.Printf("[error] Failed to parse output of power helper script '%s' : %s",
+					options.PowerHelper, err)
+				return err
+			}
+			switch power.Name {
+			case "amt":
+				params := map[string]string{
+					"mac_address":   power.MacAddress,
+					"power_pass":    power.PowerPassword,
+					"power_address": power.PowerAddress,
+				}
+				node.UpdatePowerParameters(power.Name, params)
+			default:
+				log.Printf("[warn] Unsupported power type discovered '%s'", power.Name)
+			}
+		}
 		break
 	}
 	return nil
@@ -543,7 +586,8 @@ func ProcessActions(actions []Action, client *maas.MAASObject, node MaasNode, op
 	var err error
 	for _, action := range actions {
 		if err = action(client, node, options); err != nil {
-			log.Printf("[error] Error while processing action for node '%s' : %s", node.Hostname, err)
+			log.Printf("[error] Error while processing action for node '%s' : %s",
+				node.Hostname(), err)
 			break
 		}
 	}

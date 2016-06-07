@@ -24,6 +24,11 @@
 			"ImportPath": "github.com/hashicorp/consul",
 			"Comment": "v0.6.4-341-g22938ab",
 			"Rev": "22938ab8b3ca069e490a4897a8ec13308ac61605"
-		}
+		},
+                {
+                        "ImportPath": "github.com/kelseyhightower/envconfig",
+                        "Comment": "1.1.0-17-g91921eb",
+                        "Rev": "91921eb4cf999321cdbeebdba5a03555800d493b"
+                }
 	]
 }

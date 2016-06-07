@@ -28,6 +28,8 @@ ext {
     deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
 
     dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '/usr/bin'
+
+    vboxUser = project.hasProperty('vboxUser') ? project.getProperty('vboxUser') : 'cord'
 }
 
 task buildBootstrapImage(type: Exec) {
@@ -217,6 +219,10 @@ task deploy (type: Exec) {
             .p(config.seedServer.fabric_ip, "fabric_ip")
 	    .p(config.seedServer.management_ip, "management_ip")
 	    .p(config.seedServer.external_ip, "external_ip")
+    }
+
+    if (vboxUser != "") {
+        extraVars = extraVars.p(vboxUser, "power_helper_user")
     }
 
     if (config.otherServers) {

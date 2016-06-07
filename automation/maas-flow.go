@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"github.com/kelseyhightower/envconfig"
 	"log"
 	"net/url"
 	"os"
@@ -26,10 +27,15 @@ const (
            }
 	}`
 	defaultMapping = "{}"
-	PROVISION_URL  = "PROVISION_URL"
-	PROVISION_TTL  = "PROVISION_TTL"
-	DEFAULT_TTL    = "30m"
 )
+
+type Config struct {
+	PowerHelperUser   string `default:"cord" envconfig:"POWER_HELPER_USER"`
+	PowerHelperHost   string `default:"127.0.0.1" envconfig:"POWER_HELPER_HOST"`
+	PowerHelperScript string `default:"" envconfig:"POWER_HELPER_SCRIPT"`
+	ProvisionUrl      string `default:"" envconfig:"PROVISION_URL"`
+	ProvisionTtl      string `default:"30m" envconfig:"PROVISION_TTL"`
+}
 
 var apiKey = flag.String("apikey", "", "key with which to access MAAS server")
 var maasURL = flag.String("maas", "http://localhost/MAAS", "url over which to access MAAS")
@@ -90,28 +96,23 @@ func fetchNodes(client *maas.MAASObject) ([]MaasNode, error) {
 func main() {
 
 	flag.Parse()
+	config := Config{}
+	err := envconfig.Process("AUTOMATION", &config)
+	checkError(err, "[error] unable to parse environment options : %s", err)
 
 	options := ProcessingOptions{
-		Preview:      *preview,
-		Verbose:      *verbose,
-		AlwaysRename: *always,
-		ProvTracker:  NewTracker(),
-		ProvisionURL: os.Getenv(PROVISION_URL),
+		Preview:         *preview,
+		Verbose:         *verbose,
+		AlwaysRename:    *always,
+		ProvTracker:     NewTracker(),
+		ProvisionURL:    config.ProvisionUrl,
+		PowerHelper:     config.PowerHelperScript,
+		PowerHelperUser: config.PowerHelperUser,
+		PowerHelperHost: config.PowerHelperHost,
 	}
 
-	var ttl string
-	if ttl = os.Getenv(PROVISION_TTL); ttl == "" {
-		ttl = "30m"
-	}
-
-	var err error
-	options.ProvisionTTL, err = time.ParseDuration(ttl)
-	if err != nil {
-		log.Printf("[warn] unable to parse specified duration of '%s', defaulting to '%s'",
-			ttl, DEFAULT_TTL)
-		options.ProvisionTTL, err = time.ParseDuration("30m")
-		checkError(err, "[error] unable to parse default TTL duration of '30m' : %s", err)
-	}
+	options.ProvisionTTL, err = time.ParseDuration(config.ProvisionTtl)
+	checkError(err, "[error] unable to parse specified duration of '%s' : %s", err)
 
 	// Determine the filter, this can either be specified on the the command
 	// line as a value or a file reference. If none is specified the default
@@ -161,14 +162,19 @@ func main() {
 	    MAAS URL:            %s
 	    MAAS API Version:    %s
 	    MAAS Query Interval: %s
-	    Node Filtter:        %s
+	    Node Filter:         %s
 	    Node Name Mappings:  %s
 	    Preview:             %v
 	    Verbose:             %v
 	    Always Rename:       %v
-	    Provision URL:       %s `,
+	    Provision URL:       %s
+	    Provision TTL:       %s
+	    Power Helper:        %s
+	    Power Helper User:   %s
+	    Power Helper Host:   %s`,
 		*maasURL, *apiVersion, *queryPeriod, *filterSpec, *mappings, options.Preview,
-		options.Verbose, options.AlwaysRename, options.ProvisionURL)
+		options.Verbose, options.AlwaysRename, options.ProvisionURL, options.ProvisionTTL,
+		options.PowerHelper, options.PowerHelperUser, options.PowerHelperHost)
 
 	authClient, err := maas.NewAuthenticatedClient(*maasURL, *apiKey, *apiVersion)
 	if err != nil {
