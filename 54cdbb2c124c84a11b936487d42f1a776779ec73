@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7afa4931_9e68fd88",
+        "filename": "roles/compute-node/files/rename_ifaces.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2016-06-08T05:10:21Z",
+      "side": 1,
+      "message": "My understanding is that $1 only contains the real physical interfaces.\n\nTHe output of this is the following:\n\n# The loopback network interface\nauto lo\niface lo inet loopback\n\nauto eth0\niface eth0 inet manual\n    bond-master fabric\n    bond-primary eth0\n    bond-mode active-backup\n    bond-miimon 100\n    bond-slaves none\n\nauto eth1\niface eth1 inet manual\n    bond-master fabric\n    bond-mode active-backup\n    bond-miimon 100\n    bond-slaves none\n\nauto fabric\niface fabric inet static\n  address 192.168.100.1\n  network 192.168.100.0\n  netmask 255.255.255.0\n   bond-mode active-backup\n   bond-miimon 100\n   bond-slaves none\n\nauto eth2\niface eth2 inet dhcp\n\niface eth3 inet manual",
+      "parentUuid": "7afa4931_5eeef523",
+      "revId": "54cdbb2c124c84a11b936487d42f1a776779ec73",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7afa4931_3ef3290c",
         "filename": "roles/compute-node/vars/main.yml",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-06-07T15:13:13Z",
       "side": 1,
       "message": "shouldn\u0027t this be fabric0 or fab0? or is this set up to have just one interface that is called \"fabric\" and the other 40g interfaces are eth# and bonded?",
+      "revId": "54cdbb2c124c84a11b936487d42f1a776779ec73",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7afa4931_7e0531c1",
+        "filename": "roles/compute-node/vars/main.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2016-06-08T05:10:21Z",
+      "side": 1,
+      "message": "Yes we only have one fabric interface and all physical eth interfaces are hiding behind that.",
+      "parentUuid": "7afa4931_3ef3290c",
       "revId": "54cdbb2c124c84a11b936487d42f1a776779ec73",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
