@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "7afa4931_5ed83553",
+        "filename": "roles/compute-node/files/rename_ifaces.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2016-06-09T02:33:11Z",
+      "side": 1,
+      "message": "Yes so I still rename the the fabric interfaces to eth0 and eth1. Which is why i change the udev ATTR{dev_id} to the correct values",
+      "parentUuid": "7afa4931_1e14edf3",
+      "revId": "54cdbb2c124c84a11b936487d42f1a776779ec73",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7afa4931_3ef3290c",
         "filename": "roles/compute-node/vars/main.yml",
         "patchSetId": 4
