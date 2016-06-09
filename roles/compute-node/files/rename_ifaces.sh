@@ -73,10 +73,12 @@ function generate_persistent_names {
     rm -rf $OUT
 
     IDX=0
+    # this will not support more than 10 fabric nics... should be ok. (Famous last words)
     for i in $(cat $1 | sort); do
-        echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"*\", NAME=\"eth$IDX\"" >> $OUT
+        echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", ATTR{dev_id}==\"0x$IDX\", ATTR{type}==\"1\", KERNEL==\"*\", NAME=\"eth$IDX\"" >> $OUT
         IDX=$(expr $IDX + 1)
     done
+
 
     for i in $(cat $2 | sort); do
         echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", NAME=\"eth$IDX\"" >> $OUT
@@ -98,19 +100,29 @@ function generate_interfaces {
 
     IDX=0
     for i in $(cat $1); do
-        if [ "eth$IDX" == "$3" ]; then
-            echo "auto eth$IDX" >> $OUT
-            echo "iface eth$IDX inet static" >> $OUT
-            echo "    address $FAB_IP" >> $OUT
-            echo "    network $FAB_NETWORK" >> $OUT
-            echo "    netmask $FAB_NETMASK" >> $OUT
-            FIRST=0
-        else
-            echo "iface eth$IDX inet manual" >> $OUT
-        fi
+        echo "auto eth$IDX" >> $OUT
+        echo "iface eth$IDX inet manual" >> $OUT
+        echo "    bond-master $3" >> $OUT
+        [ -z $FIRST ] && echo "    bond-primary eth$IDX" >> $OUT
+        # Make bond-mode configurable
+        echo "    bond-mode active-backup" >> $OUT
+        echo "    bond-miimon 100" >> $OUT
+        echo "    bond-slaves none" >> $OUT
+        FIRST="done"
         echo "" >> $OUT
         IDX=$(expr $IDX + 1)
     done
+
+    echo "auto $3" >> $OUT
+    echo "iface $3 inet static" >> $OUT
+    echo "  address $FAB_IP" >> $OUT
+    echo "  network $FAB_NETWORK" >> $OUT
+    echo "  netmask $FAB_NETMASK" >> $OUT
+    # Make bond-mode configurable
+    echo "   bond-mode active-backup" >> $OUT
+    echo "   bond-miimon 100" >> $OUT
+    echo "   bond-slaves none" >> $OUT
+    echo "" >> $OUT
 
     for i in $(cat $2); do
         if [ "eth$IDX" == "$4" ]; then
