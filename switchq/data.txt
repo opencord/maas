@@ -1,0 +1,9 @@
+xos             IN A 172.18.0.100 ; 52:54:00:47:42:21
+leaf-1          IN A 10.6.0.7 ; cc:37:ab:7c:bd:e6
+rabbitmq-server IN A 172.18.0.91 ; 52:54:00:73:da:98
+leaf-2          IN A 10.6.0.10 ; cc:37:ab:7c:ba:58
+sample		IN A 172.42.42.4 ; 52:54:00:1f:10:1f
+3938-128PC      IN A 10.6.0.14 ; 00:25:90:5c:f7:48
+onos-fabric     IN A 172.18.0.102 ; 52:54:00:1f:10:1f
+spine-1         IN A 10.6.0.6 ; cc:37:ab:7c:b7:4c
+spine-2         IN A 10.6.0.8 ; cc:37:ab:7c:bf:6c

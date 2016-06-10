@@ -1,0 +1,12 @@
+{
+	"ImportPath": "gerrit.opencord.org/maas/swtichq",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v72",
+	"Deps": [
+		{
+			"ImportPath": "github.com/kelseyhightower/envconfig",
+			"Comment": "1.1.0-17-g91921eb",
+			"Rev": "91921eb4cf999321cdbeebdba5a03555800d493b"
+		}
+	]
+}
