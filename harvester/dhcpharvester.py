@@ -459,7 +459,7 @@ def harvest(options):
             name = "UNK-" + lease['hardware'].translate(None, ':').upper()
 
         if ifilter != None and name in ifilter or matched(rfilter, name):
-            out.write(format(name, '<'+str(size)) + ' IN A ' + lease['ip_address'] + '\n')
+            out.write(format(name, '<'+str(size)) + ' IN A ' + lease['ip_address'] + ' ; ' + lease['hardware'] +'\n')
     if options.dest != '-':
         out.close()
     return count
