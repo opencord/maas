@@ -158,6 +158,7 @@
   shell: ifconfig {{ interfaces.management }} 2>&1 | grep "inet addr:" | sed -e 's/.*:\([.0-9]*\)[ ]*Bcast.*/\1/g'
   register: mgmt_ip_address
   changed_when: false
+  failed_when: mgmt_ip_address.rc != 0 or mgmt_ip_address.stdout == ""
 
 # Currently the onie image is being stored in **Dropbox** on a personal account, which is not really what we want to
 # have in production, but it works for the time being.
@@ -210,7 +211,7 @@
   command: docker run opencord/cord-maas-bootstrap:latest --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
   register: maas_config_result
   changed_when: maas_config_result.stdout.find("CHANGED") != -1
-  failed_when: "'ERROR' in maas_config_result.stdout"
+  failed_when: "maas_config_result.rc != 0 or 'ERROR' in maas_config_result.stdout"
 
 - name: Custom MAAS Configuration Template
   become: yes
