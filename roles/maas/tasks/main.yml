@@ -230,6 +230,22 @@
     - { src: 'dhcp_harvest.inc', dest: '/etc/maas/templates/dns' }
     - { src: 'zone.template', dest: '/tmp' }
 
+- name: Ensure RNDC Listens
+  become: yes
+  lineinfile: 
+    dest: /etc/bind/maas/named.conf.rndc.maas
+    regexp: 'inet .* port 954'
+    line: '        inet 0.0.0.0 port 954'
+    state: present
+
+- name: Ensure ENDC Allows Trusted
+  become: yes
+  lineinfile:
+    dest: /etc/bind/maas/named.conf.rndc.maas
+    regexp: 'allow { .* } keys { "rndc-maas-key"; };'
+    line: '                allow { trusted; } keys { "rndc-maas-key"; };'
+    state: present
+
 - name: Custom DNS Zone Template
   become: yes
   script: files/update_dns_template.sh {{ networks.management }} {{ maas.domain }}
