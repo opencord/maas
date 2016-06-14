@@ -306,7 +306,6 @@
   when: virtualbox_support is defined and virtualbox_host == ''
   changed_when: false
   
-
 - name: Custom Automation Compose Configurations
   become: yes
   template:
