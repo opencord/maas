@@ -24,7 +24,7 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 # CORD Provisioner Dockerfile
-WORKDIR $GOPATH
+WORKDIR /go
 
 RUN apt-get update && \
 	apt-get install -y  software-properties-common && \
@@ -36,12 +36,12 @@ RUN mkdir -p /root/.ssh
 COPY ssh-config /root/.ssh/config
 
 RUN go get github.com/tools/godep
-ADD . $GOPATH/src/github.com/ciena/cord-provisioner
+ADD . /go/src/gerrit.opencord.org/maas/cord-provisioner
 
-WORKDIR $GOPATH/src/github.com/ciena/cord-provisioner
+WORKDIR /go/src/gerrit.opencord.org/maas/cord-provisioner
 RUN $GOPATH/bin/godep restore
 
 WORKDIR $GOPATH
-RUN go install github.com/ciena/cord-provisioner
+RUN go install gerrit.opencord.org/maas/cord-provisioner
 
 ENTRYPOINT ["/go/bin/cord-provisioner"]

@@ -1,5 +1,5 @@
 allocator:
-  image: opencord/cord-ip-allocator:latest
+  image: "{{ docker.registry }}/cord-ip-allocator:{{ docker.image_version }}"
   container_name: allocator
   labels:
     - "lab.solution=CORD"
@@ -13,7 +13,7 @@ allocator:
     - "ALLOCATE_SKIP=2"
 
 provisioner:
-  image: opencord/cord-provisioner:latest
+  image: "{{ docker.registry }}/cord-provisioner:{{ docker.image_version }}"
   container_name: provisioner
   labels:
     - "lab.solution=CORD"
@@ -31,8 +31,24 @@ provisioner:
   volumes:
     - "/etc/maas/ansible:/etc/maas/ansible"
 
+switchq:
+  image: "{{ docker.registry }}/cord-maas-switchq:{{ docker.image_version }}"
+  container_name: switchq
+  labels:
+    - "lab.solution=CORD"
+    - "lab.component=switchq"
+  links:
+    - provisioner
+  environment:
+    - "SWITCHQ_PROVISION_URL=http://provisioner:4243/provision/"
+    - "SWITCHQ_PROVISION_TTL=0s"
+    - "SWITCHQ_DEFAULT_ROLE=fabric-switch"
+    - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
+  volumnes:
+    - "/etc/bind/maas:/switchq/dhcp"
+
 automation:
-  image: opencord/cord-maas-automation:latest
+  image: "{{ docker.registry }}/cord-maas-automation:{{ docker.image_version }}"
   container_name: automation
   labels:
     - "lab.solution=CORD"

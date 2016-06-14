@@ -1,5 +1,5 @@
 harvester:
-    image: opencord/cord-dhcp-harvester:latest
+    image: "{{ docker.registry }}/cord-dhcp-harvester:{{ docker.image_version }}"
     container_name: harvester
     restart: always
     labels:

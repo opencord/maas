@@ -44,7 +44,7 @@ utilities are:
      via REST interfaces
    - cord-maas-automation - (directory: automation) run on the head node to automate PXE booted servers
      through the MAAS bare metal deployment work flow
-   - cord-maas-dhcp-harvester - (directory: harvester) run on the head node to facilitate CORD / DHCP / DNS
+   - cord-dhcp-harvester - (directory: harvester) run on the head node to facilitate CORD / DHCP / DNS
      integration so that all hosts can be resolved via DNS
 
 ### Build

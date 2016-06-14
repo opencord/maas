@@ -20,10 +20,10 @@ type Worker struct {
 }
 
 type StatusMsg struct {
-	Request *WorkRequest
-	Worker  int
-	Status  TaskStatus
-	Message string
+	Request *WorkRequest `json:"request"`
+	Worker  int          `json:"worker"`
+	Status  TaskStatus   `json:"status"`
+	Message string       `json:"message"`
 }
 
 func NewWorker(id int, workerQueue chan chan WorkRequest, statusChan chan StatusMsg) Worker {
@@ -49,7 +49,7 @@ func (w *Worker) Start() {
 			case work := <-w.Work:
 				// Receive a work request.
 				w.StatusChan <- StatusMsg{&work, w.ID, Running, ""}
-				log.Printf("RUN: %s %s %s %s %s %s",
+				log.Printf("[debug] RUN: %s %s %s %s %s %s",
 					work.Script, work.Info.Id, work.Info.Name,
 					work.Info.Ip, work.Info.Mac, work.Role)
 				err := exec.Command(work.Script, work.Info.Id, work.Info.Name,
@@ -117,12 +117,12 @@ func (d *Dispatcher) Start() {
 		for {
 			select {
 			case work := <-d.WorkQueue:
-				log.Println("Received work requeust")
+				log.Println("[debug] Received work requeust")
 				go func() {
 					d.StatusChan <- StatusMsg{&work, -1, Pending, ""}
 					worker := <-d.WorkerQueue
 
-					log.Println("Dispatching work request")
+					log.Println("[debug] Dispatching work request")
 					worker <- work
 				}()
 			case update := <-d.StatusChan:

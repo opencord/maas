@@ -4,22 +4,33 @@ import (
 	"bufio"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"strings"
 )
 
 type RequestInfo struct {
-	Id   string
-	Name string
-	Ip   string
-	Mac  string
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Ip           string `json:"ip"`
+	Mac          string `json:"mac"`
+	RoleSelector string `json:"role_selector"`
+	Role         string `json:"role"`
+	Script       string `json:"script"`
 }
 
 func (c *Context) GetRole(info *RequestInfo) (string, error) {
-	if c.config.RoleSelectorURL == "" {
+	if info.Role != "" {
+		return info.Role, nil
+	} else if c.config.RoleSelectorURL == "" && info.RoleSelector == "" {
 		return c.config.DefaultRole, nil
 	}
-	r, err := http.Get(c.config.RoleSelectorURL)
+	selector := c.config.RoleSelectorURL
+	if info.RoleSelector != "" {
+		selector = info.RoleSelector
+	}
+
+	r, err := http.Get(selector)
 	if err != nil {
 		return "", err
 	}
@@ -51,6 +62,7 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	if !c.validateData(&info) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -89,6 +101,7 @@ func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	s, err := c.storage.Get(id)
 	if err != nil {
+		log.Printf("[warn] Error while retrieving status for '%s' from strorage : %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -98,6 +111,7 @@ func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	bytes, err := json.Marshal(s)
 	if err != nil {
+		log.Printf("[error] Error while attempting to marshal status for '%s' from storage : %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -105,7 +119,7 @@ func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 	switch s.Status {
 	case Pending, Running:
 		w.WriteHeader(http.StatusAccepted)
-	case Complete:
+	case Failed, Complete:
 		w.WriteHeader(http.StatusOK)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)

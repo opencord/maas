@@ -1,9 +1,5 @@
 package main
 
-import (
-	"log"
-)
-
 type Storage interface {
 	Put(id string, update StatusMsg) error
 	Get(id string) (*StatusMsg, error)
@@ -22,7 +18,6 @@ func NewMemoryStorage() *MemoryStorage {
 
 func (s *MemoryStorage) Put(id string, update StatusMsg) error {
 	s.Data[id] = update
-	log.Printf("%s : %s", id, update.Status.String())
 	return nil
 }
 
@@ -39,6 +34,7 @@ func (s *MemoryStorage) List() ([]StatusMsg, error) {
 	i := 0
 	for _, v := range s.Data {
 		r[i] = v
+		i += 1
 	}
 	return r, nil
 }

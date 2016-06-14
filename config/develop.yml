@@ -36,5 +36,5 @@ otherServers:
   role: 'compute-node'
 
 docker:
-  registry: 'opencord'
-  imageVersion: 'latest'
+  registry: '10.100.198.200:5000/opencord'
+  imageVersion: 'candidate'

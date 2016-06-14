@@ -8,10 +8,5 @@
         "prefix" : "70:72:CF",
         "vendor" : "Edgecore Networks Corportation",
         "provision" : true
-    },
-    {
-        "prefix" : "60:5B:B4",
-        "vendor" : "Fake",
-        "provision" : false
     }
 ]

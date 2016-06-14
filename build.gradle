@@ -32,6 +32,24 @@ ext {
     vboxUser = project.hasProperty('vboxUser') ? project.getProperty('vboxUser') : 'cord'
 }
 
+// Switch Configuration Image
+
+task buildSwitchqImage(type: Exec) {
+    commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-switchq', './switchq'
+}
+
+task tagSwitchqImage(type: Exec) {
+   dependsOn buildSwitchqImage
+   commandLine "$dockerPath/docker", 'tag', 'cord-maas-switchq', "$targetReg/cord-maas-switchq:$targetTag"
+}
+
+task publishSwitchqImage(type: Exec) {
+    dependsOn tagSwitchqImage
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-switchq:$targetTag"
+}
+
+// Bootstrap Image
+
 task buildBootstrapImage(type: Exec) {
     commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
 }
@@ -45,6 +63,8 @@ task publishBootstrapImage(type: Exec) {
     dependsOn tagBootstrapImage
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
+
+// IP Allocator Image
 
 task buildAllocationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'build', '-t', 'cord-ip-allocator', './ip-allocator'
@@ -60,6 +80,8 @@ task publishAllocationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
+// Provisioner Image
+
 task buildProvisionerImage(type: Exec) {
     commandLine "$dockerPath/docker", 'build', '-t', 'cord-provisioner', './provisioner'
 }
@@ -73,6 +95,8 @@ task publishProvisionerImage(type: Exec) {
     dependsOn tagProvisionerImage
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-provisioner:$targetTag"
 }
+
+// Automation Images
 
 task buildAutomationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
@@ -117,18 +141,20 @@ task publishAutomationImages {
     dependsOn publishAutomationImageAnsible
 }
 
+// DHCP Harvester Images
+
 task buildHarvesterImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-dhcp-harvester", "./harvester"
+    commandLine "$dockerPath/docker", 'build', '-t', "cord-dhcp-harvester", "./harvester"
 }
 
 task tagHarvesterImage(type: Exec) {
     dependsOn buildHarvesterImage
-    commandLine "$dockerPath/docker", 'tag', 'cord-maas-dhcp-harvester', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
+    commandLine "$dockerPath/docker", 'tag', 'cord-dhcp-harvester', "$targetReg/cord-dhcp-harvester:$targetTag"
 }
 
 task publishHarvesterImage(type: Exec) {
     dependsOn tagHarvesterImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-dhcp-harvester:$targetTag"
+    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-dhcp-harvester:$targetTag"
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,6 +175,7 @@ task buildImages {
     dependsOn buildAutomationImages
     dependsOn buildAllocationImage
     dependsOn buildProvisionerImage
+    dependsOn buildSwitchqImage
 }
 
 task tagImages {
@@ -157,6 +184,7 @@ task tagImages {
     dependsOn tagAutomationImages
     dependsOn tagAllocationImage
     dependsOn tagProvisionerImage
+    dependsOn tagSwitchqImage
 }
 
 task publish {
@@ -165,6 +193,7 @@ task publish {
     dependsOn publishAutomationImages
     dependsOn publishAllocationImage
     dependsOn publishProvisionerImage
+    dependsOn publishSwitchqImage
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
@@ -229,6 +258,11 @@ task deploy (type: Exec) {
         extraVars = extraVars.p(config.otherServers.location, "prov_location")
         .p(config.otherServers.rolesPath, "prov_role_path")
         .p(config.otherServers.role, "prov_role")
+    }
+
+    if (config.docker) {
+        extraVars = extraVars.p(config.docker.registry, "docker_registry")
+            .p(config.docker.imageVersion, "docker_image_version")
     }
 
     def skipTags = [].p(config.seedServer.skipTags)

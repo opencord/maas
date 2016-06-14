@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/ciena/provisioner",
+	"ImportPath": "gerrit.opencord.org/maas/cord-provisioner",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v72",
 	"Deps": [
@@ -10,8 +10,8 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/mux",
-			"Comment": "v1.1-9-gbd09be0",
-			"Rev": "bd09be08ed4377796d312df0a45314e11b8f5dc1"
+			"Comment": "v1.1-13-g9fa818a",
+			"Rev": "9fa818a44c2bf1396a17f9d5a3c0f6dd39d2ff8e"
 		},
 		{
 			"ImportPath": "github.com/kelseyhightower/envconfig",

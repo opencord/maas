@@ -49,3 +49,7 @@ networks:
     #   'bridge' name of the bride to create that is used when connecting
     #            the VMs created in support of XOS
     bridge_name: "{{ bridge_name | default('mgmtbr') }}"
+
+docker:
+    registry: "{{ docker_registry | default('opencord') }}"
+    image_version: "{{ docker_image_version | default('latest') }}"

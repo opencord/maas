@@ -1,18 +1,27 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/kelseyhightower/envconfig"
 	"log"
+	"net/http"
 	"time"
 )
 
 type Config struct {
-	StorageURL   string `default:"memory:///switchq/vendors.json" envconfig:"storage_url"`
-	AddressURL   string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"address_url"`
-	PollInterval string `default:"1m" envconfig:"poll_interval"`
-	ProvisionTTL string `default:"1h" envconfig:"check_ttl"`
+	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"vendors_url"`
+	StorageURL      string `default:"memory:" envconfig:"storage_url"`
+	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"address_url"`
+	PollInterval    string `default:"1m" envconfig:"poll_interval"`
+	ProvisionTTL    string `default:"1h" envconfig:"provision_ttl"`
+	ProvisionURL    string `default:"" envconfig:"provision_url"`
+	RoleSelectorURL string `default:"" envconfig:"role_selector_url"`
+	DefaultRole     string `default:"fabric-switch" envconfig:"default_role"`
+	Script          string `default:"do-ansible"`
 
+	vendors       Vendors
 	storage       Storage
 	addressSource AddressSource
 	interval      time.Duration
@@ -25,13 +34,98 @@ func checkError(err error, msg string, args ...interface{}) {
 	}
 }
 
-func (c *Config) processRecord(rec AddressRec) error {
-	if c.ttl == 0 {
-		// One provisioning only please
-		return nil
+func (c *Config) provision(rec AddressRec) error {
+	log.Printf("[debug] Verifing that device '%s (%s)' isn't already in a provisioning state",
+		rec.Name, rec.MAC)
+	resp, err := http.Get(c.ProvisionURL + rec.MAC)
+	log.Printf("%s%s", c.ProvisionURL, rec.MAC)
+	if err != nil {
+		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s)' : %s",
+			rec.Name, rec.MAC, err)
+		return err
+	}
+	if resp.StatusCode != 404 && int(resp.StatusCode/100) != 2 {
+		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s)' : %s",
+			rec.Name, rec.MAC, resp.Status)
+		return fmt.Errorf(resp.Status)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 404 {
+		decoder := json.NewDecoder(resp.Body)
+		var raw interface{}
+		err = decoder.Decode(&raw)
+		if err != nil {
+			log.Printf("[error] Unable to unmarshal status response from provisioning service for device '%s (%s)' : %s",
+				rec.Name, rec.MAC, err)
+			return err
+		}
+		status := raw.(map[string]interface{})
+		switch int(status["status"].(float64)) {
+		case 0, 1: // "PENDING", "RUNNING"
+			log.Printf("[info] Device '%s (%s)' is already scheduled to be provisioned",
+				rec.Name, rec.MAC)
+			return nil
+		case 2: // "COMPLETE"
+			// noop
+		case 3: // "FAILED"
+			c.storage.ClearProvisioned(rec.MAC)
+		default:
+			err = fmt.Errorf("unknown provisioning status : %d", status["status"])
+			log.Printf("[error] received unknown provisioning status for device '%s (%s)' : %s",
+				rec.Name, rec.MAC, err)
+			return err
+		}
+	}
+	log.Printf("[info] POSTing to '%s' for provisioning of '%s (%s)'", c.ProvisionURL, rec.Name, rec.MAC)
+	data := map[string]string{
+		"id":   rec.MAC,
+		"name": rec.Name,
+		"ip":   rec.IP,
+		"mac":  rec.MAC,
+	}
+	if c.RoleSelectorURL != "" {
+		data["role_selector"] = c.RoleSelectorURL
+	}
+	if c.DefaultRole != "" {
+		data["role"] = c.DefaultRole
+	}
+	if c.Script != "" {
+		data["script"] = c.Script
 	}
 
-	ok, err := c.storage.Switchq(rec.MAC)
+	hc := http.Client{}
+	var b []byte
+	b, err = json.Marshal(data)
+	if err != nil {
+		log.Printf("[error] Unable to marshal provisioning data : %s", err)
+		return err
+	}
+	req, err := http.NewRequest("POST", c.ProvisionURL, bytes.NewReader(b))
+	if err != nil {
+		log.Printf("[error] Unable to construct POST request to provisioner : %s", err)
+		return err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	resp, err = hc.Do(req)
+	if err != nil {
+		log.Printf("[error] Unable to POST request to provisioner : %s", err)
+		return err
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusAccepted {
+		log.Printf("[error] Provisioning request not accepted by provisioner : %s", resp.Status)
+		return err
+	}
+
+	now := time.Now()
+	c.storage.MarkProvisioned(rec.MAC, &now)
+	return nil
+}
+
+func (c *Config) processRecord(rec AddressRec) error {
+	ok, err := c.vendors.Switchq(rec.MAC)
 	if err != nil {
 		return fmt.Errorf("unable to determine ventor of MAC '%s' (%s)", rec.MAC, err)
 	}
@@ -47,8 +141,16 @@ func (c *Config) processRecord(rec AddressRec) error {
 	if err != nil {
 		return err
 	}
-	if last == nil || time.Since(*last) > c.ttl {
-		log.Printf("[debug] time to provision %s", rec.MAC)
+
+	// If TTL is 0 then we will only provision a switch once.
+	if last == nil || (c.ttl > 0 && time.Since(*last) > c.ttl) {
+		c.provision(rec)
+	} else if c.ttl == 0 {
+		log.Printf("[debug] device '%s' (%s, %s) has completed its one time provisioning, with a TTL set to %s",
+			rec.Name, rec.IP, rec.MAC, c.ProvisionTTL)
+	} else {
+		log.Printf("[debug] device '%s' (%s, %s) has completed provisioning within the specified TTL of %s",
+			rec.Name, rec.IP, rec.MAC, c.ProvisionTTL)
 	}
 	return nil
 }
@@ -58,6 +160,9 @@ func main() {
 	var err error
 	config := Config{}
 	envconfig.Process("SWITCHQ", &config)
+
+	config.vendors, err = NewVendors(config.VendorsURL)
+	checkError(err, "Unable to create known vendors list from specified URL '%s' : %s", config.VendorsURL, err)
 
 	config.storage, err = NewStorage(config.StorageURL)
 	checkError(err, "Unable to create require storage for specified URL '%s' : %s", config.StorageURL, err)
@@ -72,11 +177,17 @@ func main() {
 	checkError(err, "Unable to parse specified provision TTL value of '%s' : %s", config.ProvisionTTL, err)
 
 	log.Printf(`Configuration:
-		Storage URL:    %s
-		Poll Interval:  %s
-		Address Source: %s
-		Provision TTL:  %s`,
-		config.StorageURL, config.PollInterval, config.AddressURL, config.ProvisionTTL)
+		Vendors URL:       %s
+		Storage URL:       %s
+		Poll Interval:     %s
+		Address Source:    %s
+		Provision TTL:     %s
+		Provision URL:     %s
+		Role Selector URL: %s
+		Default Role:      %s
+		Script:            %s`,
+		config.VendorsURL, config.StorageURL, config.PollInterval, config.AddressURL, config.ProvisionTTL,
+		config.ProvisionURL, config.RoleSelectorURL, config.DefaultRole, config.Script)
 
 	// We use two methods to attempt to find the MAC (hardware) address associated with an IP. The first
 	// is to look in the table. The second is to send an ARP packet.
