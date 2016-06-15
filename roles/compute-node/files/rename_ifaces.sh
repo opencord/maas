@@ -55,7 +55,7 @@ function guess_type {
         i40e)
             RESULT="I40G"
             ;;
-        igb|e1000)
+        igb|e1000|bnx2)
             RESULT="ETH"
             ;;
         *) ;;
@@ -79,7 +79,6 @@ function generate_persistent_names {
         IDX=$(expr $IDX + 1)
     done
 
-
     for i in $(cat $2 | sort); do
         echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$i\", NAME=\"eth$IDX\"" >> $OUT
         IDX=$(expr $IDX + 1)
@@ -99,6 +98,7 @@ function generate_interfaces {
     echo "" >> $OUT
 
     IDX=0
+    local CNT40=$(cat $1 | wc -w)
     for i in $(cat $1); do
         echo "auto eth$IDX" >> $OUT
         echo "iface eth$IDX inet manual" >> $OUT
@@ -109,17 +109,20 @@ function generate_interfaces {
         IDX=$(expr $IDX + 1)
     done
 
-    echo "auto $3" >> $OUT
-    echo "iface $3 inet static" >> $OUT
-    echo "  address $FAB_IP" >> $OUT
-    echo "  network $FAB_NETWORK" >> $OUT
-    echo "  netmask $FAB_NETMASK" >> $OUT
-    # Make bond-mode configurable
-    echo "  bond-mode active-backup" >> $OUT
-    echo "  bond-miimon 100" >> $OUT
-    echo "  bond-slaves none" >> $OUT
-    echo "" >> $OUT
+    if [ $CNT40 -ne 0 ]; then
+      echo "auto $3" >> $OUT
+      echo "iface $3 inet static" >> $OUT
+      echo "  address $FAB_IP" >> $OUT
+      echo "  network $FAB_NETWORK" >> $OUT
+      echo "  netmask $FAB_NETMASK" >> $OUT
+      # Make bond-mode configurable
+      echo "  bond-mode active-backup" >> $OUT
+      echo "  bond-miimon 100" >> $OUT
+      echo "  bond-slaves none" >> $OUT
+      echo "" >> $OUT
+    fi
 
+    local GRAB_FIRST=1
     for i in $(cat $2); do
         if [ "eth$IDX" == "$4" ]; then
             if [ "$EXT_IP" == "dhcp" ]; then
@@ -138,9 +141,10 @@ function generate_interfaces {
 		echo "    dns-nameservers 8.8.8.8 8.8.4.4" >> $OUT
 		echo "    dns-search cord.lab" >> $OUT
             fi
-        elif [ "eth$IDX" == "$5" ]; then
+        elif [ $GRAB_FIRST -eq 1 ]; then
             echo "auto eth$IDX" >> $OUT
             echo "iface eth$IDX inet dhcp" >> $OUT
+            GRAB_FIRST=0
         else
             echo "iface eth$IDX inet manual" >> $OUT
         fi
