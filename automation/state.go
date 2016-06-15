@@ -341,7 +341,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 			}
 		}
 	} else if options.Verbose {
-		log.Printf("[info] Not invoking provisioning for '%s', currned state is '%s'", node.Hostname(),
+		log.Printf("[info] Not invoking provisioning for '%s', current state is '%s'", node.Hostname(),
 			record.State.String())
 	}
 
