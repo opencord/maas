@@ -53,6 +53,7 @@
   with_items:
     - id_rsa
     - id_rsa.pub
+    - config
 
 - name: Ensure CORD SUDO
   become: yes
