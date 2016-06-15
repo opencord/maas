@@ -104,10 +104,6 @@ function generate_interfaces {
         echo "iface eth$IDX inet manual" >> $OUT
         echo "    bond-master $3" >> $OUT
         [ -z $FIRST ] && echo "    bond-primary eth$IDX" >> $OUT
-        # Make bond-mode configurable
-        echo "    bond-mode active-backup" >> $OUT
-        echo "    bond-miimon 100" >> $OUT
-        echo "    bond-slaves none" >> $OUT
         FIRST="done"
         echo "" >> $OUT
         IDX=$(expr $IDX + 1)
@@ -119,9 +115,9 @@ function generate_interfaces {
     echo "  network $FAB_NETWORK" >> $OUT
     echo "  netmask $FAB_NETMASK" >> $OUT
     # Make bond-mode configurable
-    echo "   bond-mode active-backup" >> $OUT
-    echo "   bond-miimon 100" >> $OUT
-    echo "   bond-slaves none" >> $OUT
+    echo "  bond-mode active-backup" >> $OUT
+    echo "  bond-miimon 100" >> $OUT
+    echo "  bond-slaves none" >> $OUT
     echo "" >> $OUT
 
     for i in $(cat $2); do
