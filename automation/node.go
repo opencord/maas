@@ -113,7 +113,9 @@ func (n *MaasNode) IPs() []string {
 			linkObj, _ := link.GetMap()
 			ipObj, _ := linkObj["ip_address"]
 			ip, _ := ipObj.GetString()
-			result = append(result, ip)
+			if ip != "" {
+				result = append(result, ip)
+			}
 		}
 	}
 
