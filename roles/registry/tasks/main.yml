@@ -1,0 +1,33 @@
+- name: Directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+  with_items:
+    - /data/registry-mirror/conf
+  tags: [registry]
+
+- name: Configuration is copied
+  copy:
+    src: mirror-config.yml
+    dest: /data/registry-mirror/conf/config.yml
+  tags: [registry]
+
+- name: Local Docker Registry
+  become: yes
+  template:
+    src: templates/{{ item }}.j2
+    dest: /etc/maas/{{ item }}
+    owner: maas
+    group: maas
+    mode: 0644
+  with_items:
+    - registry-compose.yml
+  tags: [registry]
+
+- name: Ensure Local Registry Running
+  become: yes
+  command: docker-compose -f /etc/maas/{{ item }} up -d
+  with_items:
+    - registry-compose.yml
+  tags: [registry]
