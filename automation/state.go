@@ -297,14 +297,38 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 					log.Printf("[error] Failed to quest provision state for node '%s' : %s",
 						node.Hostname(), err)
 				} else {
+					defer resp.Body.Close()
 					switch resp.StatusCode {
-					case http.StatusOK: // provisioning completed
-						if options.Verbose {
-							log.Printf("[info] Marking node '%s' with ID '%s' as provisioned",
-								node.Hostname(), node.ID())
+					case http.StatusOK: // provisioning completed or failed
+						decoder := json.NewDecoder(resp.Body)
+						var raw interface{}
+						err = decoder.Decode(&raw)
+						if err != nil {
+							log.Printf("[error] Unable to unmarshal response from provisioner for '%s': %s",
+								node.Hostname(), err)
 						}
-						record.State = Provisioned
-						options.ProvTracker.Set(node.ID(), record)
+						status := raw.(map[string]interface{})
+						switch int(status["status"].(float64)) {
+						case 0, 1: // PENDING, RUNNING ... should never really get here
+							// noop, already in this state
+						case 2: // COMPLETE
+							if options.Verbose {
+								log.Printf("[info] Marking node '%s' with ID '%s' as provisioned",
+									node.Hostname(), node.ID())
+							}
+							record.State = Provisioned
+							options.ProvTracker.Set(node.ID(), record)
+						case 3: // FAILED
+							if options.Verbose {
+								log.Printf("[info] Marking node '%s' with ID '%s' as failed provisioning",
+									node.Hostname(), node.ID())
+							}
+							record.State = ProvisionError
+							options.ProvTracker.Set(node.ID(), record)
+						default:
+							log.Printf("[error] unknown status state for node '%s' : %d",
+								node.Hostname(), int(status["status"].(float64)))
+						}
 					case http.StatusAccepted: // in the provisioning state
 						// Noop, presumably alread in this state
 					default: // Consider anything else an erorr
