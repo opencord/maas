@@ -1,0 +1,18 @@
+registry:
+  image: registry:2.4.0
+  container_name: registry
+  volumes:
+   - /docker-registry/registry:/var/lib/registry/docker/registry
+   - /docker-registry/conf:/conf
+  ports:
+    - "5000:5000"
+
+registry-mirror:
+  image: registry:2.4.0
+  container_name: registry-mirror
+  volumes:
+   - /docker-registry-mirror/registry:/var/lib/registry/docker/registry
+   - /docker-registry-mirror/conf:/conf
+  command: serve /conf/config.yml
+  ports:
+    - "5001:5000"
