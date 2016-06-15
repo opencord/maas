@@ -2,3 +2,4 @@
   serial: 1
   roles:
     - head-node
+    - registry
