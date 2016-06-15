@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: ON.Lab
+  description: Services required to bare metal boot CORD POD
+  company: Open Networking Laboratory
+  license: Apache 2.0
+  min_ansible_version: 2.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+  galaxy_tags:
+    - cord
+dependencies:
+  - { role : docker }
