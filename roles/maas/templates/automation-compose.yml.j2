@@ -71,3 +71,4 @@ automation:
     - "/etc/maas/virtualbox:/etc/maas/virtualbox"
 {% endif %}
   command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]
+
