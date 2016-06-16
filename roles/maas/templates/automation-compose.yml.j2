@@ -23,7 +23,7 @@ provisioner:
   environment:
     # need to explicitly set the resolver, else go will skip the /etc/hosts file
     - "GODEBUG=netdns=go"
-    - "INTERFACE_CONFIG={{ interface_config }}"
+    - "INTERFACE_CONFIG=1"
     - "PROVISION_PORT=4243"
     - "PROVISION_LISTEN=0.0.0.0"
     - "PROVISION_DEFAULT_ROLE=compute-node"
