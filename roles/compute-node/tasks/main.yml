@@ -16,6 +16,21 @@
     - python-pip
     - ifenslave-2.6
 
+- name: Ensure Docker Insecure Repository
+  become: yes
+  lineinfile:
+    dest: /etc/default/docker
+    line: 'DOCKER_OPTS="$DOCKER_OPTS --insecure-registry docker-registry:5000"'
+    insertafter: '^DOCKER_OPTS'
+  register: docker_config
+
+- name: Docker Restart
+  become: yes
+  service:
+    name=docker
+    state=restarted
+  when: docker_config.changed
+
 - name: Ensure Docker Ansible Support
   become: yes
   pip:
