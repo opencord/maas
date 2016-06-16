@@ -57,6 +57,7 @@ cat <<EOT >> $OUT
 {{if domain == '$DOMAIN'}}
 \$INCLUDE "/etc/bind/maas/dhcp_harvest.inc"
 $HOSTNAME IN A $LHOST
+docker-registry CNAME $HOSTNAME
 {{endif}}
 EOT
 
