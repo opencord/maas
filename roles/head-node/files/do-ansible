@@ -15,7 +15,7 @@ echo "PROVISION $ID $HOSTNAME $IP $MAC $ROLE" >> $LOG
 SKIP_TAGS=
 EXTRA_VARS=
 if [ "$INTERFACE_CONFIG" -eq 1 ]; then
-	FAB_IP=$(curl -s http://allocator:4242/allocations/$MAC | sed -e 's/[{}"]//g' | cut -d, -f2 | cut -d: -f2)
+	FAB_IP="$(curl -s http://allocator:4242/allocations/$MAC | sed -e 's/[{}"]//g' | cut -d, -f2 | cut -d: -f2)/24"
 	EXTRA_VARS="--extra-vars=fabric_ip=$FAB_IP"
 else
 	SKIP_TAGS="--skip-tags=interface_config"
