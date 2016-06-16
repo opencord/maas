@@ -59,22 +59,26 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 	if err := decoder.Decode(&info); err != nil {
+		log.Printf("[error] Unable to decode request to provision : %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if !c.validateData(&info) {
+		log.Printf("[errpr] Provisioning request not valid for '%s'", info.Name)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	role, err := c.GetRole(&info)
 	if err != nil {
+		log.Printf("[error] unable to get provisioning role for node '%s' : %s", info.Name, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	err = c.dispatcher.Dispatch(&info, role, c.config.Script)
 	if err != nil {
+		log.Printf("[errpr] unable to dispatch provisioning request for node '%s' : %s", info.Name, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -169,12 +169,12 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 	}
 
 	record, err := options.ProvTracker.Get(node.ID())
-	if options.Verbose {
-		log.Printf("[info] Current state of node '%s' is '%s'", node.Hostname(), record.State.String())
-	}
 	if err != nil {
 		log.Printf("[warn] unable to retrieve provisioning state of node '%s' : %s", node.Hostname(), err)
 	} else if record.State == Unprovisioned || record.State == ProvisionError {
+		if options.Verbose {
+			log.Printf("[info] Current state of node '%s' is '%s'", node.Hostname(), record.State.String())
+		}
 		var err error = nil
 		var callout *url.URL
 		log.Printf("PROVISION '%s'", node.Hostname())
@@ -298,6 +298,9 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 						node.Hostname(), err)
 				} else {
 					defer resp.Body.Close()
+					if options.Verbose {
+						log.Printf("[debug] Got status '%s' for node '%s'", resp.Status, node.Hostname())
+					}
 					switch resp.StatusCode {
 					case http.StatusOK: // provisioning completed or failed
 						decoder := json.NewDecoder(resp.Body)
@@ -331,6 +334,8 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 						}
 					case http.StatusAccepted: // in the provisioning state
 						// Noop, presumably alread in this state
+					case http.StatusNotFound:
+						// Noop, but not an error
 					default: // Consider anything else an erorr
 						log.Printf("[warn] Node '%s' with ID '%s' failed provisioning, will retry",
 							node.Hostname(), node.ID())
