@@ -11,6 +11,7 @@ allocator:
     - "ALLOCATE_LISTEN=0.0.0.0"
     - "ALLOCATE_NETWORK={{ networks.fabric }}"
     - "ALLOCATE_SKIP=2"
+  restart: unless-stopped
 
 provisioner:
   image: "{{ docker.registry }}/cord-provisioner:{{ docker.image_version }}"
@@ -30,6 +31,7 @@ provisioner:
     - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
   volumes:
     - "/etc/maas/ansible:/etc/maas/ansible"
+  restart: unless-stopped
 
 switchq:
   image: "{{ docker.registry }}/cord-maas-switchq:{{ docker.image_version }}"
@@ -46,6 +48,7 @@ switchq:
     - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
   volumes:
     - "/etc/bind/maas:/switchq/dhcp"
+  restart: unless-stopped
 
 automation:
   image: "{{ docker.registry }}/cord-maas-automation:{{ docker.image_version }}"
@@ -71,4 +74,5 @@ automation:
     - "/etc/maas/virtualbox:/etc/maas/virtualbox"
 {% endif %}
   command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]
+  restart: unless-stopped
 
