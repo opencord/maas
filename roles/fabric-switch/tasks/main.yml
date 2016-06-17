@@ -16,6 +16,9 @@
   include: ofdpa.yml
   when: ofdpa_version.stdout.find('version I.12.1.1+1.1') == -1
 
+- name: Run Indigo
+  include: indigo.yml
+
 - name: Utilities Scripts
   template:
     src: files/{{ item }}
