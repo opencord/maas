@@ -38,8 +38,8 @@
   template:
     src: templates/{{ item }}.j2
     dest: /etc/maas/{{ item }}
-    owner: maas
-    group: maas
+    owner: root
+    group: root
     mode: 0644
   with_items:
     - registry-compose.yml
