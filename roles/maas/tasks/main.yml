@@ -16,6 +16,13 @@
   with_items:
     - docker-py
 
+- name: Stop MAAS Switchq Container
+  become: yes
+  docker:
+    name: switchq
+    image: opencord/cord-maas-switchq:latest
+    state: absent
+
 - name: Stop MAAS Automation Container
   become: yes
   docker:
@@ -128,7 +135,7 @@
     group: root
     mode: 0755
 
-- name: Activate Masquerading (NAT)
+- name: Ensure Masquerading (NAT)
   become: yes
   command: /etc/network/if-pre-up.d/nat report-changed
   register: masq_changed
@@ -270,9 +277,16 @@
     line: 'search cord.lab'
   register: ns_search
 
-- name: Ensure DNS
+- name: Ensure DNS Config
   become: yes
   command: resolvconf -u
+  when: ns_nameserver.changed or ns_search.changed
+
+- name: Ensure DNS
+  become: yes
+  service:
+    name=bind9
+    state=restarted
   when: ns_nameserver.changed or ns_search.changed
 
 - name: Ensure VirtualBox Power Management
