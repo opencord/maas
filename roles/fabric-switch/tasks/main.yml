@@ -1,20 +1,28 @@
 ---
-- name: Verify controller_ip Set
-  fail: msg="Please set variable 'controller_ip'. This can be set via a variable file or via the command line using the '--extra-vars' option."
-  when: controller_ip is not defined
+- name: Generate DPID
+  shell: ifconfig ma1 | grep HWaddr | awk '{ print "0x0000"$5 }' | sed s/://g
+  register: dpid
+  changed_when: false
 
-- name: Verify switch_id Set
-  fail: msg="Please set variable 'switch_id'. This can be set via a host specific variable file or via the command line using the '--extra-vars' option."
-  when: switch_id is not defined
+- name: Ensure ofdpa Config
+  set_fact:
+    switch_id: "{{ dpid.stdout }}"
+    controller_ip: "onos-fabric"
+
+- name: Verify Openflow Agent
+  shell: which ofdpa | wc -w
+  register: ofdpa_exists
+  changed_when: false
 
 - name: Openflow Agent Version
   shell: ofdpa --version
   register: ofdpa_version
   changed_when: false
+  when: ofdpa_exists.stdout != "0"
 
 - name: Version I.12.1.1+1.1 Openflow Agent
   include: ofdpa.yml
-  when: ofdpa_version.stdout.find('version I.12.1.1+1.1') == -1
+  when: ofdpa_exists.stdout == "0" or ofdpa_version.stdout.find('version I.12.1.1+1.1') == -1
 
 - name: Utilities Scripts
   template:

@@ -1,5 +1,5 @@
 allocator:
-  image: "{{ docker.registry }}/cord-ip-allocator:{{ docker.image_version }}"
+  image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
   container_name: allocator
   labels:
     - "lab.solution=CORD"
@@ -13,7 +13,7 @@ allocator:
     - "ALLOCATE_SKIP=2"
 
 provisioner:
-  image: "{{ docker.registry }}/cord-provisioner:{{ docker.image_version }}"
+  image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}"
   container_name: provisioner
   labels:
     - "lab.solution=CORD"
@@ -32,7 +32,7 @@ provisioner:
     - "/etc/maas/ansible:/etc/maas/ansible"
 
 switchq:
-  image: "{{ docker.registry }}/cord-maas-switchq:{{ docker.image_version }}"
+  image: "docker-registry:5000/cord-maas-switchq:{{ docker.image_version }}"
   container_name: switchq
   labels:
     - "lab.solution=CORD"
@@ -48,7 +48,7 @@ switchq:
     - "/etc/bind/maas:/switchq/dhcp"
 
 automation:
-  image: "{{ docker.registry }}/cord-maas-automation:{{ docker.image_version }}"
+  image: "docker-registry:5000/cord-maas-automation:{{ docker.image_version }}"
   container_name: automation
   labels:
     - "lab.solution=CORD"

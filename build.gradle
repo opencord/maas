@@ -227,6 +227,57 @@ List.metaClass.p = { spec ->
   }
 }
 
+task prime (type: Exec) {
+    println "Using deployment config: $deployConfig"
+    File configFile = new File(deployConfig)
+    def yaml = new Yaml()
+    def config = yaml.load(configFile.newReader())
+
+    executable = "ansible-playbook"
+    args = ["-i", config.seedServer.ip + ',']
+
+    if ( config.seedServer.user != null && config.seedServer.user != "" ) {
+        args = args << "--user=$config.seedServer.user"
+    }
+
+    def extraVars = []
+    if (config.seedServer) {
+        extraVars = extraVars.p(config.seedServer.extraVars)
+            .p(config.seedServer.password, "ansible_ssh_pass")
+            .p(config.seedServer.sudoPassword, "ansible_sudo_pass")
+            .p(config.seedServer.fabric_ip, "fabric_ip")
+            .p(config.seedServer.management_ip, "management_ip")
+            .p(config.seedServer.management_network, "management_network")
+            .p(config.seedServer.management_iface, "management_iface")
+            .p(config.seedServer.external_ip, "external_ip")
+            .p(config.seedServer.external_network, "external_network")
+            .p(config.seedServer.external_iface, "external_iface")
+            .p(config.seedServer.fabric_ip, "fabric_ip")
+            .p(config.seedServer.fabric_network, "fabric_network")
+            .p(config.seedServer.fabric_iface, "fabric_iface")
+            .p(config.seedServer.domain, "domain")
+    }
+
+    if (vboxUser != "") {
+        extraVars = extraVars.p(vboxUser, "power_helper_user")
+    }
+
+    if (config.otherServers) {
+        extraVars = extraVars.p(config.otherServers.location, "prov_location")
+        .p(config.otherServers.rolesPath, "prov_role_path")
+        .p(config.otherServers.role, "prov_role")
+    }
+
+    if (config.docker) {
+        extraVars = extraVars.p(config.docker.registry, "docker_registry")
+            .p(config.docker.imageVersion, "docker_image_version")
+    }
+
+    def skipTags = [].p(config.seedServer.skipTags)
+
+    args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "prime-node.yml"
+}
+
 task deploy (type: Exec) {
     println "Using deployment config: $deployConfig"
     File configFile = new File(deployConfig)

@@ -10,8 +10,15 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+IP=$(ping -c 1 {{ controller_ip }} 2>/dev/null | grep PING | awk '{print $3}' | sed -e 's/[\(\)]//g')
+while [ "$IP x" == " x" ]; do
+  echo "Waiting for controller to resolve ({{ controller_ip }}) ... sleeping 5s and will try again ..."
+  sleep 5
+  IP=$(ping -c 1 {{ controller_ip }} 2>/dev/null | grep PING | awk '{print $3}' | sed -e 's/[\(\)]//g')
+done
+
 if [ $BG -eq 1 ]; then
-  nohup brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller={{ controller_ip }} 2>&1 > connect.log &
+  nohup brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller=$IP 2>&1 > connect.log &
 else
-  brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller={{ controller_ip }}
+  brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller=$IP
 fi

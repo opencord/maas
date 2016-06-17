@@ -1,4 +1,14 @@
+- name: Ensure Hostname Resolution
+  become: yes
+  lineinfile:
+    dest: /etc/hosts
+    line: 127.0.0.1 docker-registry
+    owner: root
+    group: root
+    mode: 0644
+
 - name: Directories are present
+  become: yes
   file:
     path: "{{ item }}"
     state: directory
@@ -8,10 +18,20 @@
   tags: [registry]
 
 - name: Configuration is copied
+  become: yes
   copy:
     src: mirror-config.yml
     dest: /data/registry-mirror/conf/config.yml
   tags: [registry]
+
+- name: Ensure Directories
+  become: yes
+  file:
+    path: /etc/maas
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Local Docker Registry
   become: yes
