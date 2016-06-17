@@ -16,3 +16,4 @@ registry-mirror:
   command: serve /conf/config.yml
   ports:
     - "5001:5000"
+  restart: unless-stopped
