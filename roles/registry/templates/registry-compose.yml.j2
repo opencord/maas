@@ -6,6 +6,7 @@ registry:
    - /docker-registry/conf:/conf
   ports:
     - "5000:5000"
+  restart: unless-stopped
 
 registry-mirror:
   image: registry:2.4.0
