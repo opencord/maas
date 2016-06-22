@@ -190,7 +190,7 @@ $ ansible-playbook -i <ip-of-head-node>, --ask-pass --ask-sudo-pass \
   management_ip=<management-ip> --exeternal_ip=<external-ip>' compute-node.yml
 ```
 
-(see [Playbook Options](#Playbook Options) for a description of the parameters)
+(see [Playbook Options](#playbook-options) for a description of the parameters)
 
 If you do not wish to have the Ansible playbook to modify the network
 configuration of the host you can add the `--skip-tags=interface_config`
@@ -220,7 +220,7 @@ $ ansible-playbook -i <ip-of-head-node>, --ask-pass --ask-sudo-pass \
   --user=<deployment-user-id> --extra-vars='fabric_ip=<fabric-ip> \
   management_ip=<management-ip> --exeternal_ip=<external-ip>' --skip-tags=interface_config head-node.yml
 ```
-(see [Playbook Options](#Playbook Options) for a description of the parameters)
+(see [Playbook Options](#playbook-options) for a description of the parameters)
 
 The `ansible-playbook` will take several minutes to complete as it does
 roughly the following:
