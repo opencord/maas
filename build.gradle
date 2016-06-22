@@ -28,8 +28,6 @@ ext {
     deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
 
     dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '/usr/bin'
-
-    vboxUser = project.hasProperty('vboxUser') ? project.getProperty('vboxUser') : 'cord'
 }
 
 // Switch Configuration Image
@@ -227,14 +225,10 @@ task prime (type: Exec) {
             .p(config.seedServer.fabric_network, "fabric_network")
             .p(config.seedServer.fabric_iface, "fabric_iface")
             .p(config.seedServer.domain, "domain")
-    }
-
-    if (config.seedServer.port) {
-        extraVars = extraVars.p(config.seedServer.port, "ansible_ssh_port")
-    }
-
-    if (vboxUser != "") {
-        extraVars = extraVars.p(vboxUser, "power_helper_user")
+	    .p(config.seedServer.virtualbox_support, "virtualbox_support")
+            .p(config.seedServer.power_helper_user, "power_helper_user")
+            .p(config.seedServer.power_helper_host, "power_helper_host")
+            .p(config.seedServer.port, "ansible_ssh_port")
     }
 
     if (config.otherServers) {
@@ -282,16 +276,10 @@ task deploy (type: Exec) {
 	    .p(config.seedServer.fabric_network, "fabric_network")
 	    .p(config.seedServer.fabric_iface, "fabric_iface")
             .p(config.seedServer.domain, "domain")
+            .p(config.seedServer.virtualbox_support, "virtualbox_support")
 	    .p(config.seedServer.power_helper_user, "power_helper_user")
 	    .p(config.seedServer.power_helper_host, "power_helper_host")
-    }
-
-    if (config.seedServer.port) {
-        extraVars = extraVars.p(config.seedServer.port, "ansible_ssh_port")
-    }
-
-    if (vboxUser != "") {
-        extraVars = extraVars.p(vboxUser, "power_helper_user")
+            .p(config.seedServer.port, "ansible_ssh_port")
     }
 
     if (config.otherServers) {

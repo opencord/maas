@@ -42,6 +42,7 @@ switchq:
   links:
     - provisioner
   environment:
+    - "SWITCHQ_SCRIPT=/etc/maas/ansible/do-switch"
     - "SWITCHQ_PROVISION_URL=http://provisioner:4243/provision/"
     - "SWITCHQ_PROVISION_TTL=0s"
     - "SWITCHQ_DEFAULT_ROLE=fabric-switch"

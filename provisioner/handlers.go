@@ -76,7 +76,13 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = c.dispatcher.Dispatch(&info, role, c.config.Script)
+
+	// If the request has a script set, override the default configuration
+	script := c.config.Script
+	if info.Script != "" {
+		script = info.Script
+	}
+	err = c.dispatcher.Dispatch(&info, role, script)
 	if err != nil {
 		log.Printf("[errpr] unable to dispatch provisioning request for node '%s' : %s", info.Name, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

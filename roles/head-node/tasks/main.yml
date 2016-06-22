@@ -26,11 +26,14 @@
 - name: Ensure Ansible Provisioning Script
   become: yes
   copy:
-    dest=/etc/maas/ansible/do-ansible
-    src=files/do-ansible
+    dest=/etc/maas/ansible/{{ item }}
+    src=files/{{ item }}
     owner=maas
     group=maas
     mode=0755
+  with_items:
+    - do-ansible
+    - do-switch
 
 - name: Ensure Provisioning Log Directory
   become: yes
@@ -44,8 +47,11 @@
 - name: Ensure Compute Node Playbook
   become: yes
   template:
-    src=files/compute-node.yml.j2
-    dest=/etc/maas/ansible/compute-node.yml
+    src=files/{{ item }}
+    dest=/etc/maas/ansible/{{ item }}
     owner=maas
     group=maas
     mode=0644
+  with_items:
+    - compute-node.yml
+    - switch-node.yml

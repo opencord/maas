@@ -5,14 +5,37 @@
     validate_certs: false
     dest: /mnt/flash2/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb
 
+- name: Verify Service Exists
+  stat:
+    path: /etc/init.d/ofdpa
+  register: ofdpa_stat
+  changed_when: false
+  failed_when: false
+
 - name: OpenFlow Agent Stopped
   service: name=ofdpa state=stopped
+  when: ofdpa_stat.stat.exists
+
+- name: Verify Distributeion Release File
+  stat:
+    path: /etc/lsb-release
+  register: lsb_stat
+  changed_when: false
+  failed_when: false
+
+- name: Verify Distribute Name
+  shell: grep -i ubuntu /etc/lsb-release | wc -l
+  register: dist
+  changed_when: false
+  failed_when: false
 
 - name: Openflow Agent
   apt: deb="/mnt/flash2/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb" force=true
+  when: not lsb_stat.stat.exists or dist.stdout == "0"
 
 - name: OpenFlow Agent Started
   service: name=ofdpa state=started
+  when: not lsb_stat.stat.exists or dist.stdout == "0"
 
 - name: Mark Persist Openflow Agent
   command: persist /etc/accton/ofdpa.conf
