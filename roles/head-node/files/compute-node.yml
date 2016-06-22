@@ -1,4 +1,4 @@
 - hosts: all
   remote_user: ubuntu
   roles:
-    - compute-node
+    - {{ provision.role }}
