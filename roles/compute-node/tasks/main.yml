@@ -15,6 +15,7 @@
     - git
     - python-pip
     - ifenslave-2.6
+    - bridge-utils
 
 - name: Ensure Docker Insecure Repository
   become: yes
@@ -121,7 +122,7 @@
 
 - name: Consistent Interface Naming
   become: yes
-  script: files/rename_ifaces.sh {{ compute_node.interfaces.fabric }} {{ compute_node.addresses.fabric }} {{ compute_node.interfaces.external }} {{ compute_node.addresses.external }} {{ compute_node.interfaces.management }}
+  script: files/rename_ifaces.sh "{{ compute_node.interfaces.fabric }}" "{{ compute_node.addresses.fabric }}" "{{ compute_node.interfaces.external }}" "{{ compute_node.addresses.external }}" "{{ compute_node.interfaces.management }}" "{{ compute_node.addresses.management }}"
   register: ifaces_changed
   changed_when: ifaces_changed.stdout.find("true") != -1
   tags:
@@ -149,8 +150,13 @@
     - interface_config
     - reboot
 
+- name: Ensure Port Defined
+  set_fact:
+    ansible_ssh_port: 22
+  when: ansible_ssh_port is not defined
+
 - name: Wait For Restart
-  local_action: wait_for port=22 host={{ inventory_hostname }} search_regex=OpenSSH delay=30 timeout=600 connect_timeout=15
+  local_action: wait_for port={{ ansible_ssh_port }} host={{ inventory_hostname }} search_regex=OpenSSH delay=30 timeout=600 connect_timeout=15
   when: ifaces_changed.stdout.find("true") != -1
   tags:
     - interface_config

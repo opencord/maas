@@ -27,9 +27,9 @@ interfaces:
     #                connected to the internet
     #   'management' specifies the interface on which the head node will
     #                service DHCP and PXE boot requests
-    fabric: "{{ fabric_iface | default('eth0') }}"
-    management: "{{ management_iface | default('eth2') }}"
-    external: "{{ external_iface | default('eth3') }}"
+    fabric: "{{ fabric_iface | default('fabric') }}"
+    management: "{{ management_iface | default('br-mgmt') }}"
+    external: "{{ external_iface | default('') }}"
 
 networks:
     # CHANGE:

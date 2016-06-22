@@ -96,19 +96,10 @@ task publishProvisionerImage(type: Exec) {
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-provisioner:$targetTag"
 }
 
-// Automation Images
+// Automation Image
 
 task buildAutomationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
-}
-
-task buildAutomationImageAnsible(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation:ansible", "-f", "./automation/Dockerfile.ansible", "./automation"
-}
-
-task buildAutomationImages {
-    dependsOn buildAutomationImage
-    dependsOn buildAutomationImageAnsible
 }
 
 task tagAutomationImage(type: Exec) {
@@ -116,29 +107,9 @@ task tagAutomationImage(type: Exec) {
     commandLine "$dockerPath/docker", 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
 }
 
-task tagAutomationImageAnsible(type: Exec) {
-    dependsOn buildAutomationImageAnsible
-    commandLine "$dockerPath/docker", 'tag', 'cord-maas-automation:ansible', "$targetReg/cord-maas-automation:$targetTag-ansible"
-}
-
-task tagAutomationImages {
-    dependsOn tagAutomationImage
-    dependsOn tagAutomationImageAnsible
-}
-
 task publishAutomationImage(type: Exec) {
     dependsOn tagAutomationImage
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-automation:$targetTag"
-}
-
-task publishAutomationImageAnsible(type: Exec) {
-    dependsOn tagAutomationImageAnsible
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-automation:$targetTag-ansible"
-}
-
-task publishAutomationImages {
-    dependsOn publishAutomationImage
-    dependsOn publishAutomationImageAnsible
 }
 
 // DHCP Harvester Images
@@ -172,7 +143,7 @@ task fetch(type: Exec) {
 task buildImages {
     dependsOn buildBootstrapImage
     dependsOn buildHarvesterImage
-    dependsOn buildAutomationImages
+    dependsOn buildAutomationImage
     dependsOn buildAllocationImage
     dependsOn buildProvisionerImage
     dependsOn buildSwitchqImage
@@ -181,7 +152,7 @@ task buildImages {
 task tagImages {
     dependsOn tagBootstrapImage
     dependsOn tagHarvesterImage
-    dependsOn tagAutomationImages
+    dependsOn tagAutomationImage
     dependsOn tagAllocationImage
     dependsOn tagProvisionerImage
     dependsOn tagSwitchqImage
@@ -190,7 +161,7 @@ task tagImages {
 task publish {
     dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
-    dependsOn publishAutomationImages
+    dependsOn publishAutomationImage
     dependsOn publishAllocationImage
     dependsOn publishProvisionerImage
     dependsOn publishSwitchqImage
@@ -258,6 +229,10 @@ task prime (type: Exec) {
             .p(config.seedServer.domain, "domain")
     }
 
+    if (config.seedServer.port) {
+        extraVars = extraVars.p(config.seedServer.port, "ansible_ssh_port")
+    }
+
     if (vboxUser != "") {
         extraVars = extraVars.p(vboxUser, "power_helper_user")
     }
@@ -309,6 +284,10 @@ task deploy (type: Exec) {
             .p(config.seedServer.domain, "domain")
 	    .p(config.seedServer.power_helper_user, "power_helper_user")
 	    .p(config.seedServer.power_helper_host, "power_helper_host")
+    }
+
+    if (config.seedServer.port) {
+        extraVars = extraVars.p(config.seedServer.port, "ansible_ssh_port")
     }
 
     if (vboxUser != "") {
