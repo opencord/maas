@@ -34,20 +34,19 @@ func checkError(err error, msg string, args ...interface{}) {
 	}
 }
 
-func (c *Config) provision(rec AddressRec) error {
-	log.Printf("[debug] Verifing that device '%s (%s)' isn't already in a provisioning state",
-		rec.Name, rec.MAC)
+func (c *Config) getProvisionedState(rec AddressRec) (int, string, error) {
+	log.Printf("[debug] Fetching provisioned state of device '%s' (%s, %s)",
+		rec.Name, rec.IP, rec.MAC)
 	resp, err := http.Get(c.ProvisionURL + rec.MAC)
-	log.Printf("%s%s", c.ProvisionURL, rec.MAC)
 	if err != nil {
-		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s)' : %s",
-			rec.Name, rec.MAC, err)
-		return err
+		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
+			rec.Name, rec.IP, rec.MAC, err)
+		return -1, "", err
 	}
 	if resp.StatusCode != 404 && int(resp.StatusCode/100) != 2 {
-		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s)' : %s",
-			rec.Name, rec.MAC, resp.Status)
-		return fmt.Errorf(resp.Status)
+		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
+			rec.Name, rec.IP, rec.MAC, resp.Status)
+		return -1, "", fmt.Errorf(resp.Status)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 404 {
@@ -55,27 +54,32 @@ func (c *Config) provision(rec AddressRec) error {
 		var raw interface{}
 		err = decoder.Decode(&raw)
 		if err != nil {
-			log.Printf("[error] Unable to unmarshal status response from provisioning service for device '%s (%s)' : %s",
-				rec.Name, rec.MAC, err)
-			return err
+			log.Printf("[error] Unmarshal provisioning service response for device '%s (%s, %s)' : %s",
+				rec.Name, rec.IP, rec.MAC, err)
+			return -1, "", err
 		}
 		status := raw.(map[string]interface{})
 		switch int(status["status"].(float64)) {
 		case 0, 1: // "PENDING", "RUNNING"
-			log.Printf("[info] Device '%s (%s)' is already scheduled to be provisioned",
-				rec.Name, rec.MAC)
-			return nil
+			return int(status["status"].(float64)), "", nil
 		case 2: // "COMPLETE"
-			// noop
+			return 2, "", nil
 		case 3: // "FAILED"
-			c.storage.ClearProvisioned(rec.MAC)
+			return 3, status["message"].(string), nil
 		default:
 			err = fmt.Errorf("unknown provisioning status : %d", status["status"])
 			log.Printf("[error] received unknown provisioning status for device '%s (%s)' : %s",
 				rec.Name, rec.MAC, err)
-			return err
+			return -1, "", err
 		}
 	}
+
+	// If we end up here that means that no record was found in the provisioning, so return
+	// a status of -1, w/o an error
+	return -1, "", nil
+}
+
+func (c *Config) provision(rec AddressRec) error {
 	log.Printf("[info] POSTing to '%s' for provisioning of '%s (%s)'", c.ProvisionURL, rec.Name, rec.MAC)
 	data := map[string]string{
 		"id":   rec.MAC,
@@ -95,7 +99,7 @@ func (c *Config) provision(rec AddressRec) error {
 
 	hc := http.Client{}
 	var b []byte
-	b, err = json.Marshal(data)
+	b, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("[error] Unable to marshal provisioning data : %s", err)
 		return err
@@ -107,7 +111,7 @@ func (c *Config) provision(rec AddressRec) error {
 	}
 
 	req.Header.Add("Content-Type", "application/json")
-	resp, err = hc.Do(req)
+	resp, err := hc.Do(req)
 	if err != nil {
 		log.Printf("[error] Unable to POST request to provisioner : %s", err)
 		return err
@@ -119,8 +123,6 @@ func (c *Config) provision(rec AddressRec) error {
 		return err
 	}
 
-	now := time.Now()
-	c.storage.MarkProvisioned(rec.MAC, &now)
 	return nil
 }
 
@@ -142,8 +144,49 @@ func (c *Config) processRecord(rec AddressRec) error {
 		return err
 	}
 
+	if last == nil {
+		log.Printf("[debug] no TTL for device '%s' (%s, %s)",
+			rec.Name, rec.IP, rec.MAC)
+	} else {
+		log.Printf("[debug] TTL for device '%s' (%s, %s) is %v",
+			rec.Name, rec.IP, rec.MAC, *last)
+	}
+
+	// Verify if the provision status of the node is complete, if in an error state then TTL means
+	// nothing
+	state, message, err := c.getProvisionedState(rec)
+	switch state {
+	case 0, 1: // Pending or Running
+		log.Printf("[debug] device '%s' (%s, %s) is being provisioned",
+			rec.Name, rec.IP, rec.MAC)
+		return nil
+	case 2: // Complete
+		log.Printf("[debug] device '%s' (%s, %s) has completed provisioning",
+			rec.Name, rec.IP, rec.MAC)
+		// If no last record then set the TTL
+		if last == nil {
+			now := time.Now()
+			last = &now
+			c.storage.MarkProvisioned(rec.MAC, last)
+			log.Printf("[debug] Storing TTL for device '%s' (%s, %s) as %v",
+				rec.Name, rec.IP, rec.MAC, now)
+			return nil
+		}
+	case 3: // Failed
+		log.Printf("[debug] device '%s' (%s, %s) failed last provisioning with message '%s', reattempt",
+			rec.Name, rec.IP, rec.MAC, message)
+		c.storage.ClearProvisioned(rec.MAC)
+		last = nil
+	default: // No record
+	}
+
 	// If TTL is 0 then we will only provision a switch once.
 	if last == nil || (c.ttl > 0 && time.Since(*last) > c.ttl) {
+		if last != nil {
+			c.storage.ClearProvisioned(rec.MAC)
+			log.Printf("[debug] device '%s' (%s, %s) TTL expired, reprovisioning",
+				rec.Name, rec.IP, rec.MAC)
+		}
 		c.provision(rec)
 	} else if c.ttl == 0 {
 		log.Printf("[debug] device '%s' (%s, %s) has completed its one time provisioning, with a TTL set to %s",
