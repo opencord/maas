@@ -1,0 +1,13 @@
+nagios                  CNAME nagios-1
+openstack-dashboard     CNAME openstack-dashboard-1
+onos-fabric             CNAME onos-fabric-1
+xos                     CNAME xos-1
+juju                    CNAME juju-1
+neutron-api             CNAME neutron-api-1
+rabbitmq-server         CNAME rabbitmq-server-1
+ceilometer              CNAME ceilometer-1
+nova-cloud-controller   CNAME nova-cloud-controller-1
+glance                  CNAME glance-1
+keystone                CNAME keystone-1
+onos-cord               CNAME onos-cord-1
+percona-cluster         CNAME percona-cluster-1

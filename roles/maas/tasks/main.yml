@@ -235,6 +235,7 @@
     - { src: 'dhcpd.blacklist', dest: '/etc/dhcp' }
     - { src: 'dhcpd.reservations', dest: '/etc/dhcp' }
     - { src: 'dhcp_harvest.inc', dest: '/etc/bind/maas' }
+    - { src: 'cnames.inc', dest: '/etc/bind/maas' }
     - { src: 'named.conf.options.inside.maas', dest: '/etc/bind/maas' }
     - { src: 'dhcpd.conf.template', dest: '/etc/maas/templates/dhcp' }
     - { src: 'dhcp_harvest.inc', dest: '/etc/maas/templates/dns' }
