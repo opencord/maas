@@ -58,6 +58,7 @@ cat <<EOT >> $OUT
 \$INCLUDE "/etc/bind/maas/dhcp_harvest.inc"
 $HOSTNAME IN A $LHOST
 docker-registry CNAME $HOSTNAME
+apt-cache CNAME $HOSTNAME
 \$INCLUDE "/etc/bind/maas/cnames.inc"
 {{endif}}
 EOT
