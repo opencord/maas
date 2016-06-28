@@ -61,8 +61,8 @@
 - name: MAAS
   become: yes
   apt:
-    name: maas
-    state: latest
+    name: maas=1.9.3*
+    state: present
     force: yes
     update_cache: yes
     allow_unauthenticated: yes

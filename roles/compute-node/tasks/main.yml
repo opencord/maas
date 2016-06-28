@@ -93,7 +93,7 @@
 - name: Verify i40e Driver
   command: modinfo --field=version i40e
   register: i40e_version
-  when: intel_nic_present.stdout == "1"
+  when: intel_nic_present.stdout != "0"
   changed_when: False
   failed_when: False
   tags:
@@ -102,7 +102,7 @@
 - name: Verify mlx4 Driver
   command: modinfo --field=version mlx4_core
   register: mlx4_version
-  when: mlx_nic_present.stdout == "1"
+  when: mlx_nic_present.stdout != "0"
   changed_when: False
   failed_when: False
   tags:
@@ -110,13 +110,13 @@
 
 - name: Update mlx4 Driver
   include: tasks/mlx4_driver.yml
-  when: mlx_nic_present.stdout == "1" and mlx4_version.stdout != '3.1-1.0.4'
+  when: mlx_nic_present.stdout != "0" and mlx4_version.stdout != '3.1-1.0.4'
   tags:
     - interface_config
 
 - name: Update i40e Driver
   include: tasks/i40e_driver.yml
-  when: intel_nic_present.stdout == "1" and i40e_version.stdout != '1.4.25'
+  when: intel_nic_present.stdout != "0" and i40e_version.stdout != '1.4.25'
   tags:
     - interface_config
 
