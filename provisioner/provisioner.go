@@ -14,6 +14,7 @@ type Config struct {
 	RoleSelectorURL string `default:"" envconfig:"role_selector_url"`
 	DefaultRole     string `default:"compute-node" envconfig:"default_role"`
 	Script          string `default:"do-ansible"`
+	StorageURL      string `default:"memory:" envconfig:"storage_url"`
 }
 
 type Context struct {
@@ -36,11 +37,16 @@ func main() {
 	    Port:            %d
 	    RoleSelectorURL: %s
 	    DefaultRole:     %s
-	    Script:          %s`,
+	    Script:          %s
+	    StorageURL:      %s`,
 		context.config.Listen, context.config.Port, context.config.RoleSelectorURL,
-		context.config.DefaultRole, context.config.Script)
+		context.config.DefaultRole, context.config.Script, context.config.StorageURL)
 
-	context.storage = NewMemoryStorage()
+	context.storage, err = NewStorage(context.config.StorageURL)
+	if err != nil {
+		log.Fatalf("[error] Unable to connect to specified storage '%s' : %s",
+			context.config.StorageURL, err)
+	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/provision/", context.ProvisionRequestHandler).Methods("POST")

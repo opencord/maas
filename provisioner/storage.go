@@ -1,9 +1,31 @@
 package main
 
+import (
+	"fmt"
+	"net/url"
+	"strings"
+)
+
 type Storage interface {
 	Put(id string, update StatusMsg) error
 	Get(id string) (*StatusMsg, error)
 	List() ([]StatusMsg, error)
+}
+
+func NewStorage(spec string) (Storage, error) {
+	conn, err := url.Parse(spec)
+	if err != nil {
+		return nil, err
+	}
+
+	switch strings.ToUpper(conn.Scheme) {
+	case "MEMORY":
+		return NewMemoryStorage(), nil
+	case "CONSUL":
+		return NewConsulStorage(spec)
+	default:
+		return nil, fmt.Errorf("Unknown storage scheme specified, '%s'", conn.Scheme)
+	}
 }
 
 type MemoryStorage struct {

@@ -126,7 +126,13 @@ func (d *Dispatcher) Start() {
 					worker <- work
 				}()
 			case update := <-d.StatusChan:
-				d.Storage.Put(update.Request.Info.Id, update)
+				err := d.Storage.Put(update.Request.Info.Id, update)
+				if err != nil {
+					log.Printf("[error] Unable to update storage with status for '%s' : %s",
+						update.Request.Info.Id, err)
+				} else {
+					log.Printf("[debug] Storage updated for '%s'", update.Request.Info.Id)
+				}
 			case <-d.QuitChan:
 				log.Println("[info] Stopping dispatcher")
 				return

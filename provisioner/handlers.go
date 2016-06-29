@@ -65,7 +65,7 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	if !c.validateData(&info) {
-		log.Printf("[errpr] Provisioning request not valid for '%s'", info.Name)
+		log.Printf("[error] Provisioning request not valid for '%s'", info.Name)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -84,7 +84,7 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 	}
 	err = c.dispatcher.Dispatch(&info, role, script)
 	if err != nil {
-		log.Printf("[errpr] unable to dispatch provisioning request for node '%s' : %s", info.Name, err)
+		log.Printf("[error] unable to dispatch provisioning request for node '%s' : %s", info.Name, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
