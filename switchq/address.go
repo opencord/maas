@@ -70,7 +70,8 @@ func (s *FileAddressSource) GetAddresses() ([]AddressRec, error) {
 			idx += 1
 			if idx >= capacity {
 				capacity += 20
-				tmp, result := result, make([]AddressRec, capacity)
+				var tmp []AddressRec
+				tmp, result = result, make([]AddressRec, capacity)
 				copy(result, tmp)
 			}
 		}
