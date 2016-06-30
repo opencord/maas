@@ -52,6 +52,7 @@ func main() {
 	router.HandleFunc("/provision/", context.ProvisionRequestHandler).Methods("POST")
 	router.HandleFunc("/provision/", context.ListRequestsHandler).Methods("GET")
 	router.HandleFunc("/provision/{nodeid}", context.QueryStatusHandler).Methods("GET")
+	router.HandleFunc("/provision/{nodeid}", context.DeleteStatusHandler).Methods("DELETE")
 	http.Handle("/", router)
 
 	// Start the dispatcher and workers

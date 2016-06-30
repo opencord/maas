@@ -9,6 +9,7 @@ import (
 type Storage interface {
 	Put(id string, update StatusMsg) error
 	Get(id string) (*StatusMsg, error)
+	Delete(id string) error
 	List() ([]StatusMsg, error)
 }
 
@@ -49,6 +50,11 @@ func (s *MemoryStorage) Get(id string) (*StatusMsg, error) {
 		return nil, nil
 	}
 	return &m, nil
+}
+
+func (s *MemoryStorage) Delete(id string) error {
+	delete(s.Data, id)
+	return nil
 }
 
 func (s *MemoryStorage) List() ([]StatusMsg, error) {

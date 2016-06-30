@@ -102,6 +102,24 @@ func (c *Context) ListRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(bytes)
 }
 
+func (c *Context) DeleteStatusHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, ok := vars["nodeid"]
+	if !ok || strings.TrimSpace(id) == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err := c.storage.Delete(id)
+	if err != nil {
+		log.Printf("[warn] Error while deleting status fo '%s' from storage : %s", id, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, ok := vars["nodeid"]

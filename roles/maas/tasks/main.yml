@@ -76,6 +76,15 @@
     mode: 0755
     state: directory
 
+- name: MAAS Automation Storage
+  become: yes
+  file:
+    path: /etc/maas/automation/storage
+    owner: maas
+    group: maas
+    mode: 0777
+    state: directory
+
 - name: Host Name Mapping File
   become: yes
   copy:

@@ -1,79 +1,95 @@
-allocator:
-  image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
-  container_name: allocator
-  labels:
-    - "lab.solution=CORD"
-    - "lab.component=allocator"
-  environment:
-    # need to explicitly set the resolver, else go will skip the /etc/hosts file
-    - "GODEBUG=netdns=go"
-    - "ALLOCATE_PORT=4242"
-    - "ALLOCATE_LISTEN=0.0.0.0"
-    - "ALLOCATE_NETWORK={{ networks.fabric }}"
-    - "ALLOCATE_SKIP=2"
-  restart: unless-stopped
+version: '2'
 
-provisioner:
-  image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}"
-  container_name: provisioner
-  labels:
-    - "lab.solution=CORD"
-    - "lab.component=provisioner"
-  links:
-    - allocator
-  environment:
-    # need to explicitly set the resolver, else go will skip the /etc/hosts file
-    - "GODEBUG=netdns=go"
-    - "INTERFACE_CONFIG=1"
-    - "PROVISION_PORT=4243"
-    - "PROVISION_LISTEN=0.0.0.0"
-    - "PROVISION_DEFAULT_ROLE=compute-node"
-    - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
-  volumes:
-    - "/etc/maas/ansible:/etc/maas/ansible"
-  restart: unless-stopped
+services:
+  storage:
+    image: "docker-registry:5000/consul:{{ docker.image_version }}"
+    container_name: storage
+    labels:
+      - "lab.solution=CORD"
+      - "lab.component=storage"
+      - "lab.implementation=consul"
+    volumes:
+      - "/etc/maas/automation/storage:/consul/data"
+    network_mode: host
+    command: agent --server --bind {{ mgmt_ip_address.stdout }} --client {{ mgmt_ip_address.stdout }} --bootstrap-expect=1
 
-switchq:
-  image: "docker-registry:5000/cord-maas-switchq:{{ docker.image_version }}"
-  container_name: switchq
-  labels:
-    - "lab.solution=CORD"
-    - "lab.component=switchq"
-  links:
-    - provisioner
-  environment:
-    - "SWITCHQ_SCRIPT=/etc/maas/ansible/do-switch"
-    - "SWITCHQ_PROVISION_URL=http://provisioner:4243/provision/"
-    - "SWITCHQ_PROVISION_TTL=0s"
-    - "SWITCHQ_DEFAULT_ROLE=fabric-switch"
-    - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
-  volumes:
-    - "/etc/bind/maas:/switchq/dhcp"
-  restart: unless-stopped
+  allocator:
+    image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
+    container_name: allocator
+    labels:
+      - "lab.solution=CORD"
+      - "lab.component=allocator"
+    environment:
+      # need to explicitly set the resolver, else go will skip the /etc/hosts file
+      - "GODEBUG=netdns=go"
+      - "ALLOCATE_PORT=4242"
+      - "ALLOCATE_LISTEN=0.0.0.0"
+      - "ALLOCATE_NETWORK={{ networks.fabric }}"
+      - "ALLOCATE_SKIP=2"
+    restart: unless-stopped
 
-automation:
-  image: "docker-registry:5000/cord-maas-automation:{{ docker.image_version }}"
-  container_name: automation
-  labels:
-    - "lab.solution=CORD"
-    - "lab.component=automation"
-  links:
-    - provisioner
-  environment:
-    # need to explicitly set the resolver, else go will skip the /etc/hosts file
-    - "GODEBUG=netdns=go"
-    - "AUTOMATION_PROVISION_URL=http://provisioner:4243/provision/"
-    - "AUTOMATION_PROVISION_TTL=30m"
+  provisioner:
+    image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}"
+    container_name: provisioner
+    labels:
+      - "lab.solution=CORD"
+      - "lab.component=provisioner"
+    links:
+      - allocator
+    environment:
+      # need to explicitly set the resolver, else go will skip the /etc/hosts file
+      - "GODEBUG=netdns=go"
+      - "INTERFACE_CONFIG=1"
+      - "PROVISION_PORT=4243"
+      - "PROVISION_LISTEN=0.0.0.0"
+      - "PROVISION_DEFAULT_ROLE=compute-node"
+      - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
+      - "PROVISION_STORAGE_URL=consul://{{ mgmt_ip_address.stdout }}:8500"
+    volumes:
+      - "/etc/maas/ansible:/etc/maas/ansible"
+    restart: unless-stopped
+
+  switchq:
+    image: "docker-registry:5000/cord-maas-switchq:{{ docker.image_version }}"
+    container_name: switchq
+    labels:
+      - "lab.solution=CORD"
+      - "lab.component=switchq"
+    links:
+      - provisioner
+    environment:
+      - "SWITCHQ_SCRIPT=/etc/maas/ansible/do-switch"
+      - "SWITCHQ_PROVISION_URL=http://provisioner:4243/provision/"
+      - "SWITCHQ_PROVISION_TTL=0s"
+      - "SWITCHQ_DEFAULT_ROLE=fabric-switch"
+      - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
+    volumes:
+      - "/etc/bind/maas:/switchq/dhcp"
+    restart: unless-stopped
+
+  automation:
+    image: "docker-registry:5000/cord-maas-automation:{{ docker.image_version }}"
+    container_name: automation
+    labels:
+      - "lab.solution=CORD"
+      - "lab.component=automation"
+    links:
+      - provisioner
+    environment:
+      # need to explicitly set the resolver, else go will skip the /etc/hosts file
+      - "GODEBUG=netdns=go"
+      - "AUTOMATION_PROVISION_URL=http://provisioner:4243/provision/"
+      - "AUTOMATION_PROVISION_TTL=0s"
 {% if virtualbox_support is defined and virtualbox_support == "1" %}
-    - "AUTOMATION_POWER_HELPER_SCRIPT=/etc/maas/virtualbox/power_discovery"
-    - "AUTOMATION_POWER_HELPER_USER={{ virtualbox.power_helper_user }}"
-    - "AUTOMATION_POWER_HELPER_HOST={{ virtualbox_host }}"
+      - "AUTOMATION_POWER_HELPER_SCRIPT=/etc/maas/virtualbox/power_discovery"
+      - "AUTOMATION_POWER_HELPER_USER={{ virtualbox.power_helper_user }}"
+      - "AUTOMATION_POWER_HELPER_HOST={{ virtualbox_host }}"
 {% endif %}
-  volumes:
-    - "/etc/maas:/mappings"
+    volumes:
+      - "/etc/maas:/mappings"
 {% if virtualbox_support is defined and virtualbox_support == "1" %}
-    - "/etc/maas/virtualbox:/etc/maas/virtualbox"
+      - "/etc/maas/virtualbox:/etc/maas/virtualbox"
 {% endif %}
-  command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]
-  restart: unless-stopped
+    command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename", "-verbose" ]
+    restart: unless-stopped
 

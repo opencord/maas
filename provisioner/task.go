@@ -22,17 +22,3 @@ func (s TaskStatus) String() string {
 	}
 	return "INVALID TASK STATUS"
 }
-
-type Task struct {
-	nodeId string
-	status TaskStatus
-}
-
-type TaskQueueEntry struct {
-	previous *TaskQueueEntry
-	next     *TaskQueueEntry
-	task     *Task
-}
-
-type TaskQueue struct {
-}
