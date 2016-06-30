@@ -51,6 +51,11 @@ func (s *ConsulStorage) Put(id string, update StatusMsg) error {
 	return err
 }
 
+func (s *ConsulStorage) Delete(id string) error {
+	_, err := s.kv.Delete(PREFIX+id, nil)
+	return err
+}
+
 func (s *ConsulStorage) Get(id string) (*StatusMsg, error) {
 	pair, _, err := s.kv.Get(PREFIX+id, nil)
 	if err != nil {

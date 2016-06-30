@@ -34,7 +34,7 @@ type Config struct {
 	PowerHelperHost   string `default:"127.0.0.1" envconfig:"POWER_HELPER_HOST"`
 	PowerHelperScript string `default:"" envconfig:"POWER_HELPER_SCRIPT"`
 	ProvisionUrl      string `default:"" envconfig:"PROVISION_URL"`
-	ProvisionTtl      string `default:"30m" envconfig:"PROVISION_TTL"`
+	ProvisionTtl      string `default:"1h" envconfig:"PROVISION_TTL"`
 }
 
 var apiKey = flag.String("apikey", "", "key with which to access MAAS server")
@@ -104,7 +104,7 @@ func main() {
 		Preview:         *preview,
 		Verbose:         *verbose,
 		AlwaysRename:    *always,
-		ProvTracker:     NewTracker(),
+		Provisioner:     NewProvisioner(&ProvisionerConfig{Url: config.ProvisionUrl}),
 		ProvisionURL:    config.ProvisionUrl,
 		PowerHelper:     config.PowerHelperScript,
 		PowerHelperUser: config.PowerHelperUser,

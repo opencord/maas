@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"net/url"
 	"os/exec"
 	"regexp"
@@ -49,7 +47,7 @@ type ProcessingOptions struct {
 	Verbose         bool
 	Preview         bool
 	AlwaysRename    bool
-	ProvTracker     Tracker
+	Provisioner     Provisioner
 	ProvisionURL    string
 	ProvisionTTL    time.Duration
 	PowerHelper     string
@@ -153,7 +151,7 @@ var Reset = func(client *maas.MAASObject, node MaasNode, options ProcessingOptio
 		updateNodeName(client, node, options)
 	}
 
-	options.ProvTracker.Clear(node.ID())
+	options.Provisioner.Clear(node.ID())
 
 	return nil
 }
@@ -168,186 +166,52 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 		updateNodeName(client, node, options)
 	}
 
-	record, err := options.ProvTracker.Get(node.ID())
+	record, err := options.Provisioner.Get(node.ID())
 	if err != nil {
 		log.Printf("[warn] unable to retrieve provisioning state of node '%s' : %s", node.Hostname(), err)
-	} else if record.State == Unprovisioned || record.State == ProvisionError {
+	} else if record == nil || record.Status == Failed {
+		var label string
+		if record == nil {
+			label = "NotFound"
+		} else {
+			label = record.Status.String()
+		}
 		if options.Verbose {
-			log.Printf("[info] Current state of node '%s' is '%s'", node.Hostname(), record.State.String())
+			log.Printf("[info] Current state of node '%s' is '%s'", node.Hostname(), label)
 		}
-		var err error = nil
-		var callout *url.URL
-		log.Printf("PROVISION '%s'", node.Hostname())
-		if len(options.ProvisionURL) > 0 {
-			if options.Verbose {
-				log.Printf("[info] Provisioning callout to '%s'", options.ProvisionURL)
-			}
-			callout, err = url.Parse(options.ProvisionURL)
-			if err != nil {
-				log.Printf("[error] Failed to parse provisioning URL '%s' : %s", options.ProvisionURL, err)
-			} else {
-				ips := node.IPs()
-				ip := ""
-				if len(ips) > 0 {
-					ip = ips[0]
-				}
-				macs := node.MACs()
-				mac := ""
-				if len(macs) > 0 {
-					mac = macs[0]
-				}
-				switch callout.Scheme {
-				// If the scheme is a file, then we will execute the refereced file
-				case "", "file":
-					if options.Verbose {
-						log.Printf("[info] executing local script file '%s'", callout.Path)
-					}
-					record.State = Provisioning
-					record.Timestamp = time.Now().Unix()
-					options.ProvTracker.Set(node.ID(), record)
-					err = exec.Command(callout.Path, node.ID(), node.Hostname(), ip, mac).Run()
-					if err != nil {
-						log.Printf("[error] Failed to execute '%s' : %s", options.ProvisionURL, err)
-					} else {
-						if options.Verbose {
-							log.Printf("[info] Marking node '%s' with ID '%s' as provisioned",
-								node.Hostname(), node.ID())
-						}
-						record.State = Provisioned
-						options.ProvTracker.Set(node.ID(), record)
-					}
-
-				default:
-					if options.Verbose {
-						log.Printf("[info] POSTing to '%s'", options.ProvisionURL)
-					}
-					data := map[string]string{
-						"id":   node.ID(),
-						"name": node.Hostname(),
-						"ip":   ip,
-						"mac":  mac,
-					}
-					hc := http.Client{}
-					var b []byte
-					b, err = json.Marshal(data)
-					if err != nil {
-						log.Printf("[error] Unable to marshal node data : %s", err)
-					} else {
-						var req *http.Request
-						var resp *http.Response
-						if options.Verbose {
-							log.Printf("[debug] POSTing data '%s'", string(b))
-						}
-						req, err = http.NewRequest("POST", options.ProvisionURL, bytes.NewReader(b))
-						if err != nil {
-							log.Printf("[error] Unable to construct POST request to provisioner : %s",
-								err)
-						} else {
-							req.Header.Add("Content-Type", "application/json")
-							resp, err = hc.Do(req)
-							if err != nil {
-								log.Printf("[error] Unable to process POST request : %s",
-									err)
-							} else {
-								defer resp.Body.Close()
-								if resp.StatusCode == http.StatusAccepted {
-									record.State = Provisioning
-								} else {
-									record.State = ProvisionError
-								}
-								record.Timestamp = time.Now().Unix()
-								options.ProvTracker.Set(node.ID(), record)
-							}
-						}
-					}
-				}
-			}
+		ips := node.IPs()
+		ip := ""
+		if len(ips) > 0 {
+			ip = ips[0]
 		}
+		macs := node.MACs()
+		mac := ""
+		if len(macs) > 0 {
+			mac = macs[0]
+		}
+		if options.Verbose {
+			log.Printf("[info] POSTing '%s' (%s) to '%s'", node.Hostname(),
+				node.ID(), options.ProvisionURL)
+		}
+		err = options.Provisioner.Provision(&ProvisionRequest{
+			Id:   node.ID(),
+			Name: node.Hostname(),
+			Ip:   ip,
+			Mac:  mac,
+		})
 
 		if err != nil {
-			if options.Verbose {
-				log.Printf("[warn] Not marking node '%s' with ID '%s' as provisioned, because of error '%s'",
-					node.Hostname(), node.ID(), err)
-				record.State = ProvisionError
-				options.ProvTracker.Set(node.ID(), record)
-			}
+			log.Printf("[error] unable to provision '%s' (%s) : %s", node.ID, node.Hostname(), err)
 		}
-	} else if record.State == Provisioning && time.Since(time.Unix(record.Timestamp, 0)) > options.ProvisionTTL {
+
+	} else if options.ProvisionTTL > 0 &&
+		record.Status == Running && time.Since(time.Unix(record.Timestamp, 0)) > options.ProvisionTTL {
 		log.Printf("[error] Provisioning of node '%s' has passed provisioning TTL of '%v'",
 			node.Hostname(), options.ProvisionTTL)
-		record.State = ProvisionError
-		options.ProvTracker.Set(node.ID(), record)
-	} else if record.State == Provisioning {
-		callout, err := url.Parse(options.ProvisionURL)
-		if err != nil {
-			log.Printf("[error] Unable to parse provisioning URL '%s' : %s", options.ProvisionURL, err)
-		} else if callout.Scheme != "file" {
-			var req *http.Request
-			var resp *http.Response
-			if options.Verbose {
-				log.Printf("[info] Fetching provisioning state for node '%s'", node.Hostname())
-			}
-			req, err = http.NewRequest("GET", options.ProvisionURL+"/"+node.ID(), nil)
-			if err != nil {
-				log.Printf("[error] Unable to construct GET request to provisioner : %s", err)
-			} else {
-				hc := http.Client{}
-				resp, err = hc.Do(req)
-				if err != nil {
-					log.Printf("[error] Failed to quest provision state for node '%s' : %s",
-						node.Hostname(), err)
-				} else {
-					defer resp.Body.Close()
-					if options.Verbose {
-						log.Printf("[debug] Got status '%s' for node '%s'", resp.Status, node.Hostname())
-					}
-					switch resp.StatusCode {
-					case http.StatusOK: // provisioning completed or failed
-						decoder := json.NewDecoder(resp.Body)
-						var raw interface{}
-						err = decoder.Decode(&raw)
-						if err != nil {
-							log.Printf("[error] Unable to unmarshal response from provisioner for '%s': %s",
-								node.Hostname(), err)
-						}
-						status := raw.(map[string]interface{})
-						switch int(status["status"].(float64)) {
-						case 0, 1: // PENDING, RUNNING ... should never really get here
-							// noop, already in this state
-						case 2: // COMPLETE
-							if options.Verbose {
-								log.Printf("[info] Marking node '%s' with ID '%s' as provisioned",
-									node.Hostname(), node.ID())
-							}
-							record.State = Provisioned
-							options.ProvTracker.Set(node.ID(), record)
-						case 3: // FAILED
-							if options.Verbose {
-								log.Printf("[info] Marking node '%s' with ID '%s' as failed provisioning",
-									node.Hostname(), node.ID())
-							}
-							record.State = ProvisionError
-							options.ProvTracker.Set(node.ID(), record)
-						default:
-							log.Printf("[error] unknown status state for node '%s' : %d",
-								node.Hostname(), int(status["status"].(float64)))
-						}
-					case http.StatusAccepted: // in the provisioning state
-						// Noop, presumably alread in this state
-					case http.StatusNotFound:
-						// Noop, but not an error
-					default: // Consider anything else an erorr
-						log.Printf("[warn] Node '%s' with ID '%s' failed provisioning, will retry",
-							node.Hostname(), node.ID())
-						record.State = ProvisionError
-						options.ProvTracker.Set(node.ID(), record)
-					}
-				}
-			}
-		}
+		options.Provisioner.Clear(node.ID())
 	} else if options.Verbose {
 		log.Printf("[info] Not invoking provisioning for '%s', current state is '%s'", node.Hostname(),
-			record.State.String())
+			record.Status.String())
 	}
 
 	return nil
