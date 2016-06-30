@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os/exec"
+	"time"
 )
 
 type WorkRequest struct {
@@ -20,10 +21,11 @@ type Worker struct {
 }
 
 type StatusMsg struct {
-	Request *WorkRequest `json:"request"`
-	Worker  int          `json:"worker"`
-	Status  TaskStatus   `json:"status"`
-	Message string       `json:"message"`
+	Request   *WorkRequest `json:"request"`
+	Worker    int          `json:"worker"`
+	Status    TaskStatus   `json:"status"`
+	Message   string       `json:"message"`
+	Timestamp int64        `json:"timestamp"`
 }
 
 func NewWorker(id int, workerQueue chan chan WorkRequest, statusChan chan StatusMsg) Worker {
@@ -48,16 +50,18 @@ func (w *Worker) Start() {
 			select {
 			case work := <-w.Work:
 				// Receive a work request.
-				w.StatusChan <- StatusMsg{&work, w.ID, Running, ""}
+				w.StatusChan <- StatusMsg{&work, w.ID, Running, "", time.Now().Unix()}
 				log.Printf("[debug] RUN: %s %s %s %s %s %s",
 					work.Script, work.Info.Id, work.Info.Name,
 					work.Info.Ip, work.Info.Mac, work.Role)
 				err := exec.Command(work.Script, work.Info.Id, work.Info.Name,
 					work.Info.Ip, work.Info.Mac, work.Role).Run()
 				if err != nil {
-					w.StatusChan <- StatusMsg{&work, w.ID, Failed, err.Error()}
+					w.StatusChan <- StatusMsg{&work, w.ID, Failed, err.Error(),
+						time.Now().Unix()}
 				} else {
-					w.StatusChan <- StatusMsg{&work, w.ID, Complete, ""}
+					w.StatusChan <- StatusMsg{&work, w.ID, Complete, "",
+						time.Now().Unix()}
 				}
 			case <-w.QuitChan:
 				// We have been asked to stop.
@@ -118,8 +122,8 @@ func (d *Dispatcher) Start() {
 			select {
 			case work := <-d.WorkQueue:
 				log.Println("[debug] Received work requeust")
+				d.StatusChan <- StatusMsg{&work, -1, Pending, "", time.Now().Unix()}
 				go func() {
-					d.StatusChan <- StatusMsg{&work, -1, Pending, ""}
 					worker := <-d.WorkerQueue
 
 					log.Println("[debug] Dispatching work request")

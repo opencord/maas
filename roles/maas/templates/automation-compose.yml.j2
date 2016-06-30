@@ -1,3 +1,14 @@
+storage:
+  image: "docker-registry:5000/consul:{{ docker.image_version }}"
+  container_name: storage
+  labels:
+    - "lab.solution=CORD"
+    - "lab.component=storage"
+    - "lab.implementation=consul"
+  volumes:
+    - "/etc/maas/automation/storage:/consul/data"
+  command: agent --server --bind 0.0.0.0 --client 0.0.0.0 --bootstrap
+
 allocator:
   image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
   container_name: allocator
@@ -21,6 +32,7 @@ provisioner:
     - "lab.component=provisioner"
   links:
     - allocator
+    - storage
   environment:
     # need to explicitly set the resolver, else go will skip the /etc/hosts file
     - "GODEBUG=netdns=go"
@@ -29,6 +41,7 @@ provisioner:
     - "PROVISION_LISTEN=0.0.0.0"
     - "PROVISION_DEFAULT_ROLE=compute-node"
     - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
+    - "PROVISION_STORAGE_URL=consul://storage:8500"
   volumes:
     - "/etc/maas/ansible:/etc/maas/ansible"
   restart: unless-stopped
@@ -63,7 +76,7 @@ automation:
     # need to explicitly set the resolver, else go will skip the /etc/hosts file
     - "GODEBUG=netdns=go"
     - "AUTOMATION_PROVISION_URL=http://provisioner:4243/provision/"
-    - "AUTOMATION_PROVISION_TTL=30m"
+    - "AUTOMATION_PROVISION_TTL=0s"
 {% if virtualbox_support is defined and virtualbox_support == "1" %}
     - "AUTOMATION_POWER_HELPER_SCRIPT=/etc/maas/virtualbox/power_discovery"
     - "AUTOMATION_POWER_HELPER_USER={{ virtualbox.power_helper_user }}"
