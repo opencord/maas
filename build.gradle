@@ -13,9 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.opencord.gradle.rules.*
 import org.yaml.snakeyaml.Yaml
 
+allprojects {
+    apply plugin: 'base'
+    apply plugin: 'de.gesellix.docker'
+    //apply plugin: 'com.tmiyamon.config'
+
+    docker {
+        // dockerHost = System.env.DOCKER_HOST ?: 'unix:///var/run/docker.sock'
+        // dockerHost = System.env.DOCKER_HOST ?: 'https://192.168.99.100:2376'
+        // certPath = System.getProperty('docker.cert.path') ?: "${System.getProperty('user.home')}/.docker/machine/machines/default"
+        // authConfigPlain = [
+        //   "username"       : "joe",
+        //   "password"       : "some-pw-as-needed",
+        //   "email"          : "joe@acme.com",
+        //   "serveraddress"  : "https://index.docker.io/v1/"
+        //  ]
+    }
+}
+
 ext {
+
+    // Upstream registry to simplify filling out the comps table below
+    upstreamReg = project.hasProperty('upstreamReg') ? project.getProperty('upstreamReg') : 'docker.io'
 
     // Target registry to be used to publish docker images needed for deployment
     targetReg = project.hasProperty('targetReg') ? project.getProperty('targetReg') : 'localhost:5000'
@@ -28,6 +50,19 @@ ext {
     deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
 
     dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '/usr/bin'
+
+    comps = [
+            'consul': [
+                    'type':     'image',
+                    'upstream': upstreamReg,
+                    'name':     'consul',
+                    'digest':   'sha256:0dc990ff3c44d5b5395475bcc5ebdae4fc8b67f69e17942a8b9793b3df74d290'
+            ]
+    ]
+}
+
+task fetchUpstreamImages {
+    comps.each { name, spec -> if (spec.type == 'image') { dependsOn "fetch" + name } }
 }
 
 // Switch Configuration Image
@@ -128,10 +163,15 @@ task publishHarvesterImage(type: Exec) {
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
 
+task updateDocker (type: Exec) {
+    commandLine 'sudo', 'utils/enable-remote-docker-registry', "$targetReg"
+}
+
 // To be used to fetch upstream binaries, clone repos, etc.
 task fetch(type: Exec) {
     // this is where we fetch upstream artifacts that we do not need internet for the build phase"
     // Placeholdr example:
+    dependsOn fetchUpstreamImages
     commandLine "$dockerPath/docker", "pull", "golang:alpine"
     commandLine "$dockerPath/docker", "pull", "python:2.7-alpine"
 }
@@ -157,6 +197,7 @@ task tagImages {
 }
 
 task publish {
+    comps.each { name, spec -> if (spec.type == 'image') { dependsOn "publish" + name } }
     dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
     dependsOn publishAutomationImage
@@ -164,6 +205,10 @@ task publish {
     dependsOn publishProvisionerImage
     dependsOn publishSwitchqImage
 }
+
+tasks.addRule(new DockerFetchRule(project))
+tasks.addRule(new DockerPublishRule(project))
+tasks.addRule(new DockerTagRule(project))
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -197,6 +242,7 @@ List.metaClass.p = { spec ->
 }
 
 task prime (type: Exec) {
+    dependsOn updateDocker
     println "Using deployment config: $deployConfig"
     File configFile = new File(deployConfig)
     def yaml = new Yaml()

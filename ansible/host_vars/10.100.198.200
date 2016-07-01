@@ -1,1 +1,1 @@
-ansible_ssh_private_key_file: /opencord/.vagrant/machines/cd/virtualbox/private_key
+ansible_ssh_private_key_file: /maasdev/.vagrant/machines/maasdev/virtualbox/private_key
