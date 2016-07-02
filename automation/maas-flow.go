@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"github.com/Sirupsen/logrus"
 	"github.com/kelseyhightower/envconfig"
-	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -35,6 +35,8 @@ type Config struct {
 	PowerHelperScript string `default:"" envconfig:"POWER_HELPER_SCRIPT"`
 	ProvisionUrl      string `default:"" envconfig:"PROVISION_URL"`
 	ProvisionTtl      string `default:"1h" envconfig:"PROVISION_TTL"`
+	LogLevel          string `default:"warning" envconfig:"LOG_LEVEL"`
+	LogFormat         string `default:"text" envconfig:"LOG_FORMAT"`
 }
 
 var apiKey = flag.String("apikey", "", "key with which to access MAAS server")
@@ -44,7 +46,6 @@ var queryPeriod = flag.String("period", "15s", "frequency the MAAS service is po
 var preview = flag.Bool("preview", false, "displays the action that would be taken, but does not do the action, in this mode the nodes are processed only once")
 var mappings = flag.String("mappings", "{}", "the mac to name mappings")
 var always = flag.Bool("always-rename", true, "attempt to rename at every stage of workflow")
-var verbose = flag.Bool("verbose", false, "display verbose logging")
 var filterSpec = flag.String("filter", strings.Map(func(r rune) rune {
 	if unicode.IsSpace(r) {
 		return -1
@@ -56,7 +57,7 @@ var filterSpec = flag.String("filter", strings.Map(func(r rune) rune {
 // return false.
 func checkError(err error, message string, v ...interface{}) bool {
 	if err != nil {
-		log.Fatalf("[error] "+message, v)
+		log.Fatalf(message, v...)
 	}
 	return false
 }
@@ -65,7 +66,7 @@ func checkError(err error, message string, v ...interface{}) bool {
 // return true, else return false.
 func checkWarn(err error, message string, v ...interface{}) bool {
 	if err != nil {
-		log.Printf("[warn] "+message, v)
+		log.Warningf(message, v...)
 		return true
 	}
 	return false
@@ -93,16 +94,19 @@ func fetchNodes(client *maas.MAASObject) ([]MaasNode, error) {
 	return nodes, nil
 }
 
+var log = logrus.New()
+
 func main() {
 
 	flag.Parse()
 	config := Config{}
 	err := envconfig.Process("AUTOMATION", &config)
-	checkError(err, "[error] unable to parse environment options : %s", err)
+	if err != nil {
+		log.Fatalf("Unable to parse configuration options : %s", err)
+	}
 
 	options := ProcessingOptions{
 		Preview:         *preview,
-		Verbose:         *verbose,
 		AlwaysRename:    *always,
 		Provisioner:     NewProvisioner(&ProvisionerConfig{Url: config.ProvisionUrl}),
 		ProvisionURL:    config.ProvisionUrl,
@@ -111,8 +115,24 @@ func main() {
 		PowerHelperHost: config.PowerHelperHost,
 	}
 
+	switch config.LogFormat {
+	case "json":
+		log.Formatter = &logrus.JSONFormatter{}
+	default:
+		log.Formatter = &logrus.TextFormatter{
+			FullTimestamp: true,
+			ForceColors:   true,
+		}
+	}
+
+	level, err := logrus.ParseLevel(config.LogLevel)
+	if err != nil {
+		level = logrus.WarnLevel
+	}
+	log.Level = level
+
 	options.ProvisionTTL, err = time.ParseDuration(config.ProvisionTtl)
-	checkError(err, "[error] unable to parse specified duration of '%s' : %s", err)
+	checkError(err, "unable to parse specified duration of '%s' : %s", err)
 
 	// Determine the filter, this can either be specified on the the command
 	// line as a value or a file reference. If none is specified the default
@@ -121,17 +141,17 @@ func main() {
 		if (*filterSpec)[0] == '@' {
 			name := os.ExpandEnv((*filterSpec)[1:])
 			file, err := os.OpenFile(name, os.O_RDONLY, 0)
-			checkError(err, "[error] unable to open file '%s' to load the filter : %s", name, err)
+			checkError(err, "unable to open file '%s' to load the filter : %s", name, err)
 			decoder := json.NewDecoder(file)
 			err = decoder.Decode(&options.Filter)
-			checkError(err, "[error] unable to parse filter configuration from file '%s' : %s", name, err)
+			checkError(err, "unable to parse filter configuration from file '%s' : %s", name, err)
 		} else {
 			err := json.Unmarshal([]byte(*filterSpec), &options.Filter)
-			checkError(err, "[error] unable to parse filter specification: '%s' : %s", *filterSpec, err)
+			checkError(err, "unable to parse filter specification: '%s' : %s", *filterSpec, err)
 		}
 	} else {
 		err := json.Unmarshal([]byte(defaultFilter), &options.Filter)
-		checkError(err, "[error] unable to parse default filter specificiation: '%s' : %s", defaultFilter, err)
+		checkError(err, "unable to parse default filter specificiation: '%s' : %s", defaultFilter, err)
 	}
 
 	// Determine the mac to name mapping, this can either be specified on the the command
@@ -141,44 +161,45 @@ func main() {
 		if (*mappings)[0] == '@' {
 			name := os.ExpandEnv((*mappings)[1:])
 			file, err := os.OpenFile(name, os.O_RDONLY, 0)
-			checkError(err, "[error] unable to open file '%s' to load the mac name mapping : %s", name, err)
+			checkError(err, "unable to open file '%s' to load the mac name mapping : %s", name, err)
 			decoder := json.NewDecoder(file)
 			err = decoder.Decode(&options.Mappings)
-			checkError(err, "[error] unable to parse filter configuration from file '%s' : %s", name, err)
+			checkError(err, "unable to parse filter configuration from file '%s' : %s", name, err)
 		} else {
 			err := json.Unmarshal([]byte(*mappings), &options.Mappings)
-			checkError(err, "[error] unable to parse mac name mapping: '%s' : %s", *mappings, err)
+			checkError(err, "unable to parse mac name mapping: '%s' : %s", *mappings, err)
 		}
 	} else {
 		err := json.Unmarshal([]byte(defaultMapping), &options.Mappings)
-		checkError(err, "[error] unable to parse default mac name mappings: '%s' : %s", defaultMapping, err)
+		checkError(err, "unable to parse default mac name mappings: '%s' : %s", defaultMapping, err)
 	}
 
 	// Verify the specified period for queries can be converted into a Go duration
 	period, err := time.ParseDuration(*queryPeriod)
-	checkError(err, "[error] unable to parse specified query period duration: '%s': %s", queryPeriod, err)
+	checkError(err, "unable to parse specified query period duration: '%s': %s", queryPeriod, err)
 
-	log.Printf(`Configuration:
+	log.Infof(`Configuration:
 	    MAAS URL:            %s
 	    MAAS API Version:    %s
 	    MAAS Query Interval: %s
 	    Node Filter:         %s
 	    Node Name Mappings:  %s
 	    Preview:             %v
-	    Verbose:             %v
 	    Always Rename:       %v
 	    Provision URL:       %s
 	    Provision TTL:       %s
 	    Power Helper:        %s
 	    Power Helper User:   %s
-	    Power Helper Host:   %s`,
+	    Power Helper Host:   %s
+	    Log Level:           %s
+	    Log Format:		 %s`,
 		*maasURL, *apiVersion, *queryPeriod, *filterSpec, *mappings, options.Preview,
-		options.Verbose, options.AlwaysRename, options.ProvisionURL, options.ProvisionTTL,
-		options.PowerHelper, options.PowerHelperUser, options.PowerHelperHost)
+		options.AlwaysRename, options.ProvisionURL, options.ProvisionTTL,
+		options.PowerHelper, options.PowerHelperUser, options.PowerHelperHost, config.LogLevel, config.LogFormat)
 
 	authClient, err := maas.NewAuthenticatedClient(*maasURL, *apiKey, *apiVersion)
 	if err != nil {
-		checkError(err, "[error] Unable to use specified client key, '%s', to authenticate to the MAAS server: %s", *apiKey, err)
+		checkError(err, "Unable to use specified client key, '%s', to authenticate to the MAAS server: %s", *apiKey, err)
 	}
 
 	// Create an object through which we will communicate with MAAS
@@ -197,7 +218,7 @@ func main() {
 		// Create a ticker and fetch and process the nodes every "period"
 		ticker := time.NewTicker(period)
 		for t := range ticker.C {
-			log.Printf("[info] query server at %s", t)
+			log.Infof("query server at %s", t)
 			nodes, _ := fetchNodes(client)
 			ProcessAll(client, nodes, options)
 		}

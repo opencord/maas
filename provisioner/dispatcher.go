@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os/exec"
 	"time"
 )
@@ -51,7 +50,7 @@ func (w *Worker) Start() {
 			case work := <-w.Work:
 				// Receive a work request.
 				w.StatusChan <- StatusMsg{&work, w.ID, Running, "", time.Now().Unix()}
-				log.Printf("[debug] RUN: %s %s %s %s %s %s",
+				log.Debugf("RUN: %s %s %s %s %s %s",
 					work.Script, work.Info.Id, work.Info.Name,
 					work.Info.Ip, work.Info.Mac, work.Role)
 				err := exec.Command(work.Script, work.Info.Id, work.Info.Name,
@@ -65,7 +64,7 @@ func (w *Worker) Start() {
 				}
 			case <-w.QuitChan:
 				// We have been asked to stop.
-				log.Printf("worker%d stopping\n", w.ID)
+				log.Infof("worker%d stopping\n", w.ID)
 				return
 			}
 		}
@@ -112,7 +111,7 @@ func (d *Dispatcher) Dispatch(info *RequestInfo, role string, script string) err
 func (d *Dispatcher) Start() {
 	// Now, create all of our workers.
 	for i := 0; i < d.NumWorkers; i++ {
-		log.Printf("Creating worker %d", i)
+		log.Infof("Creating worker %d", i)
 		worker := NewWorker(i, d.WorkerQueue, d.StatusChan)
 		worker.Start()
 	}
@@ -121,24 +120,24 @@ func (d *Dispatcher) Start() {
 		for {
 			select {
 			case work := <-d.WorkQueue:
-				log.Println("[debug] Received work requeust")
+				log.Debugf("Received work requeust")
 				d.StatusChan <- StatusMsg{&work, -1, Pending, "", time.Now().Unix()}
 				go func() {
 					worker := <-d.WorkerQueue
 
-					log.Println("[debug] Dispatching work request")
+					log.Debugf("Dispatching work request")
 					worker <- work
 				}()
 			case update := <-d.StatusChan:
 				err := d.Storage.Put(update.Request.Info.Id, update)
 				if err != nil {
-					log.Printf("[error] Unable to update storage with status for '%s' : %s",
+					log.Errorf("Unable to update storage with status for '%s' : %s",
 						update.Request.Info.Id, err)
 				} else {
-					log.Printf("[debug] Storage updated for '%s'", update.Request.Info.Id)
+					log.Debugf("Storage updated for '%s'", update.Request.Info.Id)
 				}
 			case <-d.QuitChan:
-				log.Println("[info] Stopping dispatcher")
+				log.Infof("Stopping dispatcher")
 				return
 			}
 		}

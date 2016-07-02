@@ -2,9 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"log"
-	"strings"
 	"net/http"
+	"strings"
 )
 
 type Vendors interface {
@@ -43,7 +42,7 @@ func NewVendors(spec string) (Vendors, error) {
 	for _, rec := range data {
 		v.Vendors[rec.Prefix] = rec
 	}
-	log.Printf("[debug] %v", v.Vendors)
+	log.Debugf("known vendors %+v", v.Vendors)
 
 	return &v, nil
 }

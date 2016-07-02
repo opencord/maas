@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
-	"log"
 	"net/http"
 )
 
@@ -15,6 +15,8 @@ type Config struct {
 	DefaultRole     string `default:"compute-node" envconfig:"default_role"`
 	Script          string `default:"do-ansible"`
 	StorageURL      string `default:"memory:" envconfig:"storage_url"`
+	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL"`
+	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
 }
 
 type Context struct {
@@ -24,23 +26,44 @@ type Context struct {
 	dispatcher *Dispatcher
 }
 
+var log = logrus.New()
+
 func main() {
 	context := &Context{}
 
 	err := envconfig.Process("PROVISION", &(context.config))
 	if err != nil {
-		log.Fatalf("[error] Unable to parse configuration options : %s", err)
+		log.Fatalf("[ERRO] Unable to parse configuration options : %s", err)
 	}
 
-	log.Printf(`Configuration:
+	switch context.config.LogFormat {
+	case "json":
+		log.Formatter = &logrus.JSONFormatter{}
+	default:
+		log.Formatter = &logrus.TextFormatter{
+			FullTimestamp: true,
+			ForceColors:   true,
+		}
+	}
+
+	level, err := logrus.ParseLevel(context.config.LogLevel)
+	if err != nil {
+		level = logrus.WarnLevel
+	}
+	log.Level = level
+
+	log.Infof(`Configuration:
 	    Listen:          %s
 	    Port:            %d
 	    RoleSelectorURL: %s
 	    DefaultRole:     %s
 	    Script:          %s
-	    StorageURL:      %s`,
+	    StorageURL:      %s
+	    Log Level:       %s
+	    Log Format:      %s`,
 		context.config.Listen, context.config.Port, context.config.RoleSelectorURL,
-		context.config.DefaultRole, context.config.Script, context.config.StorageURL)
+		context.config.DefaultRole, context.config.Script, context.config.StorageURL,
+		context.config.LogLevel, context.config.LogFormat)
 
 	context.storage, err = NewStorage(context.config.StorageURL)
 	if err != nil {

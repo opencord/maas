@@ -39,7 +39,7 @@ RUN go get github.com/tools/godep
 ADD . /go/src/gerrit.opencord.org/maas/cord-provisioner
 
 WORKDIR /go/src/gerrit.opencord.org/maas/cord-provisioner
-RUN $GOPATH/bin/godep restore
+RUN $GOPATH/bin/godep restore || true
 
 WORKDIR $GOPATH
 RUN go install gerrit.opencord.org/maas/cord-provisioner

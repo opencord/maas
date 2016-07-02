@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-
 	maas "github.com/juju/gomaasapi"
 	"net/url"
 )
@@ -89,7 +87,7 @@ func (n *MaasNode) UpdatePowerParameters(ptype string, params map[string]string)
 	}
 	_, err := n.Update(values)
 	if err != nil {
-		log.Printf("[error] error updating power settings : %s", err.Error())
+		log.Errorf("error updating power settings : %s", err.Error())
 	}
 }
 

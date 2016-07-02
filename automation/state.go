@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"os/exec"
 	"regexp"
@@ -44,7 +43,6 @@ type ProcessingOptions struct {
 		}
 	}
 	Mappings        map[string]interface{}
-	Verbose         bool
 	Preview         bool
 	AlwaysRename    bool
 	Provisioner     Provisioner
@@ -130,7 +128,7 @@ func updateNodeName(client *maas.MAASObject, node MaasNode, options ProcessingOp
 			if name, ok := entry.(map[string]interface{})["hostname"]; ok && current != name.(string) {
 				nodesObj := client.GetSubObject("nodes")
 				nodeObj := nodesObj.GetSubObject(node.ID())
-				log.Printf("RENAME '%s' to '%s'\n", node.Hostname(), name.(string))
+				log.Infof("RENAME '%s' to '%s'\n", node.Hostname(), name.(string))
 
 				if !options.Preview {
 					nodeObj.Update(url.Values{"hostname": []string{name.(string)}})
@@ -143,9 +141,7 @@ func updateNodeName(client *maas.MAASObject, node MaasNode, options ProcessingOp
 
 // Reset we are at the target state, nothing to do
 var Reset = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	if options.Verbose {
-		log.Printf("RESET: %s", node.Hostname())
-	}
+	log.Debugf("RESET: %s", node.Hostname())
 
 	if options.AlwaysRename {
 		updateNodeName(client, node, options)
@@ -158,9 +154,7 @@ var Reset = func(client *maas.MAASObject, node MaasNode, options ProcessingOptio
 
 // Provision we are at the target state, nothing to do
 var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	if options.Verbose {
-		log.Printf("CHECK PROVISION: %s", node.Hostname())
-	}
+	log.Debugf("CHECK PROVISION: %s", node.Hostname())
 
 	if options.AlwaysRename {
 		updateNodeName(client, node, options)
@@ -168,7 +162,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 
 	record, err := options.Provisioner.Get(node.ID())
 	if err != nil {
-		log.Printf("[warn] unable to retrieve provisioning state of node '%s' : %s", node.Hostname(), err)
+		log.Warningf("unable to retrieve provisioning state of node '%s' : %s", node.Hostname(), err)
 	} else if record == nil || record.Status == Failed {
 		var label string
 		if record == nil {
@@ -176,9 +170,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 		} else {
 			label = record.Status.String()
 		}
-		if options.Verbose {
-			log.Printf("[info] Current state of node '%s' is '%s'", node.Hostname(), label)
-		}
+		log.Debugf("Current state of node '%s' is '%s'", node.Hostname(), label)
 		ips := node.IPs()
 		ip := ""
 		if len(ips) > 0 {
@@ -189,10 +181,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 		if len(macs) > 0 {
 			mac = macs[0]
 		}
-		if options.Verbose {
-			log.Printf("[info] POSTing '%s' (%s) to '%s'", node.Hostname(),
-				node.ID(), options.ProvisionURL)
-		}
+		log.Debugf("POSTing '%s' (%s) to '%s'", node.Hostname(), node.ID(), options.ProvisionURL)
 		err = options.Provisioner.Provision(&ProvisionRequest{
 			Id:   node.ID(),
 			Name: node.Hostname(),
@@ -201,16 +190,16 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 		})
 
 		if err != nil {
-			log.Printf("[error] unable to provision '%s' (%s) : %s", node.ID, node.Hostname(), err)
+			log.Errorf("unable to provision '%s' (%s) : %s", node.ID, node.Hostname(), err)
 		}
 
 	} else if options.ProvisionTTL > 0 &&
 		record.Status == Running && time.Since(time.Unix(record.Timestamp, 0)) > options.ProvisionTTL {
-		log.Printf("[error] Provisioning of node '%s' has passed provisioning TTL of '%v'",
+		log.Errorf("Provisioning of node '%s' has passed provisioning TTL of '%v'",
 			node.Hostname(), options.ProvisionTTL)
 		options.Provisioner.Clear(node.ID())
-	} else if options.Verbose {
-		log.Printf("[info] Not invoking provisioning for '%s', current state is '%s'", node.Hostname(),
+	} else {
+		log.Debugf("Not invoking provisioning for '%s', current state is '%s'", node.Hostname(),
 			record.Status.String())
 	}
 
@@ -223,9 +212,7 @@ var Done = func(client *maas.MAASObject, node MaasNode, options ProcessingOption
 	// log this fact unless we are in verbose mode. I suspect it would be
 	// nice to log it once when the device transitions from a non COMPLETE
 	// state to a complete state, but that would require keeping state.
-	if options.Verbose {
-		log.Printf("COMPLETE: %s", node.Hostname())
-	}
+	log.Debugf("COMPLETE: %s", node.Hostname())
 
 	if options.AlwaysRename {
 		updateNodeName(client, node, options)
@@ -236,7 +223,7 @@ var Done = func(client *maas.MAASObject, node MaasNode, options ProcessingOption
 
 // Deploy cause a node to deploy
 var Deploy = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	log.Printf("DEPLOY: %s", node.Hostname())
+	log.Infof("DEPLOY: %s", node.Hostname())
 
 	if options.AlwaysRename {
 		updateNodeName(client, node, options)
@@ -249,7 +236,7 @@ var Deploy = func(client *maas.MAASObject, node MaasNode, options ProcessingOpti
 		// a parameter default
 		_, err := myNode.CallPost("start", url.Values{"distro_series": []string{"trusty"}})
 		if err != nil {
-			log.Printf("ERROR: DEPLOY '%s' : '%s'", node.Hostname(), err)
+			log.Errorf("DEPLOY '%s' : '%s'", node.Hostname(), err)
 			return err
 		}
 	}
@@ -258,7 +245,7 @@ var Deploy = func(client *maas.MAASObject, node MaasNode, options ProcessingOpti
 
 // Aquire aquire a machine to a specific operator
 var Aquire = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	log.Printf("AQUIRE: %s", node.Hostname())
+	log.Infof("AQUIRE: %s", node.Hostname())
 	nodesObj := client.GetSubObject("nodes")
 
 	if options.AlwaysRename {
@@ -352,7 +339,7 @@ var Aquire = func(client *maas.MAASObject, node MaasNode, options ProcessingOpti
 		_, err = nodesObj.CallPost("acquire",
 			url.Values{"name": []string{node.Hostname()}})
 		if err != nil {
-			log.Printf("ERROR: AQUIRE '%s' : '%s'", node.Hostname(), err)
+			log.Errorf("AQUIRE '%s' : '%s'", node.Hostname(), err)
 			return err
 		}
 	}
@@ -369,21 +356,21 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 	switch state {
 	case "on":
 		// Attempt to turn the node off
-		log.Printf("POWER DOWN: %s", node.Hostname())
+		log.Infof("POWER DOWN: %s", node.Hostname())
 		if !options.Preview {
 			//POST /api/1.0/nodes/{system_id}/ op=stop
 			nodesObj := client.GetSubObject("nodes")
 			nodeObj := nodesObj.GetSubObject(node.ID())
 			_, err := nodeObj.CallPost("stop", url.Values{"stop_mode": []string{"soft"}})
 			if err != nil {
-				log.Printf("ERROR: Commission '%s' : changing power start to off : '%s'", node.Hostname(), err)
+				log.Errorf("Commission '%s' : changing power start to off : '%s'", node.Hostname(), err)
 			}
 			return err
 		}
 		break
 	case "off":
 		// We are off so move to commissioning
-		log.Printf("COMISSION: %s", node.Hostname())
+		log.Infof("COMISSION: %s", node.Hostname())
 		if !options.Preview {
 			nodesObj := client.GetSubObject("nodes")
 			nodeObj := nodesObj.GetSubObject(node.ID())
@@ -392,14 +379,14 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 
 			_, err := nodeObj.CallPost("commission", url.Values{})
 			if err != nil {
-				log.Printf("ERROR: Commission '%s' : '%s'", node.Hostname(), err)
+				log.Errorf("Commission '%s' : '%s'", node.Hostname(), err)
 			}
 			return err
 		}
 		break
 	default:
 		// We are in a state from which we can't move forward.
-		log.Printf("[warn]: %s has invalid power state '%s'", node.Hostname(), state)
+		log.Warningf("%s has invalid power state '%s'", node.Hostname(), state)
 
 		// If a power helper script is set, we have an unknown power state, and
 		// we have not power type then attempt to use the helper script to discover
@@ -410,14 +397,14 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 					node.MACs()...)...)
 			stdout, err := cmd.Output()
 			if err != nil {
-				log.Printf("[error] Failed while executing power helper script '%s' : %s",
+				log.Errorf("Failed while executing power helper script '%s' : %s",
 					options.PowerHelper, err)
 				return err
 			}
 			power := Power{}
 			err = json.Unmarshal(stdout, &power)
 			if err != nil {
-				log.Printf("[error] Failed to parse output of power helper script '%s' : %s",
+				log.Errorf("Failed to parse output of power helper script '%s' : %s",
 					options.PowerHelper, err)
 				return err
 			}
@@ -430,7 +417,7 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 				}
 				node.UpdatePowerParameters(power.Name, params)
 			default:
-				log.Printf("[warn] Unsupported power type discovered '%s'", power.Name)
+				log.Warningf("Unsupported power type discovered '%s'", power.Name)
 			}
 		}
 		break
@@ -440,32 +427,32 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 
 // Wait a do nothing state, while work is being done
 var Wait = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	log.Printf("WAIT: %s", node.Hostname())
+	log.Infof("WAIT: %s", node.Hostname())
 	return nil
 }
 
 // Fail a state from which we cannot, currently, automatically recover
 var Fail = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	log.Printf("FAIL: %s", node.Hostname())
+	log.Infof("FAIL: %s", node.Hostname())
 	return nil
 }
 
 // AdminState an administrative state from which we should make no automatic transition
 var AdminState = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	log.Printf("ADMIN: %s", node.Hostname())
+	log.Infof("ADMIN: %s", node.Hostname())
 	return nil
 }
 
 func findActions(target string, current string) ([]Action, error) {
 	targets, ok := Transitions[target]
 	if !ok {
-		log.Printf("[warn] unable to find transitions to target state '%s'", target)
+		log.Warningf("unable to find transitions to target state '%s'", target)
 		return nil, fmt.Errorf("Could not find transition to target state '%s'", target)
 	}
 
 	actions, ok := targets[current]
 	if !ok {
-		log.Printf("[warn] unable to find transition from current state '%s' to target state '%s'",
+		log.Warningf("unable to find transition from current state '%s' to target state '%s'",
 			current, target)
 		return nil, fmt.Errorf("Could not find transition from current state '%s' to target state '%s'",
 			current, target)
@@ -479,7 +466,7 @@ func ProcessActions(actions []Action, client *maas.MAASObject, node MaasNode, op
 	var err error
 	for _, action := range actions {
 		if err = action(client, node, options); err != nil {
-			log.Printf("[error] Error while processing action for node '%s' : %s",
+			log.Errorf("Error while processing action for node '%s' : %s",
 				node.Hostname(), err)
 			break
 		}
@@ -554,16 +541,12 @@ func ProcessAll(client *maas.MAASObject, nodes []MaasNode, options ProcessingOpt
 					errors[i] = nil
 				}
 			} else {
-				if options.Verbose {
-					log.Printf("[info] ignoring node '%s' as its zone '%s' didn't match include zone name filter '%v'",
-						node.Hostname(), node.Zone(), options.Filter.Zones.Include)
-				}
+				log.Debugf("ignoring node '%s' as its zone '%s' didn't match include zone name filter '%v'",
+					node.Hostname(), node.Zone(), options.Filter.Zones.Include)
 			}
 		} else {
-			if options.Verbose {
-				log.Printf("[info] ignoring node '%s' as it didn't match include hostname filter '%v'",
-					node.Hostname(), options.Filter.Hosts.Include)
-			}
+			log.Debugf("ignoring node '%s' as it didn't match include hostname filter '%v'",
+				node.Hostname(), options.Filter.Hosts.Include)
 		}
 	}
 	return errors

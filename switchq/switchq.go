@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/Sirupsen/logrus"
 	"github.com/kelseyhightower/envconfig"
-	"log"
 	"net/http"
 	"time"
 )
@@ -20,6 +20,8 @@ type Config struct {
 	RoleSelectorURL string `default:"" envconfig:"role_selector_url"`
 	DefaultRole     string `default:"fabric-switch" envconfig:"default_role"`
 	Script          string `default:"do-ansible"`
+	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL"`
+	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
 
 	vendors       Vendors
 	storage       Storage
@@ -35,16 +37,16 @@ func checkError(err error, msg string, args ...interface{}) {
 }
 
 func (c *Config) getProvisionedState(rec AddressRec) (int, string, error) {
-	log.Printf("[debug] Fetching provisioned state of device '%s' (%s, %s)",
+	log.Debugf("Fetching provisioned state of device '%s' (%s, %s)",
 		rec.Name, rec.IP, rec.MAC)
 	resp, err := http.Get(c.ProvisionURL + rec.MAC)
 	if err != nil {
-		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
+		log.Errorf("Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
 			rec.Name, rec.IP, rec.MAC, err)
 		return -1, "", err
 	}
 	if resp.StatusCode != 404 && int(resp.StatusCode/100) != 2 {
-		log.Printf("[error] Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
+		log.Errorf("Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
 			rec.Name, rec.IP, rec.MAC, resp.Status)
 		return -1, "", fmt.Errorf(resp.Status)
 	}
@@ -54,7 +56,7 @@ func (c *Config) getProvisionedState(rec AddressRec) (int, string, error) {
 		var raw interface{}
 		err = decoder.Decode(&raw)
 		if err != nil {
-			log.Printf("[error] Unmarshal provisioning service response for device '%s (%s, %s)' : %s",
+			log.Errorf("Unmarshal provisioning service response for device '%s (%s, %s)' : %s",
 				rec.Name, rec.IP, rec.MAC, err)
 			return -1, "", err
 		}
@@ -68,7 +70,7 @@ func (c *Config) getProvisionedState(rec AddressRec) (int, string, error) {
 			return 3, status["message"].(string), nil
 		default:
 			err = fmt.Errorf("unknown provisioning status : %d", status["status"])
-			log.Printf("[error] received unknown provisioning status for device '%s (%s)' : %s",
+			log.Errorf("received unknown provisioning status for device '%s (%s)' : %s",
 				rec.Name, rec.MAC, err)
 			return -1, "", err
 		}
@@ -80,7 +82,7 @@ func (c *Config) getProvisionedState(rec AddressRec) (int, string, error) {
 }
 
 func (c *Config) provision(rec AddressRec) error {
-	log.Printf("[info] POSTing to '%s' for provisioning of '%s (%s)'", c.ProvisionURL, rec.Name, rec.MAC)
+	log.Infof("POSTing to '%s' for provisioning of '%s (%s)'", c.ProvisionURL, rec.Name, rec.MAC)
 	data := map[string]string{
 		"id":   rec.MAC,
 		"name": rec.Name,
@@ -101,25 +103,25 @@ func (c *Config) provision(rec AddressRec) error {
 	var b []byte
 	b, err := json.Marshal(data)
 	if err != nil {
-		log.Printf("[error] Unable to marshal provisioning data : %s", err)
+		log.Errorf("Unable to marshal provisioning data : %s", err)
 		return err
 	}
 	req, err := http.NewRequest("POST", c.ProvisionURL, bytes.NewReader(b))
 	if err != nil {
-		log.Printf("[error] Unable to construct POST request to provisioner : %s", err)
+		log.Errorf("Unable to construct POST request to provisioner : %s", err)
 		return err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := hc.Do(req)
 	if err != nil {
-		log.Printf("[error] Unable to POST request to provisioner : %s", err)
+		log.Errorf("Unable to POST request to provisioner : %s", err)
 		return err
 	}
 
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusAccepted {
-		log.Printf("[error] Provisioning request not accepted by provisioner : %s", resp.Status)
+		log.Errorf("Provisioning request not accepted by provisioner : %s", resp.Status)
 		return err
 	}
 
@@ -134,7 +136,7 @@ func (c *Config) processRecord(rec AddressRec) error {
 
 	if !ok {
 		// Not something we care about
-		log.Printf("[debug] host with IP '%s' and MAC '%s' and named '%s' not a known switch type",
+		log.Debugf("host with IP '%s' and MAC '%s' and named '%s' not a known switch type",
 			rec.IP, rec.MAC, rec.Name)
 		return nil
 	}
@@ -145,10 +147,10 @@ func (c *Config) processRecord(rec AddressRec) error {
 	}
 
 	if last == nil {
-		log.Printf("[debug] no TTL for device '%s' (%s, %s)",
+		log.Debugf("no TTL for device '%s' (%s, %s)",
 			rec.Name, rec.IP, rec.MAC)
 	} else {
-		log.Printf("[debug] TTL for device '%s' (%s, %s) is %v",
+		log.Debugf("TTL for device '%s' (%s, %s) is %v",
 			rec.Name, rec.IP, rec.MAC, *last)
 	}
 
@@ -157,23 +159,23 @@ func (c *Config) processRecord(rec AddressRec) error {
 	state, message, err := c.getProvisionedState(rec)
 	switch state {
 	case 0, 1: // Pending or Running
-		log.Printf("[debug] device '%s' (%s, %s) is being provisioned",
+		log.Debugf("device '%s' (%s, %s) is being provisioned",
 			rec.Name, rec.IP, rec.MAC)
 		return nil
 	case 2: // Complete
-		log.Printf("[debug] device '%s' (%s, %s) has completed provisioning",
+		log.Debugf("device '%s' (%s, %s) has completed provisioning",
 			rec.Name, rec.IP, rec.MAC)
 		// If no last record then set the TTL
 		if last == nil {
 			now := time.Now()
 			last = &now
 			c.storage.MarkProvisioned(rec.MAC, last)
-			log.Printf("[debug] Storing TTL for device '%s' (%s, %s) as %v",
+			log.Debugf("Storing TTL for device '%s' (%s, %s) as %v",
 				rec.Name, rec.IP, rec.MAC, now)
 			return nil
 		}
 	case 3: // Failed
-		log.Printf("[debug] device '%s' (%s, %s) failed last provisioning with message '%s', reattempt",
+		log.Debugf("device '%s' (%s, %s) failed last provisioning with message '%s', reattempt",
 			rec.Name, rec.IP, rec.MAC, message)
 		c.storage.ClearProvisioned(rec.MAC)
 		last = nil
@@ -184,25 +186,46 @@ func (c *Config) processRecord(rec AddressRec) error {
 	if last == nil || (c.ttl > 0 && time.Since(*last) > c.ttl) {
 		if last != nil {
 			c.storage.ClearProvisioned(rec.MAC)
-			log.Printf("[debug] device '%s' (%s, %s) TTL expired, reprovisioning",
+			log.Debugf("device '%s' (%s, %s) TTL expired, reprovisioning",
 				rec.Name, rec.IP, rec.MAC)
 		}
 		c.provision(rec)
 	} else if c.ttl == 0 {
-		log.Printf("[debug] device '%s' (%s, %s) has completed its one time provisioning, with a TTL set to %s",
+		log.Debugf("device '%s' (%s, %s) has completed its one time provisioning, with a TTL set to %s",
 			rec.Name, rec.IP, rec.MAC, c.ProvisionTTL)
 	} else {
-		log.Printf("[debug] device '%s' (%s, %s) has completed provisioning within the specified TTL of %s",
+		log.Debugf("device '%s' (%s, %s) has completed provisioning within the specified TTL of %s",
 			rec.Name, rec.IP, rec.MAC, c.ProvisionTTL)
 	}
 	return nil
 }
 
+var log = logrus.New()
+
 func main() {
 
 	var err error
 	config := Config{}
-	envconfig.Process("SWITCHQ", &config)
+	err = envconfig.Process("SWITCHQ", &config)
+	if err != nil {
+		log.Fatalf("Unable to parse configuration options : %s", err)
+	}
+
+	switch config.LogFormat {
+	case "json":
+		log.Formatter = &logrus.JSONFormatter{}
+	default:
+		log.Formatter = &logrus.TextFormatter{
+			FullTimestamp: true,
+			ForceColors:   true,
+		}
+	}
+
+	level, err := logrus.ParseLevel(config.LogLevel)
+	if err != nil {
+		level = logrus.WarnLevel
+	}
+	log.Level = level
 
 	config.vendors, err = NewVendors(config.VendorsURL)
 	checkError(err, "Unable to create known vendors list from specified URL '%s' : %s", config.VendorsURL, err)
@@ -219,7 +242,7 @@ func main() {
 	config.ttl, err = time.ParseDuration(config.ProvisionTTL)
 	checkError(err, "Unable to parse specified provision TTL value of '%s' : %s", config.ProvisionTTL, err)
 
-	log.Printf(`Configuration:
+	log.Infof(`Configuration:
 		Vendors URL:       %s
 		Storage URL:       %s
 		Poll Interval:     %s
@@ -228,25 +251,28 @@ func main() {
 		Provision URL:     %s
 		Role Selector URL: %s
 		Default Role:      %s
-		Script:            %s`,
+		Script:            %s
+		Log Level:         %s
+		Log Format:        %s`,
 		config.VendorsURL, config.StorageURL, config.PollInterval, config.AddressURL, config.ProvisionTTL,
-		config.ProvisionURL, config.RoleSelectorURL, config.DefaultRole, config.Script)
+		config.ProvisionURL, config.RoleSelectorURL, config.DefaultRole, config.Script,
+		config.LogLevel, config.LogFormat)
 
 	// We use two methods to attempt to find the MAC (hardware) address associated with an IP. The first
 	// is to look in the table. The second is to send an ARP packet.
 	for {
-		log.Printf("[info] Checking for switches @ %s", time.Now())
+		log.Infof("Checking for switches @ %s", time.Now())
 		addresses, err := config.addressSource.GetAddresses()
 
 		if err != nil {
-			log.Printf("[error] unable to read addresses from address source : %s", err)
+			log.Errorf("unable to read addresses from address source : %s", err)
 		} else {
-			log.Printf("[info] Queried %d addresses from address source", len(addresses))
+			log.Infof("Queried %d addresses from address source", len(addresses))
 
 			for _, rec := range addresses {
-				log.Printf("[debug] Processing %s(%s, %s)", rec.Name, rec.IP, rec.MAC)
+				log.Debugf("Processing %s(%s, %s)", rec.Name, rec.IP, rec.MAC)
 				if err := config.processRecord(rec); err != nil {
-					log.Printf("[error] Error when processing IP '%s' : %s", rec.IP, err)
+					log.Errorf("Error when processing IP '%s' : %s", rec.IP, err)
 				}
 			}
 		}

@@ -42,7 +42,7 @@ RUN go get github.com/tools/godep
 ADD . $GOPATH/src/gerrit.opencord.com/maas/switchq
 
 WORKDIR $GOPATH/src/gerrit.opencord.com/maas/switchq
-RUN $GOPATH/bin/godep restore
+RUN $GOPATH/bin/godep restore || true
 
 WORKDIR $GOPATH
 RUN go install gerrit.opencord.com/maas/switchq

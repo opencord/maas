@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -59,20 +58,20 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 	if err := decoder.Decode(&info); err != nil {
-		log.Printf("[error] Unable to decode request to provision : %s", err)
+		log.Errorf("Unable to decode request to provision : %s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if !c.validateData(&info) {
-		log.Printf("[error] Provisioning request not valid for '%s'", info.Name)
+		log.Errorf("Provisioning request not valid for '%s'", info.Name)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	role, err := c.GetRole(&info)
 	if err != nil {
-		log.Printf("[error] unable to get provisioning role for node '%s' : %s", info.Name, err)
+		log.Errorf("unable to get provisioning role for node '%s' : %s", info.Name, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -84,7 +83,7 @@ func (c *Context) ProvisionRequestHandler(w http.ResponseWriter, r *http.Request
 	}
 	err = c.dispatcher.Dispatch(&info, role, script)
 	if err != nil {
-		log.Printf("[error] unable to dispatch provisioning request for node '%s' : %s", info.Name, err)
+		log.Errorf("unable to dispatch provisioning request for node '%s' : %s", info.Name, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -112,7 +111,7 @@ func (c *Context) DeleteStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := c.storage.Delete(id)
 	if err != nil {
-		log.Printf("[warn] Error while deleting status fo '%s' from storage : %s", id, err)
+		log.Errorf("Error while deleting status fo '%s' from storage : %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -129,7 +128,7 @@ func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	s, err := c.storage.Get(id)
 	if err != nil {
-		log.Printf("[warn] Error while retrieving status for '%s' from strorage : %s", id, err)
+		log.Errorf("Error while retrieving status for '%s' from strorage : %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -139,7 +138,7 @@ func (c *Context) QueryStatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	bytes, err := json.Marshal(s)
 	if err != nil {
-		log.Printf("[error] Error while attempting to marshal status for '%s' from storage : %s", id, err)
+		log.Errorf("Error while attempting to marshal status for '%s' from storage : %s", id, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

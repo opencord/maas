@@ -22,6 +22,10 @@
 			"ImportPath": "github.com/kelseyhightower/envconfig",
 			"Comment": "1.1.0-17-g91921eb",
 			"Rev": "91921eb4cf999321cdbeebdba5a03555800d493b"
-		}
+		},
+                {
+                        "ImportPath": "github.com/Sirupsen/logrus",
+                        "Rev": "f3cfb454f4c209e6668c95216c4744b8fddb2356"
+                }
 	]
 }

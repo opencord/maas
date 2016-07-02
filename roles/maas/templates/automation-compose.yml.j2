@@ -12,6 +12,7 @@ services:
       - "/etc/maas/automation/storage:/consul/data"
     network_mode: host
     command: agent --server --bind {{ mgmt_ip_address.stdout }} --client {{ mgmt_ip_address.stdout }} --bootstrap-expect=1
+    restart: unless-stopped
 
   allocator:
     image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
@@ -26,6 +27,8 @@ services:
       - "ALLOCATE_LISTEN=0.0.0.0"
       - "ALLOCATE_NETWORK={{ networks.fabric }}"
       - "ALLOCATE_SKIP=2"
+      - "ALLOCATE_LOG_LEVEL=debug"
+      - "ALLOCATE_LOG_FORMAT=text"
     restart: unless-stopped
 
   provisioner:
@@ -36,6 +39,7 @@ services:
       - "lab.component=provisioner"
     links:
       - allocator
+      - storage
     environment:
       # need to explicitly set the resolver, else go will skip the /etc/hosts file
       - "GODEBUG=netdns=go"
@@ -45,6 +49,8 @@ services:
       - "PROVISION_DEFAULT_ROLE=compute-node"
       - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
       - "PROVISION_STORAGE_URL=consul://{{ mgmt_ip_address.stdout }}:8500"
+      - "PROVISION_LOG_LEVEL=debug"
+      - "PROVISION_LOG_FORMAT=text"
     volumes:
       - "/etc/maas/ansible:/etc/maas/ansible"
     restart: unless-stopped
@@ -63,6 +69,8 @@ services:
       - "SWITCHQ_PROVISION_TTL=0s"
       - "SWITCHQ_DEFAULT_ROLE=fabric-switch"
       - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
+      - "SWITCHQ_LOG_LEVEL=debug"
+      - "SWITCHQ_LOG_FORMAT=text"
     volumes:
       - "/etc/bind/maas:/switchq/dhcp"
     restart: unless-stopped
@@ -85,11 +93,13 @@ services:
       - "AUTOMATION_POWER_HELPER_USER={{ virtualbox.power_helper_user }}"
       - "AUTOMATION_POWER_HELPER_HOST={{ virtualbox_host }}"
 {% endif %}
+      - "AUTOMATION_LOG_FORMAT=text"
+      - "AUTOMATION_LOG_LEVEL=debug"
     volumes:
       - "/etc/maas:/mappings"
 {% if virtualbox_support is defined and virtualbox_support == "1" %}
       - "/etc/maas/virtualbox:/etc/maas/virtualbox"
 {% endif %}
-    command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename", "-verbose" ]
+    command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]
     restart: unless-stopped
 

@@ -7,7 +7,7 @@ RUN go get github.com/tools/godep
 ADD . /go/src/gerrit.opencord.org/maas/cord-ip-allocator
 
 WORKDIR /go/src/gerrit.opencord.org/maas/cord-ip-allocator
-RUN /go/bin/godep restore
+RUN /go/bin/godep restore || true
 
 WORKDIR /go
 

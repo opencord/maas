@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	consul "github.com/hashicorp/consul/api"
-	"log"
 	"net/url"
 )
 
@@ -27,7 +26,7 @@ func NewConsulStorage(spec string) (*ConsulStorage, error) {
 		Scheme:  "http",
 	}
 
-	log.Printf("%+v", cfg)
+	log.Debugf("Consul config = %+v", cfg)
 
 	client, err := consul.NewClient(&cfg)
 	if err != nil {
