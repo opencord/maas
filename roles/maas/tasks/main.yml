@@ -9,6 +9,7 @@
     - python-pycurl
     - python-pip
     - ethtool
+    - jq
 
 - name: Install Python Prerequisites
   become: yes
