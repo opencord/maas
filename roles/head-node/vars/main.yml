@@ -7,3 +7,6 @@ provision:
     location: "{{ prov_location | default('http://gerrit.opencord.org/maas') }}"
     role_path: "{{ prov_role_path | default('roles') }}"
     role: "{{ prov_role | default('compute-node') }}"
+
+maas:
+    user: "{{ maas_user | default('cord') }}"

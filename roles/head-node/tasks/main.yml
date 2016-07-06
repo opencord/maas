@@ -44,6 +44,12 @@
     group=maas
     mode=0755
 
+- name: Capture MAAS API Key
+  become: yes
+  command: maas-region-admin apikey --username={{ maas.user }}
+  register: apikey
+  changed_when: false
+
 - name: Ensure Compute Node Playbook
   become: yes
   template:
@@ -55,3 +61,12 @@
   with_items:
     - compute-node.yml
     - switch-node.yml
+
+- name: Ensure Dynamic Inventory Script
+  become: yes
+  template:
+    src=files/pod-inventory
+    dest=/etc/maas/ansible/pod-inventory
+    owner=maas
+    group=maas
+    mode=0755
