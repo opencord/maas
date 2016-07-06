@@ -293,7 +293,7 @@ task prime (type: Exec) {
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "prime-node.yml"
 }
 
-task deploy (type: Exec) {
+task deployBase (type: Exec) {
     println "Using deployment config: $deployConfig"
     File configFile = new File(deployConfig)
     def yaml = new Yaml()
