@@ -1,0 +1,140 @@
+{
+ "devices" : {
+
+    "of:0000000000000021" : {
+            "segmentrouting" : {
+                "name" : "device-21",
+                "nodeSid" : 121,
+                "routerIp" : "10.6.0.7",
+                "routerMac" : "cc:37:ab:cc:ef:21",
+                "isEdgeRouter" : true,
+                "adjacencySids" : []
+            }
+    },
+    "of:0000000000000011" : {
+            "segmentrouting" : {
+                "name" : "device-11",
+                "nodeSid" : 111,
+                "routerIp" : "10.6.0.6",
+                "routerMac" : "cc:37:ab:cc:ef:11",
+                "isEdgeRouter" : true,
+                "adjacencySids" : []
+            }
+    },
+    "of:0000000000000022" : {
+            "segmentrouting" : {
+                "name" : "device-22",
+                "nodeSid" : 122,
+                "routerIp" : "10.6.0.10",
+                "routerMac" : "cc:37:ab:cc:ef:22",
+                "isEdgeRouter" : true,
+                "adjacencySids" : []
+            }
+    },
+    "of:0000000000000012" : {
+            "segmentrouting" : {
+                "name" : "device-12",
+                "nodeSid" : 112,
+                "routerIp" : "10.6.0.8",
+                "routerMac" : "cc:37:ab:cc:ef:12",
+                "isEdgeRouter" : true,
+                "adjacencySids" : []
+            }
+    }
+ },
+
+ "links": {
+
+    "of:0000000000000011/2-of:0000000000000022/31": {
+         "basic": {}
+     },
+    "of:0000000000000022/31-of:0000000000000011/2": {
+         "basic": {}
+     },
+    "of:0000000000000022/32-of:0000000000000012/2": {
+         "basic": {}
+     },
+    "of:0000000000000021/31-of:0000000000000011/1": {
+         "basic": {}
+     },
+    "of:0000000000000012/1-of:0000000000000021/32": {
+         "basic": {}
+     },
+    "of:0000000000000012/2-of:0000000000000022/32": {
+         "basic": {}
+     },
+    "of:0000000000000021/32-of:0000000000000012/1": {
+         "basic": {}
+     },
+    "of:0000000000000011/1-of:0000000000000021/31": {
+         "basic": {}
+     }
+ },
+
+"ports": {
+
+  "of:0000000000000022/3" : {
+    	"interfaces": [
+    		{
+        		"ips" : [ "10.6.2.254/24" ]
+    		}
+    	]
+	},
+  "of:0000000000000022/4" : {
+    	"interfaces": [
+    		{
+        		"ips" : [ "10.6.2.254/24" ]
+    		}
+    	]
+	},
+  "of:0000000000000021/2" : {
+    	"interfaces": [
+    		{
+        		"ips" : [ "10.6.1.254/24" ]
+    		}
+    	]
+	},
+  "of:0000000000000021/1" : {
+    	"interfaces": [
+    		{
+        		"ips" : [ "10.6.1.254/24" ]
+    		}
+    	]
+	}
+ },
+
+ "hosts" : {
+
+	"3C:FD:FE:9E:95:99/-1" : {
+		"basic" : {
+			"ips" : ["10.6.2.3"],
+			"location" : "of:0000000000000022/3"
+		}
+	},
+	"3C:FD:FE:9E:94:29/-1" : {
+		"basic" : {
+			"ips" : ["10.6.2.4"],
+			"location" : "of:0000000000000022/4"
+		}
+	},
+	"3C:FD:FE:9E:98:68/-1" : {
+		"basic" : {
+			"ips" : ["10.6.1.2"],
+			"location" : "of:0000000000000021/2"
+		}
+	},
+	"3C:FD:FE:9E:94:30/-1" : {
+		"basic" : {
+			"ips" : ["10.6.1.1"],
+			"location" : "of:0000000000000021/1"
+		}
+	}
+ },
+ "apps" : {
+        "org.onosproject.core" : {
+            "core" : {
+                "linkDiscoveryMode" : "STRICT"
+            }
+        }
+    }
+}
