@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5af74547_77a0b0f4",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2016-07-07T13:24:35Z",
+      "side": 0,
+      "message": "any reason to drop jq? I kind of like installed.",
+      "range": {
+        "startLine": 12,
+        "startChar": 5,
+        "endLine": 12,
+        "endChar": 8
+      },
+      "revId": "23a494543b1b2cf5ad552e486b966b7711f0c370",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
