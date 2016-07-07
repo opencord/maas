@@ -1,6 +1,6 @@
 #!/bin/bash
 
-maas login cord http://10.2.0.1/MAAS/api/1.0 '{{ apikey.stdout }}' > /dev/null
+maas login cord http://localhost/MAAS/api/1.0 '{{ apikey.stdout }}' > /dev/null
 NODES=$(maas cord nodes list | jq '.[].hostname' | sed -e 's/"//g')
 maas logout cord
 
@@ -15,9 +15,11 @@ cat <<EO_HEAD
     "hosts" : [
 EO_HEAD
 
-for i in $(echo $NODES | sed -e 's/\([a-zA-Z0-9_-.]*\)/"\1"/g' -e 's/ /, /g'); do
-echo "      $i"
-done
+if [ ! -z "$NODES" ]; then
+  for i in $(echo $NODES | sed -e 's/\([a-zA-Z0-9_-.]*\)/"\1"/g' -e 's/ /, /g'); do
+    echo "      $i"
+  done
+fi
 
 cat << EO_TAIL
     ]
