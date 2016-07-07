@@ -1,6 +1,6 @@
-# config Gen 
+# config Gen
 
-- install Go 
+- install Go
 - Make sure ONOS is reachable on localhost or modify the IP in the configGen.go
 - Make sure devices, hosts are connected and showing up in ONOS
 - Run by `go run congifGen.go`

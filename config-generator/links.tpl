@@ -1,8 +1,5 @@
- "links": {
-     {{ range . }}
-     "{{ .Val }}": {
+ "links": { {{ range . }}
+    "{{ .Val }}": {
          "basic": {}
-     }{{ .Comma }}
-     {{ end }}
+     }{{ .Comma }}{{ end }}
  },
-

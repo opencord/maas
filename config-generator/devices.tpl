@@ -1,7 +1,6 @@
 {
- "devices" : {
-    {{ range . }}
-        "{{ .Id}}" : {
+ "devices" : { {{ range . }}
+    "{{ .Id}}" : {
             "segmentrouting" : {
                 "name" : "device-{{ .ChassisId }}",
                 "nodeSid" : 1{{ .ChassisId }},
@@ -10,8 +9,5 @@
                 "isEdgeRouter" : true,
                 "adjacencySids" : []
             }
-    }{{ .Comma }}
-    {{ end }}
-
+    }{{ .Comma }}{{ end }}
 },
-

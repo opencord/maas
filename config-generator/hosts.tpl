@@ -1,20 +1,16 @@
-"hosts" : {
-	{{ range . }}
+ "hosts" : { {{ range . }}
 	"{{ .Mac }}/-1" : {
 		"basic" : {
 			"ips" : ["{{ range $element := .IpAddresses }}{{ $element }}{{ end}}"],
 			"location" : "{{ .Location.ElementID }}/{{ .Location.Port }}"
 		}
-	}{{ .Comma }}
-	{{ end }}
+	}{{ .Comma }}{{ end }}
   },
-
-  "apps" : {
+ "apps" : {
         "org.onosproject.core" : {
             "core" : {
-                "linkDiscoveryMode" : "STRICT" 
-            }    
+                "linkDiscoveryMode" : "STRICT"
+            }
         }
     }
-
 }

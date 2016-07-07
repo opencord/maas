@@ -4,7 +4,6 @@ default: image
 ansible:
 	ansible-playbook ./setup.yml -v -vvvv -u gunjan -i ./host.yml --ask-pass
 	
-
 get:
 	goimports -w .
 	go get -t -d -v ./...
@@ -30,7 +29,7 @@ build:
 
 depsave:
 	godep save
-	
+
 depupdate:
 	go get -t -v ./...
 	godep update
