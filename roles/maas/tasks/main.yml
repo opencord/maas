@@ -317,7 +317,7 @@
 
 - name: Ensure SSH keys for Ansible
   become: yes
-  command: cp /home/{{ ansible_user }}/.ssh/id_rsa /etc/maas/ansible/id_rsa
+  command: cp {{ ansible_env['PWD'] }}/.ssh/id_rsa /etc/maas/ansible/id_rsa
 
 - name: Ensure SSH Key Permissions
   become: yes
