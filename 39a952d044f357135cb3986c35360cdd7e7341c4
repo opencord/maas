@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5af74547_17e72c14",
+        "filename": "config-generator/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-07-07T21:28:26Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "39a952d044f357135cb3986c35360cdd7e7341c4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5af74547_f7e3a003",
+        "filename": "config-generator/network-cfg.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-07-07T21:28:26Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "39a952d044f357135cb3986c35360cdd7e7341c4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5af74547_d7f0a4cb",
+        "filename": "config-generator/network-cfg.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-07-07T21:28:26Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "39a952d044f357135cb3986c35360cdd7e7341c4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5af74547_b7ed18f2",
+        "filename": "config-generator/network-cfg.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-07-07T21:28:26Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "39a952d044f357135cb3986c35360cdd7e7341c4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5af74547_97ba1ce0",
+        "filename": "config-generator/network-cfg.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-07-07T21:28:26Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "39a952d044f357135cb3986c35360cdd7e7341c4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
