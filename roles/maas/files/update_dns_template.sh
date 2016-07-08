@@ -60,6 +60,7 @@ $HOSTNAME IN A $LHOST
 docker-registry CNAME $HOSTNAME
 apt-cache CNAME $HOSTNAME
 mavenrepo CNAME $HOSTNAME
+juju-head-node CNAME $HOSTNAME
 \$INCLUDE "/etc/bind/maas/cnames.inc"
 {{endif}}
 EOT
