@@ -160,9 +160,11 @@ var Reset = func(client *maas.MAASObject, node MaasNode, options ProcessingOptio
 		updateNodeName(client, node, options)
 	}
 
-	options.Provisioner.Clear(node.ID())
-
-	return nil
+	err := options.Provisioner.Clear(node.ID())
+	if err != nil {
+		log.Errorf("Attempting to clear provisioning state of node '%s' : %s", node.ID(), err)
+	}
+	return err
 }
 
 // Provision we are at the target state, nothing to do

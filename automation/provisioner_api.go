@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type ProvisionStatus int
@@ -65,12 +66,19 @@ type ProvisionerConfig struct {
 	Url string
 }
 
+func buildUrl(base string, id string) string {
+	if strings.HasSuffix(base, "/") {
+		return base + id
+	}
+	return base + "/" + id
+}
+
 func NewProvisioner(config *ProvisionerConfig) Provisioner {
 	return config
 }
 
 func (p *ProvisionerConfig) Get(id string) (*ProvisionRecord, error) {
-	resp, err := http.Get(p.Url + "/" + id)
+	resp, err := http.Get(buildUrl(p.Url, id))
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +125,7 @@ func (p *ProvisionerConfig) Provision(prov *ProvisionRequest) error {
 
 func (p *ProvisionerConfig) Clear(id string) error {
 	hc := http.Client{}
-	req, err := http.NewRequest("DELETE", p.Url+"/"+id, nil)
+	req, err := http.NewRequest("DELETE", buildUrl(p.Url, id), nil)
 	if err != nil {
 		return err
 	}
