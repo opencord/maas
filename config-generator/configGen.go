@@ -16,12 +16,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 	"text/template"
 )
+
+type Config struct {
+	Port        string `default:"8181"`
+	IP          string `default:"127.0.0.1"`
+	SwitchCount int    `default:"0"`
+	HostCount   int    `default:"0"`
+	Username    string `default:"karaf"`
+	Password    string `default:"karaf"`
+	LogLevel    string `default:"warning" envconfig:"LOG_LEVEL"`
+	LogFormat   string `default:"text" envconfig:"LOG_FORMAT"`
+}
 
 type hosts struct {
 	Host []struct {
@@ -48,17 +61,16 @@ type devices struct {
 }
 
 type onosLinks struct {
-	Links []link `json:"links"`
-}
-
-type link struct {
-	Src devicePort `json:"src"`
-	Dst devicePort `json:"dst"`
-}
-
-type devicePort struct {
-	Port   string `json:"port"`
-	Device string `json:"device"`
+	Links []struct {
+		Src struct {
+			Port   string `json:"port"`
+			Device string `json:"device"`
+		} `json:"src"`
+		Dst struct {
+			Port   string `json:"port"`
+			Device string `json:"device"`
+		} `json:"dst"`
+	} `json:"links"`
 }
 
 type linkStructJSON struct {
@@ -66,12 +78,20 @@ type linkStructJSON struct {
 	Comma string
 }
 
-func main() {
-	onos := "http://karaf:karaf@127.0.0.1:8181"
+var c Config
 
-	err := os.Remove("network-cfg.json")
+func main() {
+
+	err := envconfig.Process("CONFIGGEN", &c)
 	if err != nil {
-		fmt.Println("Warning: no file called network-cfg.json (ignore if this is the first run)")
+		log.Fatalf("[ERROR] Unable to parse configuration options : %s", err)
+	}
+
+	onos := "http://" + c.Username + ":" + c.Password + "@" + c.IP + ":" + c.Port
+
+	err = os.Remove("network-cfg.json")
+	if err != nil {
+		log.Println("Warning: no file called network-cfg.json (ignore if this is the first run)")
 	}
 	generateDevicesJSON(onos)
 	generateLinkJSON(onos)
@@ -102,6 +122,12 @@ func generateDevicesJSON(onos string) {
 	err := json.Unmarshal(ds, &d)
 	check(err)
 
+	if len(d.Device) != c.SwitchCount {
+		_ = os.Remove("network-cfg.json")
+		log.Println("[INFO] Cleaning up unfinished config file")
+		log.Fatalf("[ERROR] Number of switches configured don't match actual switches connected to the controller. Configured: %d, connected: %d", c.SwitchCount, len(d.Device))
+	}
+
 	for k, _ := range d.Device {
 		d.Device[k].Comma = ","
 		if k >= len(d.Device)-1 {
@@ -118,6 +144,12 @@ func generateHostJSON(onos string) {
 	var h hosts
 	err := json.Unmarshal(hs, &h)
 	check(err)
+
+	if len(h.Host) != c.HostCount {
+		_ = os.Remove("network-cfg.json")
+		log.Println("[INFO] Cleaning up unfinished config file")
+		log.Fatalf("[ERROR] Number of hosts configured don't match actual hosts visible to the controller. Configured: %d, connected: %d", c.HostCount, len(h.Host))
+	}
 
 	for k, _ := range h.Host {
 
