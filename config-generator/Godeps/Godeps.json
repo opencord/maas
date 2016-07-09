@@ -1,6 +1,23 @@
 {
-	"ImportPath": ".",
+	"ImportPath": "gerrit.opencord.org/maas/config-generator",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v69",
-	"Deps": []
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Comment": "v1.1-4-gaed02d1",
+			"Rev": "aed02d124ae4a0e94fea4541c8effd05bf0c8296"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.1-9-gbd09be0",
+			"Rev": "bd09be08ed4377796d312df0a45314e11b8f5dc1"
+		},
+		{
+			"ImportPath": "github.com/kelseyhightower/envconfig",
+			"Comment": "1.1.0-17-g91921eb",
+			"Rev": "91921eb4cf999321cdbeebdba5a03555800d493b"
+		}
+	]
 }
+

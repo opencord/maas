@@ -11,30 +11,31 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM ubuntu:14.04
+FROM golang:alpine
+
 MAINTAINER Open Networking Labratory <info@onlab.us>
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    ca-certificates \
-    curl \
-    mercurial \
-    git-core
-RUN curl -s https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz | tar -v -C /usr/local -xz
+RUN apk --update add git
 
-ENV GOPATH /go
-ENV GOROOT /usr/local/go
-ENV PATH /usr/local/go/bin:/go/bin:/usr/local/bin:$PATH
+# install godep
+WORKDIR /go
+RUN go get github.com/tools/godep
+ADD . /go/src/gerrit.opencord.org/maas/config-generator
 
-WORKDIR /app
+# restore dependancies
+WORKDIR /go/src/gerrit.opencord.org/maas/config-generator
+RUN /go/bin/godep restore || true
 
-# copy binary into image
-COPY app /app/
-COPY hosts.tpl /app/
-COPY links.tpl /app/
-COPY ports.tpl /app/
-COPY devices.tpl /app/
+# generate the binary
+WORKDIR /go/
+RUN go install gerrit.opencord.org/maas/config-generator
 
-VOLUME /app
+# copy templates to the image
+COPY hosts.tpl /go/bin/
+COPY links.tpl /go/bin/
+COPY ports.tpl /go/bin/
+COPY devices.tpl /go/bin/
 
+EXPOSE 1337
 
-# ENTRYPOINT ["./app"]
+ENTRYPOINT ["/go/bin/config-generator"]

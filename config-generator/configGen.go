@@ -15,13 +15,30 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/kelseyhightower/envconfig"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 	"text/template"
 )
+
+type Config struct {
+	Port             string `default:"8181"`
+	IP               string `default:"127.0.0.1"`
+	SwitchCount      int    `default:"4"`
+	HostCount        int    `default:"4"`
+	Username         string `default:"karaf"`
+	Password         string `default:"karaf"`
+	LogLevel         string `default:"warning" envconfig:"LOG_LEVEL"`
+	LogFormat        string `default:"text" envconfig:"LOG_FORMAT"`
+	ConfigServerPort string `default:"1337"`
+	ConfigServerIP   string `default:"127.0.0.1"`
+}
 
 type hosts struct {
 	Host []struct {
@@ -48,17 +65,16 @@ type devices struct {
 }
 
 type onosLinks struct {
-	Links []link `json:"links"`
-}
-
-type link struct {
-	Src devicePort `json:"src"`
-	Dst devicePort `json:"dst"`
-}
-
-type devicePort struct {
-	Port   string `json:"port"`
-	Device string `json:"device"`
+	Links []struct {
+		Src struct {
+			Port   string `json:"port"`
+			Device string `json:"device"`
+		} `json:"src"`
+		Dst struct {
+			Port   string `json:"port"`
+			Device string `json:"device"`
+		} `json:"dst"`
+	} `json:"links"`
 }
 
 type linkStructJSON struct {
@@ -66,18 +82,71 @@ type linkStructJSON struct {
 	Comma string
 }
 
+type ConfigParam struct {
+	SwitchCount int `json:"switchcount"`
+	HostCount   int `json:"hostcount"`
+}
+
+var c Config
+
 func main() {
-	onos := "http://karaf:karaf@127.0.0.1:8181"
+
+	err := envconfig.Process("CONFIGGEN", &c)
+	if err != nil {
+		log.Fatalf("[ERROR] Unable to parse configuration options : %s", err)
+	}
+
+	router := mux.NewRouter()
+	router.HandleFunc("/config/", ConfigGenHandler).Methods("POST")
+	http.Handle("/", router)
+
+	fmt.Println("Config Generator server listening at: " + c.ConfigServerIP + ":" + c.ConfigServerPort)
+
+	http.ListenAndServe(c.ConfigServerIP+":"+c.ConfigServerPort, nil)
+
+}
+
+func ConfigGenHandler(w http.ResponseWriter, r *http.Request) {
+	var para ConfigParam
+
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	if err := decoder.Decode(&para); err != nil {
+		fmt.Errorf("Unable to decode request to provision : %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	c.HostCount = para.HostCount
+	c.SwitchCount = para.SwitchCount
+
+	onos := "http://" + c.Username + ":" + c.Password + "@" + c.IP + ":" + c.Port
 
 	err := os.Remove("network-cfg.json")
 	if err != nil {
-		fmt.Println("Warning: no file called network-cfg.json (ignore if this is the first run)")
+		log.Println("Warning: no file called network-cfg.json (ignore if this is the first run)")
 	}
-	generateDevicesJSON(onos)
+	err = generateDevicesJSON(onos)
+	if err != nil {
+		w.WriteHeader(http.StatusExpectationFailed)
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 	generateLinkJSON(onos)
-	generateHostJSON(onos)
+	err = generateHostJSON(onos)
+	if err != nil {
+		w.WriteHeader(http.StatusExpectationFailed)
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 
 	fmt.Println("Config file generated: network-cfg.json")
+
+	data, err := ioutil.ReadFile("network-cfg.json")
+	check(err)
+
+	w.WriteHeader(http.StatusAccepted)
+	fmt.Fprintf(w, string(data))
 
 }
 
@@ -95,12 +164,20 @@ func writeToFile(object interface{}, t string) {
 	check(err)
 }
 
-func generateDevicesJSON(onos string) {
+func generateDevicesJSON(onos string) error {
 	ds := getData(onos + "/onos/v1/devices")
 
 	var d devices
 	err := json.Unmarshal(ds, &d)
 	check(err)
+
+	if len(d.Device) != c.SwitchCount {
+		_ = os.Remove("network-cfg.json")
+		log.Println("[INFO] Cleaning up unfinished config file")
+		e := fmt.Sprintf("[ERROR] Number of switches configured don't match actual switches connected to the controller. Configured: %d, connected: %d", c.SwitchCount, len(d.Device))
+		log.Println(e)
+		return errors.New(e)
+	}
 
 	for k, _ := range d.Device {
 		d.Device[k].Comma = ","
@@ -110,14 +187,23 @@ func generateDevicesJSON(onos string) {
 	}
 
 	writeToFile(d.Device, "devices.tpl")
+	return nil
 
 }
 
-func generateHostJSON(onos string) {
+func generateHostJSON(onos string) error {
 	hs := getData(onos + "/onos/v1/hosts")
 	var h hosts
 	err := json.Unmarshal(hs, &h)
 	check(err)
+
+	if len(h.Host) != c.HostCount {
+		_ = os.Remove("network-cfg.json")
+		log.Println("[INFO] Cleaning up unfinished config file")
+		e := fmt.Sprintf("[ERROR] Number of hosts configured don't match actual hosts visible to the controller. Configured: %d, connected: %d", c.HostCount, len(h.Host))
+		log.Println(e)
+		return errors.New(e)
+	}
 
 	for k, _ := range h.Host {
 
@@ -137,6 +223,7 @@ func generateHostJSON(onos string) {
 	writeToFile(h.Host, "ports.tpl")
 
 	writeToFile(h.Host, "hosts.tpl")
+	return nil
 
 }
 
