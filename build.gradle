@@ -129,6 +129,22 @@ task publishProvisionerImage(type: Exec) {
     commandLine "$dockerPath/docker", 'push', "$targetReg/cord-provisioner:$targetTag"
 }
 
+// Config Generator Image
+
+task buildConfigGeneratorImage(type: Exec) {
+    commandLine "$dockerPath/docker", 'build', '-t', 'config-generator', './config-generator'
+}
+
+task tagConfigGeneratorImage(type: Exec) {
+   dependsOn buildConfigGeneratorImage
+   commandLine "$dockerPath/docker", 'tag', 'config-generator', "$targetReg/config-generator:$targetTag"
+}
+
+task publishConfigGeneratorImage(type: Exec) {
+    dependsOn tagConfigGeneratorImage
+    commandLine "$dockerPath/docker", 'push', "$targetReg/config-generator:$targetTag"
+}
+
 // Automation Image
 
 task buildAutomationImage(type: Exec) {
@@ -184,6 +200,7 @@ task buildImages {
     dependsOn buildAutomationImage
     dependsOn buildAllocationImage
     dependsOn buildProvisionerImage
+    dependsOn buildConfigGeneratorImage
     dependsOn buildSwitchqImage
 }
 
@@ -193,6 +210,7 @@ task tagImages {
     dependsOn tagAutomationImage
     dependsOn tagAllocationImage
     dependsOn tagProvisionerImage
+    dependsOn tagConfigGeneratorImage
     dependsOn tagSwitchqImage
 }
 
@@ -203,6 +221,7 @@ task publish {
     dependsOn publishAutomationImage
     dependsOn publishAllocationImage
     dependsOn publishProvisionerImage
+    dependsOn publishConfigGeneratorImage
     dependsOn publishSwitchqImage
 }
 
