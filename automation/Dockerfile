@@ -26,4 +26,7 @@ RUN /go/bin/godep restore || true
 WORKDIR /go
 RUN go install gerrit.opencord.org/maas/cord-maas-automation
 
+RUN mkdir -p /root/.ssh
+COPY ssh-config /root/.ssh/config
+
 ENTRYPOINT ["/go/bin/cord-maas-automation"]
