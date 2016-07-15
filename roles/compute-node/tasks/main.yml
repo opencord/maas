@@ -16,6 +16,7 @@
     - python-pip
     - ifenslave-2.6
     - bridge-utils
+    - ethtool
 
 - name: Ensure Docker Insecure Repository
   become: yes
