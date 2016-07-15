@@ -296,6 +296,26 @@
   command: resolvconf -u
   when: ns_nameserver.changed or ns_search.changed
 
+- name: Restart MAAS Services
+  become: yes
+  service:
+    name={{ item }}
+    state=restarted
+  with_items:
+    - maas-proxy
+    - maas-regiond
+    - maas-clusterd
+    - maas-dhcpd
+  tags:
+    - maas_restart
+
+- name: Wait for MAAS to Intialize (start)
+  pause:
+    seconds=30
+  changed_when: false
+  tags:
+    - maas_restart
+
 - name: Ensure DNS
   become: yes
   service:
