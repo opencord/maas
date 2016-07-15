@@ -1,20 +1,2 @@
 {
-   "2c:60:0c:e3:c4:2d":{
-      "hostname":"cord-r1-s2"
-   },
-   "2c:60:0c:cb:00:ef":{
-      "hosname":"cord-r1-s3"
-   },
-   "2c:60:0c:cb:00:3b":{
-      "hostname":"cord-r1-s4"
-   },
-   "00:25:90:fa:5f:78":{
-      "hostname":"cord-r2-s2"
-   },
-   "00:25:90:fa:5f:52":{
-      "hostname":"cord-r2-s3"
-   },
-   "00:25:90:fa:5f:4e":{
-      "hostname":"cord-r2-s4"
-   }
 }
