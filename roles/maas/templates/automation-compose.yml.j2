@@ -34,6 +34,7 @@ services:
   provisioner:
     image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}"
     container_name: provisioner
+    dns: {{ mgmt_ip_address.stdout }}
     labels:
       - "lab.solution=CORD"
       - "lab.component=provisioner"

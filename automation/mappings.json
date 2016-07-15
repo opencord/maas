@@ -1,26 +1,2 @@
 {
-   "2c:60:0c:e3:c0:f1":{
-      "hostname":"cord-r1-s1"
-   },
-   "2c:60:0c:e3:c4:bd":{
-      "hostname":"cord-r1-s2"
-   },
-   "2c:60:0c:e3:c2:83":{
-      "hostname":"cord-r1-s3"
-   },
-   "2c:60:0c:e3:bb:ae":{
-      "hostname":"cord-r1-s4"
-   },
-   "2c:60:0c:e3:bf:b0":{
-      "hostname":"cord-r1-s5"
-   },
-   "2c:60:0c:e3:be:ff":{
-      "hostname":"cord-r1-s6"
-   },
-   "2c:60:0c:e3:c5:fe":{
-      "hostname":"cord-r1-s7"
-   },
-   "2c:60:0c:e3:bd:10":{
-      "hostname":"cord-r1-s8"
-   }
 }
