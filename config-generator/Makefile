@@ -19,10 +19,10 @@ test:
 	go test -cover -v ./...
 
 image:
-	docker build -t gunjan5/configGen .
+	docker build -t config-gen .
 
 run:
-	docker run --rm -it gunjan5/configGen
+	docker run --rm -p 1337:1337 -it config-gen
 
 build:
 	GOOS=linux GOARCH=amd64 go build -o app

@@ -30,8 +30,8 @@ import (
 type Config struct {
 	Port             string `default:"8181"`
 	IP               string `default:"127.0.0.1"`
-	SwitchCount      int    `default:"4"`
-	HostCount        int    `default:"4"`
+	SwitchCount      int    `default:"0"`
+	HostCount        int    `default:"0"`
 	Username         string `default:"karaf"`
 	Password         string `default:"karaf"`
 	LogLevel         string `default:"warning" envconfig:"LOG_LEVEL"`

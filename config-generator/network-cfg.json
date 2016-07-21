@@ -4,9 +4,9 @@
     "of:0000000000000021" : {
             "segmentrouting" : {
                 "name" : "device-21",
-                "nodeSid" : 121,
+                "nodeSid" : 100,
                 "routerIp" : "10.6.0.7",
-                "routerMac" : "cc:37:ab:cc:ef:21",
+                "routerMac" : "cc:37:ab:00:00:00",
                 "isEdgeRouter" : true,
                 "adjacencySids" : []
             }
@@ -14,9 +14,9 @@
     "of:0000000000000011" : {
             "segmentrouting" : {
                 "name" : "device-11",
-                "nodeSid" : 111,
+                "nodeSid" : 101,
                 "routerIp" : "10.6.0.6",
-                "routerMac" : "cc:37:ab:cc:ef:11",
+                "routerMac" : "cc:37:ab:00:00:01",
                 "isEdgeRouter" : true,
                 "adjacencySids" : []
             }
@@ -24,9 +24,9 @@
     "of:0000000000000022" : {
             "segmentrouting" : {
                 "name" : "device-22",
-                "nodeSid" : 122,
+                "nodeSid" : 102,
                 "routerIp" : "10.6.0.10",
-                "routerMac" : "cc:37:ab:cc:ef:22",
+                "routerMac" : "cc:37:ab:00:00:02",
                 "isEdgeRouter" : true,
                 "adjacencySids" : []
             }
@@ -34,9 +34,9 @@
     "of:0000000000000012" : {
             "segmentrouting" : {
                 "name" : "device-12",
-                "nodeSid" : 112,
+                "nodeSid" : 103,
                 "routerIp" : "10.6.0.8",
-                "routerMac" : "cc:37:ab:cc:ef:12",
+                "routerMac" : "cc:37:ab:00:00:03",
                 "isEdgeRouter" : true,
                 "adjacencySids" : []
             }
