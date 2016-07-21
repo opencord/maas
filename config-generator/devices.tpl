@@ -1,12 +1,12 @@
 {
  "devices" : {
-{{ range . }}
+{{ range $index, $element := . }}
     "{{ .Id}}" : {
             "segmentrouting" : {
                 "name" : "device-{{ .ChassisId }}",
-                "nodeSid" : 1{{ .ChassisId }},
+                "nodeSid" : 10{{ $index }},
                 "routerIp" : "{{ .Annotations.ManagementAddress }}",
-                "routerMac" : "cc:37:ab:cc:ef:{{ .ChassisId }}",
+                "routerMac" : "cc:37:ab:00:00:0{{ $index }}",
                 "isEdgeRouter" : true,
                 "adjacencySids" : []
             }
