@@ -17,6 +17,9 @@
     - ifenslave-2.6
     - bridge-utils
     - ethtool
+    - minicom
+    - curl
+    - jq
 
 - name: Ensure Docker Insecure Repository
   become: yes

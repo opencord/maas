@@ -323,6 +323,10 @@
     state=restarted
   when: ns_nameserver.changed or ns_search.changed
 
+- name: Ensure Boot Resource Import Started
+  become: yes
+  shell: maas login cord http://localhost/MAAS/api/1.0/ "{{apikey.stdout}}" && maas cord boot-resources import && maas logout cord
+
 - name: Ensure VirtualBox Power Management
   include: virtualbox.yml
   when: virtualbox_support is defined
