@@ -129,3 +129,14 @@ docker-compose -f /etc/maas/automation-compose.yml logs provisioner
 ```
 
 This can be useful to look for errors in the logs.
+
+## Pull New images
+The following command can be used on the head node to pull all the latest
+docker images from the local docker registry into the docker daemon. This
+would be done after updating the docker images in the registry.
+```
+for i in $(docker images | grep "docker-registry:5000" | awk '{printf("%s:%s\n", $1, $2)}'); do docker pull $i; done`
+```
+
+After doing this any container that you want to use the new image needs to be
+killed, removed, and restarted.
