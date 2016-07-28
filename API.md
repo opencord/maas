@@ -207,7 +207,6 @@ will be completed before it is removed.
 |Environment Variable|Default|Description|
 |-|-|-|
 |SWITCHQ_VENDORS_URL|"file:///switchq/vendors.json"|URL from which a structure can be read that identifies the supported vendor OUIs|
-|SWITCHQ_STORAGE_URL|"memory:"|URL that specifies where the service should maintain its state|
 |SWITCHQ_ADDRESS_URL|"file:///switchq/dhcp_harvest.inc"|URL from which the service should obtain device IP / MAC information for known devices|
 |SWITCHQ_POLL_INTERVAL|"1m"|Interval at which a check should be made for new devices|
 |SWITCHQ_PROVISION_TTL|"1h"|how often the switches will be re-provisioned|
