@@ -25,7 +25,6 @@ import (
 
 type Config struct {
 	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"vendors_url"`
-	StorageURL      string `default:"memory:" envconfig:"storage_url"`
 	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"address_url"`
 	PollInterval    string `default:"1m" envconfig:"poll_interval"`
 	ProvisionTTL    string `default:"1h" envconfig:"provision_ttl"`
@@ -37,10 +36,42 @@ type Config struct {
 	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
 
 	vendors       Vendors
-	storage       Storage
 	addressSource AddressSource
 	interval      time.Duration
 	ttl           time.Duration
+}
+
+const (
+	Pending TaskStatus = iota
+	Running
+	Complete
+	Failed
+)
+
+type RequestInfo struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Ip           string `json:"ip"`
+	Mac          string `json:"mac"`
+	RoleSelector string `json:"role_selector"`
+	Role         string `json:"role"`
+	Script       string `json:"script"`
+}
+
+type TaskStatus uint8
+
+type WorkRequest struct {
+	Info   *RequestInfo
+	Script string
+	Role   string
+}
+
+type StatusMsg struct {
+	Request   *WorkRequest `json:"request"`
+	Worker    int          `json:"worker"`
+	Status    TaskStatus   `json:"status"`
+	Message   string       `json:"message"`
+	Timestamp int64        `json:"timestamp"`
 }
 
 func checkError(err error, msg string, args ...interface{}) {
@@ -49,49 +80,36 @@ func checkError(err error, msg string, args ...interface{}) {
 	}
 }
 
-func (c *Config) getProvisionedState(rec AddressRec) (int, string, error) {
+func (c *Config) getProvisionedState(rec AddressRec) (*StatusMsg, error) {
 	log.Debugf("Fetching provisioned state of device '%s' (%s, %s)",
 		rec.Name, rec.IP, rec.MAC)
 	resp, err := http.Get(c.ProvisionURL + rec.MAC)
 	if err != nil {
 		log.Errorf("Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
 			rec.Name, rec.IP, rec.MAC, err)
-		return -1, "", err
+		return nil, err
 	}
 	if resp.StatusCode != 404 && int(resp.StatusCode/100) != 2 {
 		log.Errorf("Error while retrieving provisioning state for device '%s (%s, %s)' : %s",
 			rec.Name, rec.IP, rec.MAC, resp.Status)
-		return -1, "", fmt.Errorf(resp.Status)
+		return nil, fmt.Errorf(resp.Status)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 404 {
 		decoder := json.NewDecoder(resp.Body)
-		var raw interface{}
-		err = decoder.Decode(&raw)
+		var status StatusMsg
+		err = decoder.Decode(&status)
 		if err != nil {
 			log.Errorf("Unmarshal provisioning service response for device '%s (%s, %s)' : %s",
 				rec.Name, rec.IP, rec.MAC, err)
-			return -1, "", err
+			return nil, err
 		}
-		status := raw.(map[string]interface{})
-		switch int(status["status"].(float64)) {
-		case 0, 1: // "PENDING", "RUNNING"
-			return int(status["status"].(float64)), "", nil
-		case 2: // "COMPLETE"
-			return 2, "", nil
-		case 3: // "FAILED"
-			return 3, status["message"].(string), nil
-		default:
-			err = fmt.Errorf("unknown provisioning status : %d", status["status"])
-			log.Errorf("received unknown provisioning status for device '%s (%s)' : %s",
-				rec.Name, rec.MAC, err)
-			return -1, "", err
-		}
+		return &status, nil
 	}
 
 	// If we end up here that means that no record was found in the provisioning, so return
 	// a status of -1, w/o an error
-	return -1, "", nil
+	return nil, nil
 }
 
 func (c *Config) provision(rec AddressRec) error {
@@ -154,51 +172,33 @@ func (c *Config) processRecord(rec AddressRec) error {
 		return nil
 	}
 
-	last, err := c.storage.LastProvisioned(rec.MAC)
-	if err != nil {
-		return err
-	}
-
-	if last == nil {
-		log.Debugf("no TTL for device '%s' (%s, %s)",
-			rec.Name, rec.IP, rec.MAC)
-	} else {
-		log.Debugf("TTL for device '%s' (%s, %s) is %v",
-			rec.Name, rec.IP, rec.MAC, *last)
-	}
-
 	// Verify if the provision status of the node is complete, if in an error state then TTL means
 	// nothing
-	state, message, err := c.getProvisionedState(rec)
-	switch state {
-	case 0, 1: // Pending or Running
-		log.Debugf("device '%s' (%s, %s) is being provisioned",
-			rec.Name, rec.IP, rec.MAC)
-		return nil
-	case 2: // Complete
-		log.Debugf("device '%s' (%s, %s) has completed provisioning",
-			rec.Name, rec.IP, rec.MAC)
-		// If no last record then set the TTL
-		if last == nil {
-			now := time.Now()
-			last = &now
-			c.storage.MarkProvisioned(rec.MAC, last)
-			log.Debugf("Storing TTL for device '%s' (%s, %s) as %v",
-				rec.Name, rec.IP, rec.MAC, now)
+	state, err := c.getProvisionedState(rec)
+	if state != nil {
+		switch state.Status {
+		case Pending, Running: // Pending or Running
+			log.Debugf("device '%s' (%s, %s) is being provisioned",
+				rec.Name, rec.IP, rec.MAC)
 			return nil
+		case Complete: // Complete
+			log.Debugf("device '%s' (%s, %s) has completed provisioning",
+				rec.Name, rec.IP, rec.MAC)
+		case Failed: // Failed
+			log.Debugf("device '%s' (%s, %s) failed last provisioning with message '%s', reattempt",
+				rec.Name, rec.IP, rec.MAC, state.Message)
+		default: // Unknown state
+			log.Debugf("device '%s' (%s, %s) has unknown provisioning state '%d', will provision",
+				rec.Name, rec.IP, rec.MAC, state.Status)
 		}
-	case 3: // Failed
-		log.Debugf("device '%s' (%s, %s) failed last provisioning with message '%s', reattempt",
-			rec.Name, rec.IP, rec.MAC, message)
-		c.storage.ClearProvisioned(rec.MAC)
-		last = nil
-	default: // No record
+	} else {
+		log.Debugf("device '%s' (%s, %s) has no provisioning record",
+			rec.Name, rec.IP, rec.MAC)
 	}
 
 	// If TTL is 0 then we will only provision a switch once.
-	if last == nil || (c.ttl > 0 && time.Since(*last) > c.ttl) {
-		if last != nil {
-			c.storage.ClearProvisioned(rec.MAC)
+	if state == nil || (c.ttl > 0 && time.Since(time.Unix(state.Timestamp, 0)) > c.ttl) {
+		if state != nil {
 			log.Debugf("device '%s' (%s, %s) TTL expired, reprovisioning",
 				rec.Name, rec.IP, rec.MAC)
 		}
@@ -243,9 +243,6 @@ func main() {
 	config.vendors, err = NewVendors(config.VendorsURL)
 	checkError(err, "Unable to create known vendors list from specified URL '%s' : %s", config.VendorsURL, err)
 
-	config.storage, err = NewStorage(config.StorageURL)
-	checkError(err, "Unable to create require storage for specified URL '%s' : %s", config.StorageURL, err)
-
 	config.addressSource, err = NewAddressSource(config.AddressURL)
 	checkError(err, "Unable to create required address source for specified URL '%s' : %s", config.AddressURL, err)
 
@@ -257,7 +254,6 @@ func main() {
 
 	log.Infof(`Configuration:
 		Vendors URL:       %s
-		Storage URL:       %s
 		Poll Interval:     %s
 		Address Source:    %s
 		Provision TTL:     %s
@@ -267,7 +263,7 @@ func main() {
 		Script:            %s
 		Log Level:         %s
 		Log Format:        %s`,
-		config.VendorsURL, config.StorageURL, config.PollInterval, config.AddressURL, config.ProvisionTTL,
+		config.VendorsURL, config.PollInterval, config.AddressURL, config.ProvisionTTL,
 		config.ProvisionURL, config.RoleSelectorURL, config.DefaultRole, config.Script,
 		config.LogLevel, config.LogFormat)
 
