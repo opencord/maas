@@ -29,12 +29,20 @@
     insertafter: '^DOCKER_OPTS'
   register: docker_config
 
+- name: Ensure Docker Registry Mirror
+  become: yes
+  lineinfile:
+    dest: /etc/default/docker
+    line: 'DOCKER_OPTS="$DOCKER_OPTS --registry-mirror=http://docker-registry:5001"'
+    insertafter: '^DOCKER_OPTS'
+  register: docker_config_mirror
+
 - name: Docker Restart
   become: yes
   service:
     name=docker
     state=restarted
-  when: docker_config.changed
+  when: docker_config.changed or docker_config_mirror.changed
 
 - name: Ensure Docker Ansible Support
   become: yes
