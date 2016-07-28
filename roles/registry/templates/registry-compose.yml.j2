@@ -11,10 +11,13 @@ registry:
 registry-mirror:
   image: registry:2.4.0
   container_name: registry-mirror
+  environment:
+  - "STANDALONE=false"
+  - "MIRROR_SOURCE=https://registry-1.docker.io"
+  - "MIRROR_SOURCE_INDEX=https://index.docker.io"
   volumes:
    - /docker-registry-mirror/registry:/var/lib/registry/docker/registry
    - /docker-registry-mirror/conf:/conf
-  command: serve /conf/config.yml
   ports:
     - "5001:5000"
   restart: unless-stopped
