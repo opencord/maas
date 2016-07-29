@@ -104,3 +104,16 @@ services:
     command: [ "-apiVersion", "1.0", "-apikey", "{{ apikey.stdout }}", "-maas", "http://{{ mgmt_ip_address.stdout }}/MAAS", "-period", "30s", "-mappings", "@/mappings/mappings.json", "-always-rename" ]
     restart: unless-stopped
 
+  generator:
+    image: "docker-registry:5000/config-generator:{{ docker.image_version }}"
+    container_name: generator
+    labels:
+      - "lab.solution=CORD"
+      - "lab.component=generator"
+    environment:
+      - "CONFIGGEN_PORT=8181"
+      - "CONFIGGEN_IP=onos-fabric"
+      - "CONFIGGEN_CONFIGSERVERPORT=1337"
+      - "CONFIGGEN_CONFIGSERVERIP=0.0.0.0"
+    restart: unless-stopped
+
