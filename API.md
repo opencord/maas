@@ -353,7 +353,20 @@ be performed immediately.
 |/config/|POST|Generates and returns a CORD leaf - spine configuration file|
 
 ##### POST /config/
-This request will interigate the specified ONOS instance and if the expected
+This request will interrogate the specified ONOS instance and if the expected
 number of switches and hosts are in ONOS it will then generate a configuration
 file suitable to use for the CORD leaf - spine fabric and return that to the
 caller.
+
+|Name|Type|Required|Description|
+|-|-|-|-|
+|switchcount|number|yes|number of hosts expected to be found in ONOS when generating a configuration|
+|hostcount|number|yes|number of hosts expected to be found in ONOS when generating a configuration|
+
+*example:*
+```
+{
+    "switchcount" : 4,
+    "hostcount" : 4
+}
+```
