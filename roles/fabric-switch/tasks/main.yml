@@ -38,7 +38,7 @@
     - reset
   register: utils
 
-- name: Mark Persistent
+- name: Mark Utilities Persistent
   command: persist {{ item }}
   with_items:
     - purge
@@ -47,7 +47,19 @@
     - reset
   when: utils.changed
 
+- name: Authorize SSH Key
+  become: yes
+  authorized_key:
+    key={{ pub_ssh_key }}
+    user=root
+    state=present
+  register: sshkey
+
+- name: Mark SSH Key Persistent
+  command: persist /root/.ssh/authorized_keys
+  when: sshkey.changed
+
 - name: Persist
   command: savepersist
-  when: utils.changed
+  when: utils.changed or sshkey.changed
   failed_when: false
