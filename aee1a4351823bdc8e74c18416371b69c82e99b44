@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a014df3_e4cd305f",
+        "filename": "roles/fabric-switch/tasks/connect.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-08-02T07:22:09Z",
+      "side": 1,
+      "message": "might it be safer to grep for the known support OUI in the MAC address that is also generated into the harvest file\n\ncat /etc/bind/maas/dhcp_harvest.inc  | grep -i \" cc:37:ab\\| 70:72;cf\"\n\nthis way we aren\u0027t dependent on a name scheme.",
+      "revId": "aee1a4351823bdc8e74c18416371b69c82e99b44",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
