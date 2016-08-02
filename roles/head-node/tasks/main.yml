@@ -50,7 +50,7 @@
   register: apikey
   changed_when: false
 
-- name: Ensure Compute Node Playbook
+- name: Ensure Playbooks
   become: yes
   template:
     src=files/{{ item }}
@@ -61,6 +61,7 @@
   with_items:
     - compute-node.yml
     - switch-node.yml
+    - connect-switch.yml
 
 - name: Ensure Dynamic Inventory Script
   become: yes
