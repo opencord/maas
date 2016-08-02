@@ -1,0 +1,35 @@
+---
+- name: Locate all switches
+  hosts: localhost
+  tasks:
+    - name: Lookup DHCP harvest
+      shell: cat /etc/bind/maas/dhcp_harvest.inc | grep -i " cc:37:ab\| 70:72;cf" | awk '{print $1}'
+      register: switches
+    - name: Add hosts into inventory
+      add_host: name={{item}} group=fabric
+      with_items: "{{switches.stdout_lines}}"
+
+- name: Connect all fabric switches to onos-fabric
+  hosts: fabric
+  remote_user: root
+  tasks:
+    - name: Check the status of indigo agent
+      command: ps aux
+      changed_when: false
+      register: status
+
+    - name: Terminate indigo agent
+      command: /root/killit
+      when: status.stdout.find('brcm-indigo-ofdpa-ofagent') != -1
+
+    - name: Purge hardware tables
+      command: /root/purge
+
+    - name: Start indigo agent
+      command: /root/connect -bg
+
+    - name: Verify indigo agent has been started
+      command: ps aux
+      changed_when: false
+      register: status
+      failed_when: status.stdout.find('brcm-indigo-ofdpa-ofagent') == -1
