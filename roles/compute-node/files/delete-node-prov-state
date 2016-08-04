@@ -1,0 +1,9 @@
+#!/bin/bash
+
+LIST=$(curl -sS http://$(docker-ip provisioner):4243/provision/ | jq . | grep "node-" | awk '{print $2}' | sed -e 's/"//g')
+
+for i in $LIST; do
+	echo "DELETE PROV RECORD '$i'"
+	curl -sS -XDELETE http://$(docker-ip provisioner):4243/provision/$i
+done
+

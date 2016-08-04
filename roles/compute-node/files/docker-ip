@@ -1,0 +1,11 @@
+#!/bin/bash
+
+test $# -ne 1 && echo "must specify the name of a container" && exit 1
+
+IP=$(docker inspect --format '{{.NetworkSettings.IPAddress}}' $1)
+
+if [ "$IP x" == " x" ]; then
+  IP=$(docker inspect --format '{{.NetworkSettings.Networks.maas_default.IPAddress}}' $1)
+fi
+
+/bin/echo -ne $IP

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+CFG=${1:-"config-tibit.json"}
+
+curl -v -XPOST -H Content-Type: application/json http://karaf:karaf@onos-fabric:8181/onos/v1/network/configuration -d @$CFG

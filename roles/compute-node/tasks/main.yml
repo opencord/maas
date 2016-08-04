@@ -91,6 +91,23 @@
     group=root
     mode=0600
 
+- name: Ensure Utility Scripts
+  become: yes
+  copy:
+    src=files/{{ item }}
+    dest=/usr/local/bin/{{ item }}
+    owner=root
+    group=root
+    mode=0755
+  with_items:
+    - delete-fabric-config
+    - delete-node-prov-state
+    - docker-ip
+    - fabric-pingall
+    - get-fabric-config
+    - get-node-prov-state
+    - remove-xos-components
+
 - name: Verify Mellanox 40Gb NIC
   shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c ConnectX-3 || true
   register: mlx_nic_present

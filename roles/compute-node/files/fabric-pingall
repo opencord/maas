@@ -1,0 +1,40 @@
+#!/bin/bash
+
+NODES="10.2.1.1 10.2.1.2 10.2.2.1 10.2.2.2 10.2.1.254 10.2.2.254"
+
+test -z $1 || NODES="$*"
+
+USE_LIST="br-int fabric"
+for u in $USE_LIST; do
+	ifconfig $u > /dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		USE_IFACE=$u
+		break
+	fi
+done
+
+LIST="-$USE_IFACE $NODES - 8.8.8.8"
+IFACE=
+ILABEL="none"
+FROM="none"
+if [ ! -z $USE_IFACE ]; then
+	FROM=$(ifconfig $USE_IFACE | grep "inet addr" | head -1 | awk '{print $2}' | cut -d: -f2)
+fi
+
+echo "from $(hostname) ($FROM):"
+for ip in $LIST; do
+	case $ip in
+		-*)
+			if [ "$ip" == "-" ]; then
+				IFACE=
+				ILABEL="none"
+			else
+				ILABEL="$(echo $ip | sed -e 's/^-//g')"
+				IFACE="-I $ILABEL"
+			fi
+			;;
+		*)
+			printf "  %-20s%s\n" "$ip ($ILABEL)" $(ping $IFACE -c 1 $ip 2>&1 | grep "^rtt min/avg/max/mdev" | sed -e 's/.*= \([.0-9]*\).*/\1/')
+		;;
+	esac
+done
