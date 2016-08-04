@@ -1,0 +1,48 @@
+#!/bin/bash
+
+J=$(which juju)
+
+if [ ! -z $J ]; then
+  juju remove-machine --force 12
+  juju remove-machine --force 11
+  juju remove-machine --force 10
+
+  RETRY=30
+  while [ $RETRY -gt 0 -a $(juju status --format=tabular | grep "^10\|^11\|^12" | wc -l) -ne 0 ]; do
+    echo -n "."
+    RETRY=$(expr $RETRY - 1)
+    sleep 2
+  done
+  echo
+fi
+
+UVT=$(which uvt-kvm)
+test -z $UVT || uvt-kvm list | xargs uvt-kvm destroy
+
+sudo apt-get remove --purge -y $(dpkg --get-selections | grep "nagioas\|juju\|nova\|neutron" | awk '{print $1}') &&sudo apt-get autoremove -y && sudo rm -rf /etc/juju /etc/neutron /home/ubuntu/.juju && sudo find / -name "*juju*" -exec rm -r \{\} \;
+
+OVS=$(which ovs-vsctl)
+
+if [ ! -z $OVS ]; then
+  sudo ovs-vsctl del-br br-int
+fi
+
+sudo ifdown fabric
+sleep 3
+sudo ifup eth0
+sleep 3
+
+IP=$(ifconfig fabric | grep "inet addr" | awk '{print $2}' | cut -d: -f2)
+
+case $(echo "$IP" | cut -d. -f3) in
+	1)
+		TO=$(echo "$IP" | awk -F. '{printf("%s.%s.2.0/24", $1, $2)}')
+		GW=$(echo "$IP" | awk -F. '{printf("%s.%s.%s.254", $1, $2, $3)}')
+		;;
+	2)
+                TO=$(echo "$IP" | awk -F. '{printf("%s.%s.1.0/24", $1, $2)}')
+                GW=$(echo "$IP" | awk -F. '{printf("%s.%s.%s.254", $1, $2, $3)}')
+		;;
+esac
+
+sudo route add -net $TO gw $GW

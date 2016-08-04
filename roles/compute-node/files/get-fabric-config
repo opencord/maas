@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl -sS -H Content-Type: application/json http://karaf:karaf@onos-fabric:8181/onos/v1/network/configuration
