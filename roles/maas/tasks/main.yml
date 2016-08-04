@@ -253,7 +253,7 @@
 
 - name: Ensure RNDC Listens
   become: yes
-  lineinfile: 
+  lineinfile:
     dest: /etc/bind/maas/named.conf.rndc.maas
     regexp: 'inet .* port 954'
     line: '        inet 0.0.0.0 port 954'
@@ -279,7 +279,7 @@
     dest: /etc/resolvconf/resolv.conf.d/head
     state: present
     insertafter: EOF
-    line: "nameserver {{ mgmt_ip_address.stdout }}" 
+    line: "nameserver {{ mgmt_ip_address.stdout }}"
   register: ns_nameserver
 
 - name: Ensure Domain Search
@@ -323,6 +323,14 @@
     state=restarted
   when: ns_nameserver.changed or ns_search.changed
 
+- name: MAAS Accepting API Requests
+  action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
+  register: api_test2
+  until: api_test2.status_code is defined and api_test2.status_code == 403
+  retries: 5
+  delay: 60
+  failed_when: api_test2.status_code is not defined or api_test2.status_code != 403
+
 - name: Ensure Boot Resource Import Started
   become: yes
   shell: maas login cord http://localhost/MAAS/api/1.0/ "{{apikey.stdout}}" && maas cord boot-resources import && maas logout cord
@@ -363,7 +371,7 @@
 
 - name: Default VirtualBox Host
   become: no
-  set_fact: 
+  set_fact:
     virtualbox_host: "{{ virtualbox.power_helper_host }}"
   when: virtualbox_support is defined
   changed_when: false
@@ -374,7 +382,7 @@
     virtualbox_host: "{{ discovered_vbox_host.stdout }}"
   when: virtualbox_support is defined and virtualbox_host == ''
   changed_when: false
-  
+
 - name: Custom Automation Compose Configurations
   become: yes
   template:
