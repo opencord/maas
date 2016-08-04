@@ -107,6 +107,7 @@
     - get-fabric-config
     - get-node-prov-state
     - remove-xos-components
+    - post-fabric-config
 
 - name: Verify Mellanox 40Gb NIC
   shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c ConnectX-3 || true
