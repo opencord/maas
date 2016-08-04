@@ -50,7 +50,7 @@
   register: apikey
   changed_when: false
 
-- name: Ensure Playbooks
+- name: Ensure Compute and Switch Node Playbooks
   become: yes
   template:
     src=files/{{ item }}
@@ -61,6 +61,16 @@
   with_items:
     - compute-node.yml
     - switch-node.yml
+
+- name: Ensure Connect Switch Ansible Playbook
+  become: yes
+  copy:
+    dest=/etc/maas/ansible/{{ item }}
+    src=files/{{ item }}
+    owner=maas
+    group=maas
+    mode=0644
+  with_items:
     - connect-switch.yml
 
 - name: Ensure Dynamic Inventory Script
