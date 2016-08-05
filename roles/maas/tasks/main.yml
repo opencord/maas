@@ -197,6 +197,21 @@
   tags:
     - switch_support
 
+- name: Disable Proxy Access To All
+  become: yes
+  replace:
+    dest: /usr/share/maas/maas-proxy.conf
+    regexp: '^(acl localnet src all.*)$'
+    replace: '# \1'
+
+- name: Only Allow Proxy Access To POD Management Network
+  become: yes
+  lineinfile:
+    insertafter: '^# acl localnet src all'
+    line: "acl localnet src {{ networks.management }} # Only allow the POD management network to use proxy"
+    dest: /usr/share/maas/maas-proxy.conf
+    state: present
+
 - name: Restart MAAS Services
   become: yes
   service:
