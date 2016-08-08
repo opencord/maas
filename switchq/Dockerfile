@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 FROM ubuntu:14.04
-MAINTAINER Open Networking Labratory <info@onlab.us>
+MAINTAINER Open Networking Laboratory <info@onlab.us>
 
 # Base image information borrowed by official golang wheezy Dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends \

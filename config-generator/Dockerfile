@@ -13,7 +13,7 @@
 ## limitations under the License.
 FROM golang:alpine
 
-MAINTAINER Open Networking Labratory <info@onlab.us>
+MAINTAINER Open Networking Laboratory <info@onlab.us>
 
 RUN apk --update add git
 
