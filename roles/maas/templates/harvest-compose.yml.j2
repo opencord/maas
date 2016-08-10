@@ -15,5 +15,5 @@ services:
           - "/etc/dhcp:/etc/dhcp"
       ports:
           - "8954:8954"
-      command: [ "--server", "{{ mgmt_ip_address.stdout }}", "--port", "954", "--key", "/key/rndc.conf.maas", "--zone", "cord.lab", "--update", "--verify", "--timeout", "1s", "--repeat", "5m", "--quiet", "2s", "--workers", "10", "--filter", "^(?!cord)" ]
+      command: [ "--server", "{{ mgmt_ip_address.stdout }}", "--port", "954", "--key", "/key/rndc.conf.maas", "--zone", "cord.lab", "--update", "--verify", "--timeout", "1s", "--repeat", "2m", "--quiet", "2s", "--workers", "10", "--filter", "^(?!cord)" ]
       restart: unless-stopped
