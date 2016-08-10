@@ -195,6 +195,7 @@ task fetch(type: Exec) {
 // To be used to generate all needed binaries that need to be present on the target
 // as docker images in the local docker runner.
 task buildImages {
+    dependsOn fetch
     dependsOn buildBootstrapImage
     dependsOn buildHarvesterImage
     dependsOn buildAutomationImage
