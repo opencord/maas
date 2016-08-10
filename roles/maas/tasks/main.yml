@@ -62,7 +62,7 @@
 - name: MAAS
   become: yes
   apt:
-    name: maas=1.9.3*
+    name: maas=1.9.*
     state: present
     force: yes
     update_cache: yes
