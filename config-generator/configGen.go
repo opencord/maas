@@ -27,6 +27,8 @@ import (
 	"text/template"
 )
 
+var unmarshalError = errors.New("Error Unmarshaling the JSON Data\n")
+
 type Config struct {
 	Port             string `default:"8181"`
 	IP               string `default:"127.0.0.1"`
@@ -83,8 +85,9 @@ type linkStructJSON struct {
 }
 
 type ConfigParam struct {
-	SwitchCount int `json:"switchcount"`
-	HostCount   int `json:"hostcount"`
+	SwitchCount int    `json:"switchcount"`
+	HostCount   int    `json:"hostcount"`
+	ONOSIP      string `json:"onosip"`
 }
 
 var c Config
@@ -119,6 +122,7 @@ func ConfigGenHandler(w http.ResponseWriter, r *http.Request) {
 
 	c.HostCount = para.HostCount
 	c.SwitchCount = para.SwitchCount
+	c.IP = para.ONOSIP
 
 	onos := "http://" + c.Username + ":" + c.Password + "@" + c.IP + ":" + c.Port
 
@@ -128,14 +132,19 @@ func ConfigGenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = generateDevicesJSON(onos)
 	if err != nil {
-		w.WriteHeader(http.StatusExpectationFailed)
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, err.Error())
 		return
 	}
-	generateLinkJSON(onos)
+	err = generateLinkJSON(onos)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 	err = generateHostJSON(onos)
 	if err != nil {
-		w.WriteHeader(http.StatusExpectationFailed)
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, err.Error())
 		return
 	}
@@ -165,11 +174,16 @@ func writeToFile(object interface{}, t string) {
 }
 
 func generateDevicesJSON(onos string) error {
-	ds := getData(onos + "/onos/v1/devices")
+	ds, err := getData(onos + "/onos/v1/devices")
+	if err != nil {
+		return err
+	}
 
 	var d devices
-	err := json.Unmarshal(ds, &d)
-	check(err)
+	err = json.Unmarshal(ds, &d)
+	if err != nil {
+		return unmarshalError
+	}
 
 	if len(d.Device) != c.SwitchCount {
 		_ = os.Remove("network-cfg.json")
@@ -192,10 +206,15 @@ func generateDevicesJSON(onos string) error {
 }
 
 func generateHostJSON(onos string) error {
-	hs := getData(onos + "/onos/v1/hosts")
+	hs, err := getData(onos + "/onos/v1/hosts")
+	if err != nil {
+		return err
+	}
 	var h hosts
-	err := json.Unmarshal(hs, &h)
-	check(err)
+	err = json.Unmarshal(hs, &h)
+	if err != nil {
+		return unmarshalError
+	}
 
 	if len(h.Host) != c.HostCount {
 		_ = os.Remove("network-cfg.json")
@@ -227,13 +246,18 @@ func generateHostJSON(onos string) error {
 
 }
 
-func generateLinkJSON(onos string) {
+func generateLinkJSON(onos string) error {
 
-	links := getData(onos + "/onos/v1/links")
+	links, err := getData(onos + "/onos/v1/links")
+	if err != nil {
+		return err
+	}
 
 	var l onosLinks
-	err := json.Unmarshal(links, &l)
-	check(err)
+	err = json.Unmarshal(links, &l)
+	if err != nil {
+		return unmarshalError
+	}
 
 	var in []linkStructJSON
 
@@ -252,19 +276,25 @@ func generateLinkJSON(onos string) {
 
 	writeToFile(in, "links.tpl")
 
+	return nil
+
 }
 
-func getData(url string) []byte {
+func getData(url string) ([]byte, error) {
 
 	resp, err := http.Get(url)
-	check(err)
+	if err != nil {
+		return nil, errors.New("Error getting data from the URL\n")
+	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	check(err)
+	if err != nil {
+		return nil, errors.New("Error reading data from response body\n")
+	}
 
-	return body
+	return body, nil
 
 }
 
