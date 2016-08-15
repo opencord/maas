@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NODES="10.2.1.1 10.2.1.2 10.2.2.1 10.2.2.2 10.2.1.254 10.2.2.254"
+NODES="10.X.1.1 10.X.1.2 10.X.2.1 10.X.2.2 10.X.1.254 10.X.2.254 8.8.8.8"
 
 test -z $1 || NODES="$*"
 
@@ -20,6 +20,14 @@ FROM="none"
 if [ ! -z $USE_IFACE ]; then
 	FROM=$(ifconfig $USE_IFACE | grep "inet addr" | head -1 | awk '{print $2}' | cut -d: -f2)
 fi
+
+if [ "$FROM" != "none" ]; then
+    X=$(echo "$FROM" | cut -d. -f2)
+else
+    X='6'
+fi
+
+LIST=$(echo $LIST | sed -e "s/X/$X/g")
 
 echo "from $(hostname) ($FROM):"
 for ip in $LIST; do
