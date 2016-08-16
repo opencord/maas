@@ -275,6 +275,10 @@ task prime (type: Exec) {
         args = args << "--user=$config.seedServer.user"
     }
 
+    if ( config.debug ) {
+        args = args << "-vvvv"
+    }
+
     def extraVars = []
     if (config.seedServer) {
         extraVars = extraVars.p(config.seedServer.extraVars)
@@ -324,6 +328,11 @@ task deployBase (type: Exec) {
 
     if ( config.seedServer.user != null && config.seedServer.user != "" ) {
         args = args << "--user=$config.seedServer.user"
+    }
+
+
+    if ( config.debug ) {
+        args = args << "-vvvv"
     }
 
     def extraVars = []
