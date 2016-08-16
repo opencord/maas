@@ -5,23 +5,27 @@
     owner=maas
     group=maas
     state=directory
+    mode=0755
 
-- name: Ensure Ansible Compute Config Files
+- name: Ensure Ansible Roles
   become: yes
-  git:
-    repo={{ provision.location }}
-    dest=/tmp/ansible.maas
-    clone=yes
-    force=yes
-    update=yes
+  copy:
+    src: roles
+    dest: /etc/maas/ansible
+    owner: maas
+    group: maas
+    mode: u=rwX,g=rX,o=rX
+    force: true
 
-- name: Ensure Ansible Roles Exist
+- name: Ensure Role Permissions and Modes
   become: yes
-  command: cp -rf /tmp/ansible.maas/{{ provision.role_path }} /etc/maas/ansible
-
-- name: Ensure Ansible Roles Ownership
-  become: yes
-  file: dest=/etc/maas/ansible/{{ provision.role_path }} owner=maas group=maas recurse=yes
+  file:
+    path: /etc/maas/ansible
+    owner: maas
+    group: maas
+    mode: u=rwX,g=rX,o=rX
+    state: directory
+    recurse: true
 
 - name: Ensure Ansible Provisioning Script
   become: yes
