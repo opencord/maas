@@ -28,7 +28,7 @@ interfaces:
     #   'management' specifies the interface on which the head node will
     #                service DHCP and PXE boot requests
     fabric: "{{ fabric_iface | default('fabric') }}"
-    management: "{{ management_iface | default('br-mgmt') }}"
+    management: "{{ management_iface | default('mgmtbr') }}"
     external: "{{ external_iface | default('') }}"
 
 networks:
@@ -42,7 +42,7 @@ networks:
     #   'fabric'     specifies the network that will be assigned to
     #                the leaf - spine fabric
     management: "{{ management_network | default('10.6.0.0/24') }}"
-    bridge: "{{ bridge_network | default('172.18.0.0/24') }}"
+    bridge: "{{ bridge_network | default('172.42.0.0/24') }}"
     fabric: "{{ fabric_network | default('10.6.1.0/24') }}"
 
     # CHANGE:

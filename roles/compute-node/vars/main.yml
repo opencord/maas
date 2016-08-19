@@ -3,9 +3,12 @@ pub_ssh_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
 compute_node:
     interfaces:
         fabric: "{{ fabric_iface | default('fabric') }}"
-        management: "{{ management_iface | default('br-mgmt') }}"
+        management: "{{ management_iface | default('mgmtbr') }}"
         external: "{{ external_iface | default('') }}"
     addresses:
         fabric: "{{ fabric_ip | mandatory }}"
         management: "{{ management_ip | default('dhcp') }}"
         external: "{{ external_ip | default('manual') }}"
+    gateway:
+        external: "{{ external_gw | default('') }}"
+        management: "{{ management_gw | default('') }}"

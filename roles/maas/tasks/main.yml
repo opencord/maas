@@ -1,4 +1,14 @@
 ---
+- name: Ensure Management Bridge Interface
+  become: yes
+  command: ifconfig mgmtbr
+  register: have_mgmtbr
+  failed_when: false
+  changed_when: false
+
+- fail: msg="The head node must have a network bridge named 'mgmtbr' to continue the deployment. Please see docuemataiton at 'http://github.com/opencord/cord`."
+  when: have_mgmtbr.rc != 0
+
 - name: Install Prerequisites
   become: yes
   apt: name={{ item }} state=latest force=true
@@ -17,40 +27,20 @@
   with_items:
     - docker-py
 
-- name: Stop MAAS Switchq Container
+- name: Stop Containers
   become: yes
   docker:
-    name: switchq
-    image: opencord/cord-maas-switchq:latest
+    name: "{{ item.name }}"
+    image: "{{ item.image }}"
     state: absent
-
-- name: Stop MAAS Automation Container
-  become: yes
-  docker:
-    name: automation
-    image: opencord/cord-maas-automation:latest
-    state: absent
-
-- name: Stop Provisioner Container
-  become: yes
-  docker:
-    name: provisioner
-    image: opencord/cord-provisioner:latest
-    state: absent
-
-- name: Stop DHCP Harvester Container
-  become: yes
-  docker:
-    name: harvester
-    image: opencord/cord-dhcp-harvester:latest
-    state: absent
-
-- name: Stop IP Allocator Container
-  become: yes
-  docker:
-    name: allocator
-    image: opencord/cord-ip-allocator:latest
-    state: absent
+  with_items:
+    - { name: "storage", image: "docker-registry:5000/consul:{{ docker.image_version }}" }
+    - { name: "allocator", image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}" }
+    - { name: "provisioner", image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}" }
+    - { name: "switchq", image: "docker-registry:5000/cord-maas-switchq:{{ docker.image_version }}" }
+    - { name: "automation", image: "docker-registry:5000/cord-maas-automation:{{ docker.image_version }}" }
+    - { name: "generator", image: "docker-registry:5000/config-generator:{{ docker.image_version }}" }
+    - { name: "harvester", image: "docker-registry:5000/cord-dhcp-harvester:{{ docker.image_version }}" }
 
 - name: MAAS Repository
   become: yes
@@ -133,12 +123,6 @@
   command: virsh net-destroy default
   when: virsh_default_network_exists.stdout != '0'
 
-- name: Network Configuration
-  become: yes
-  script: files/generate_network_config.sh {{ interfaces.management }} {{ networks.management }} {{ networks.bridge }} {{ networks.bridge_name }}
-  register: network_config_changed
-  changed_when: network_config_changed.stdout == 'true'
-
 - name: Network Masquerading (NAT)
   become: yes
   template:
@@ -153,26 +137,6 @@
   command: /etc/network/if-pre-up.d/nat report-changed
   register: masq_changed
   changed_when: masq_changed.stdout == 'true'
-
-- name: VM Bridge
-  become: yes
-  template:
-    src: templates/create_bridge.j2
-    dest: /etc/network/if-pre-up.d/create_bridge_{{ networks.bridge_name }}
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Activate VM Bridge
-  become: yes
-  command: /etc/network/if-pre-up.d/create_bridge_{{ networks.bridge_name }} report-changed
-  register: bridge_changed
-  changed_when: bridge_changed.stdout == 'true'
-
-- name: Management Interface
-  become: yes
-  shell: ifdown {{ interfaces.management }} && ifup {{ interfaces.management }}
-  when: network_config_changed.stdout == 'true'
 
 - name: Management Interface IP Address
   shell: ifconfig {{ interfaces.management }} 2>&1 | grep "inet addr:" | sed -e 's/.*:\([.0-9]*\)[ ]*Bcast.*/\1/g'

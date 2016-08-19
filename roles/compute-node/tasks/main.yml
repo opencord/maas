@@ -108,6 +108,7 @@
     - get-node-prov-state
     - remove-xos-components
     - post-fabric-config
+    - pull-latest-docker-images
 
 - name: Verify Mellanox 40Gb NIC
   shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c ConnectX-3 || true
@@ -151,7 +152,7 @@
 
 - name: Consistent Interface Naming
   become: yes
-  script: files/rename_ifaces.sh "{{ compute_node.interfaces.fabric }}" "{{ compute_node.addresses.fabric }}" "{{ compute_node.interfaces.external }}" "{{ compute_node.addresses.external }}" "{{ compute_node.interfaces.management }}" "{{ compute_node.addresses.management }}"
+  script: files/rename_ifaces.sh "{{ compute_node.interfaces.fabric }}" "{{ compute_node.addresses.fabric }}" "{{ compute_node.interfaces.external }}" "{{ compute_node.addresses.external }}" "{{ compute_node.gateway.external }}" "{{ compute_node.interfaces.management }}" "{{ compute_node.addresses.management }}" "{{ compute_node.gateway.management }}"
   register: ifaces_changed
   changed_when: ifaces_changed.stdout.find("true") != -1
   tags:
