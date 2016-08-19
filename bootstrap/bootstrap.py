@@ -290,7 +290,7 @@ def main():
         hostIfc = ifc if ifc['name'] == config['bridge'] else hostIfc
 
     add_or_update_node_group_interface(client, ng, config['gw'], localIfc, config['interface'], config['network'])
-    add_or_update_node_group_interface(client, ng, config['gw'], hostIfc, config['bridge'], config['bridge-subnet'])
+    #add_or_update_node_group_interface(client, ng, config['gw'], hostIfc, config['bridge'], config['bridge-subnet'])
 
     # Update the server settings to upstream DNS request to Google
     # POST /api/2.0/maas/ op=set_config

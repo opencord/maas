@@ -132,10 +132,10 @@ function generate_interfaces {
     for i in $(cat $2); do
         if [ "eth$IDX" == "$4" ]; then
                 echo "auto eth$IDX" >> $OUT
-            if [ "$EXT_IP" == "dhcp" ]; then
+            if [ "$EXT_ADDR" == "dhcp" ]; then
                 echo "iface eth$IDX inet dhcp" >> $OUT
-            elif [ "$EXT_IP" == "manual" ]; then
-            echo "iface eth$IDX inet manual" >> $OUT
+            elif [ "$EXT_ADDR" == "manual" ]; then
+                echo "iface eth$IDX inet manual" >> $OUT
             else
                 echo "iface eth$IDX inet static" >> $OUT
                 echo "    address $EXT_IP" >> $OUT
@@ -143,22 +143,8 @@ function generate_interfaces {
                 echo "    netmask $EXT_NETMASK" >> $OUT
                 echo "    broadcast $EXT_BROADCAST" >> $OUT
                 echo "    gateway $EXT_GW" >> $OUT
-            echo "    dns-nameservers 8.8.8.8 8.8.4.4" >> $OUT
-            echo "    dns-search cord.lab" >> $OUT
-            fi
-        elif [ "eth$IDX" == "$5" ]; then
-            echo "auto eth$IDX" >> $OUT
-            if [ "$MGT_IP" == "dhcp" ]; then
-                echo "iface eth$IDX inet dhcp" >> $OUT
-            elif [ "$MGT_IP" == "manual" ]; then
-            echo "iface eth$IDX inet manual" >> $OUT
-            else
-                echo "iface eth$IDX inet static" >> $OUT
-                echo "    address $MGT_IP" >> $OUT
-                echo "    network $MGT_NETWORK" >> $OUT
-                echo "    netmask $MGT_NETMASK" >> $OUT
-                echo "    broadcast $MGT_BROADCAST" >> $OUT
-                echo "    gateway $MGT_GW" >> $OUT
+                echo "    dns-nameservers 8.8.8.8 8.8.4.4" >> $OUT
+                echo "    dns-search cord.lab" >> $OUT
             fi
         else
             echo "auto eth$IDX" >> $OUT
@@ -172,12 +158,23 @@ function generate_interfaces {
     local BRNAME=$5
     local F=$(echo $5 | grep "^eth[0-9]*$" | wc -l)
     if [ $F -ne 0 ]; then
-        BRNAME="br-mgmt"
+            BRNAME="mgmtbr"
     fi
     local BPCNT=$(echo $BRIDGE_PORTS | wc -w)
     if [ $BPCNT -ne 0 ]; then
         echo "auto $BRNAME" >> $OUT
-        echo "iface $BRNAME inet dhcp" >> $OUT
+        if [ "$MGT_ADDR" == "dhcp" ]; then
+            echo "iface $BRNAME inet dhcp" >> $OUT
+        elif [ "$MGT_ADDR" == "manual" ]; then
+                echo "iface $BRNAME inet manual" >> $OUT
+        else
+            echo "iface $BRNAME inet static" >> $OUT
+            echo "    address $MGT_IP" >> $OUT
+            echo "    network $MGT_NETWORK" >> $OUT
+            echo "    netmask $MGT_NETMASK" >> $OUT
+            echo "    broadcast $MGT_BROADCAST" >> $OUT
+            echo "    gateway $MGT_GW" >> $OUT
+        fi
         echo "    bridge_ports $BRIDGE_PORTS" >> $OUT
     fi
 }
@@ -191,23 +188,25 @@ FAB_NETMASK=$(netmask $FAB_MASKBITS)
 
 EXT_IFACE=$3
 EXT_ADDR=$4
+EXT_GW=$5
 if [ "$EXT_ADDR" != "dhcp" ]; then
     EXT_IP=$(echo $EXT_ADDR | cut -d/ -f1)
     EXT_MASKBITS=$(echo $EXT_ADDR | cut -d/ -f2)
     EXT_NETWORK=$(network $EXT_IP $EXT_MASKBITS)
     EXT_NETMASK=$(netmask $EXT_MASKBITS)
     EXT_BROADCAST=$(broadcast $EXT_IP $EXT_MASKBITS)
-    EXT_GW=$(first $EXT_ADDR)
+    test -z $EXT_GW && EXT_GW=$(first $EXT_ADDR)
 fi
-MGT_IFACE=$5
-MGT_ADDR=$6
+MGT_IFACE=$6
+MGT_ADDR=$7
+MGT_GW=$8
 if [ "$MGT_ADDR" != "dhcp" ]; then
     MGT_IP=$(echo $MGT_ADDR | cut -d/ -f1)
     MGT_MASKBITS=$(echo $MGT_ADDR | cut -d/ -f2)
     MGT_NETWORK=$(network $MGT_IP $MGT_MASKBITS)
     MGT_NETMASK=$(netmask $MGT_MASKBITS)
     MGT_BROADCAST=$(broadcast $MGT_IP $MGT_MASKBITS)
-    MGT_GW=$(first $MGT_ADDR)
+    test -z $MGT_GW && MGT_GW=$(first $MGT_ADDR)
 fi
 
 LIST_ETH=$(mktemp -u)
@@ -236,23 +235,23 @@ generate_interfaces $LIST_FABRIC $LIST_ETH "$FAB_IFACE" "$EXT_IFACE" "$MGT_IFACE
 
 diff /etc/network/interfaces $IFACES_FILE 2>&1 > /dev/null
 if [ $? -ne 0 ]; then
-  CHANGED="true"
-  cp /etc/network/interfaces /etc/network/interfaces.1
-  cp $IFACES_FILE /etc/network/interfaces
+    CHANGED="true"
+    cp /etc/network/interfaces /etc/network/interfaces.1
+    cp $IFACES_FILE /etc/network/interfaces
 fi
 
 generate_persistent_names $LIST_FABRIC $LIST_ETH "$FAB_IFACE" "$EXT_IFACE"
 
 if [ -r /etc/udev/rules.d/70-persistent-net.rules ]; then
-  diff /etc/udev/rules.d/70-persistent-net.rules $NAMES_FILE 2>&1 > /dev/null
-  if [ $? -ne 0 ]; then
-    CHANGED="true"
-    cp /etc/udev/rules.d/70-persistent-net.rules /etc/udev/rules.d/70-persistent-net.rules.1
-    cp $NAMES_FILE /etc/udev/rules.d/70-persistent-net.rules
-  fi
+    diff /etc/udev/rules.d/70-persistent-net.rules $NAMES_FILE 2>&1 > /dev/null
+    if [ $? -ne 0 ]; then
+        CHANGED="true"
+        cp /etc/udev/rules.d/70-persistent-net.rules /etc/udev/rules.d/70-persistent-net.rules.1
+        cp $NAMES_FILE /etc/udev/rules.d/70-persistent-net.rules
+    fi
 else
-  CHANGED="true"
-  cp $NAMES_FILE /etc/udev/rules.d/70-persistent-net.rules
+    CHANGED="true"
+    cp $NAMES_FILE /etc/udev/rules.d/70-persistent-net.rules
 fi
 
 rm -rf $IFACES_FILE

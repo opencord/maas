@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for i in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep docker-registry | grep -v "<none>" | sort); do
+    docker pull $i
+done
