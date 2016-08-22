@@ -48,24 +48,15 @@ function guess_type {
     fi
     local DRIVER=$(ethtool -i $1 2>/dev/null | grep driver | awk '{print $2}')
     local RESULT="DNC"
-    case $DRIVER in
-            mlx4_en)
-            RESULT="MLX4_EN"
-            ;;
-        i40e)
-            RESULT="I40G"
-            ;;
-        ixgbe)
-            RESULT="10G"
-            ;;
-        *)
-            IS_PHY=$(ls -l /sys/class/net/$1 | grep -v virtual | wc -l)
-            if [ $IS_PHY -eq 1 ]; then
+    MATCH=$(echo "|$FABRIC_IFACE_SPEC|" | grep "|$DRIVER|" | wc -l)
+    if [ $MATCH -ne 0 ]; then
+        RESULT="FABRIC"
+    else
+        IS_PHY=$(ls -l /sys/class/net/$1 | grep -v virtual | wc -l)
+        if [ $IS_PHY -eq 1 ]; then
             RESULT="ETH"
-            fi
-            ;;
-        *) ;;
-    esac
+        fi
+    fi
     echo $RESULT
 }
 
@@ -209,6 +200,9 @@ if [ "$MGT_ADDR" != "dhcp" ]; then
     test -z $MGT_GW && MGT_GW=$(first $MGT_ADDR)
 fi
 
+FABRIC_IFACE_SPEC=$9
+test -z $FABRIC_IFACE_SPEC && FABRIC_IFACE_SPEC="i40e|mlx4_en"
+
 LIST_ETH=$(mktemp -u)
 LIST_FABRIC=$(mktemp -u)
 IFACES_FILE=$(mktemp -u)
@@ -222,7 +216,7 @@ for i in $IFACES; do
         ETH)
             echo "$(get_mac $i)" >> $LIST_ETH
             ;;
-        I40G|MLX4_EN|10G)
+        FABRIC)
             echo "$(get_mac $i)" >> $LIST_FABRIC
             ;;
         *) ;;

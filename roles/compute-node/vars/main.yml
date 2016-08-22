@@ -1,6 +1,7 @@
 pub_ssh_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
 
 compute_node:
+    fabric_iface_match: "{{ fabric_iface_spec | default('i40e|mlx4_en') }}"
     interfaces:
         fabric: "{{ fabric_iface | default('fabric') }}"
         management: "{{ management_iface | default('mgmtbr') }}"
