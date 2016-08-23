@@ -1,5 +1,5 @@
-accton_as5712_54x: 'http://178.33.61.6/putstorage/DownloadFileHash/AA90EC2D3A5A4A5QQWE3332069EWQS/onie-installer-x86_64-accton_as6712_32x-r0'
-accton_as6712_32x: 'http://178.33.61.6/putstorage/DownloadFileHash/AA90EC2D3A5A4A5QQWE3332069EWQS/onie-installer-x86_64-accton_as6712_32x-r0'
+accton_as5712_54x: 'https://www.dropbox.com/s/tgpsmblubr6r0xc/onie-installer-x86_64-accton_as6712_32x-r0'
+accton_as6712_32x: 'https://www.dropbox.com/s/tgpsmblubr6r0xc/onie-installer-x86_64-accton_as6712_32x-r0'
 
 virtualbox:
     # CHANGE:
