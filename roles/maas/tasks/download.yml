@@ -1,0 +1,35 @@
+---
+# For some reason the ansible get_url retrieves HTML when we attempt to download the switch
+# boot resources from drop box, but using curl things work. So this include is all about
+# downloading the boot resource assuming it is not already on the local files (as detetermined
+# by the file size in bytes)
+
+- name: Get Remote Size
+  shell: curl -sSL -I "{{ item.url }}" | grep Content-Length | tail -1 | cut "-d " -f2
+  register: remote_size
+  tags:
+    - switch_support
+
+- name: Check Local File
+  stat:
+    path: "/var/www/html/{{ item.dest }}"
+  register: local_size
+  tags:
+    - switch_support
+
+- name: Download Switch Boot Resource
+  become: yes
+  command: curl -sSL "{{ item.url }}" -o "/var/www/html/{{ item.dest }}"
+  when: local_size.stat.exists == false or remote_size.stdout|int != local_size.stat.size
+  tags:
+    - switch_support
+
+- name: Switch Boot Resources Permissions
+  become: yes
+  file:
+    path: "/var/www/html/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - switch_support

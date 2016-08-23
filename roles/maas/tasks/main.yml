@@ -144,17 +144,8 @@
   changed_when: false
   failed_when: mgmt_ip_address.rc != 0 or mgmt_ip_address.stdout == ""
 
-# Currently the onie image is being stored in **Dropbox** on a personal account, which is not really what we want to
-# have in production, but it works for the time being.
-- name: Switch Boot Resources
-  become: yes
-  get_url:
-    url={{ item.url }}
-    dest=/var/www/html/{{ item.dest }}
-    owner=root
-    group=root
-    mode=0644
-    validate_certs=no
+- name: Switch Resource
+  include: download.yml
   with_items:
     - { url : "{{ accton_as6712_32x }}", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
     - { url : "{{ accton_as5712_54x }}", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
