@@ -187,9 +187,11 @@ func (c *Config) processRecord(rec AddressRec) error {
 		case Failed: // Failed
 			log.Debugf("device '%s' (%s, %s) failed last provisioning with message '%s', reattempt",
 				rec.Name, rec.IP, rec.MAC, state.Message)
+			state = nil
 		default: // Unknown state
 			log.Debugf("device '%s' (%s, %s) has unknown provisioning state '%d', will provision",
 				rec.Name, rec.IP, rec.MAC, state.Status)
+			state = nil
 		}
 	} else {
 		log.Debugf("device '%s' (%s, %s) has no provisioning record",
