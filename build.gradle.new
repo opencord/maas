@@ -215,6 +215,7 @@ task tagImages {
 }
 
 task publish {
+    //FIXME: This works because the upstream project primes the nodes before running this.
     comps.each { name, spec -> if (spec.type == 'image') { dependsOn "publish" + name } }
     dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
@@ -225,9 +226,6 @@ task publish {
     dependsOn publishSwitchqImage
 }
 
-tasks.addRule(new DockerFetchRule(project))
-tasks.addRule(new DockerPublishRule(project))
-tasks.addRule(new DockerTagRule(project))
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -377,8 +375,12 @@ task deployBase(type: Exec)  {
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
 }
 
-publish.mustRunAfter prime
-
 prime.dependsOn {
     updateDocker
 }
+
+tasks.addRule(new DockerFetchRule(project))
+tasks.addRule(new DockerPublishRule(project, project(':maas').prime))
+tasks.addRule(new DockerTagRule(project))
+
+
