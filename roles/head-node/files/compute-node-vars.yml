@@ -1,0 +1,1 @@
+fabric_iface_spec: '{{ compute_node.fabric_iface_match }}'

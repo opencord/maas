@@ -66,6 +66,24 @@
     - compute-node.yml
     - switch-node.yml
 
+- name: Ensure Compute and Switch Variable Directory
+  become: yes
+  file:
+    path=/etc/maas/ansible/vars
+    owner=maas
+    group=maas
+    mode=0755
+    state=directory
+
+- name: Ensure Compute and Switch Node Variables
+  become: yes
+  template:
+    src=files/compute-node-vars.yml
+    dest=/etc/maas/ansible/vars/compute-node.yml
+    owner=maas
+    group=maas
+    mode=0644
+
 - name: Ensure Connect Switch Ansible Playbook
   become: yes
   copy:

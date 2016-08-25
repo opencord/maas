@@ -1,4 +1,12 @@
-- hosts: all
+---
+- name: Include vars
+  hosts: all
+  tasks:
+  - include_vars: vars/compute-node.yml
+
+- name: Configure compute hosts to use DNS server
+  hosts: all
   remote_user: ubuntu
+  become: yes
   roles:
-    - compute-node
+    - role: compute-node
