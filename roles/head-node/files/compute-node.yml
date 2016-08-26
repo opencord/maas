@@ -1,6 +1,7 @@
 ---
 - name: Include vars
   hosts: all
+  remote_user: ubuntu
   tasks:
   - include_vars: vars/compute-node.yml
 
