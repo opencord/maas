@@ -20,7 +20,7 @@
 - name: Ensure Role Permissions and Modes
   become: yes
   file:
-    path: /etc/maas/ansible
+    path: /etc/maas/ansible/roles
     owner: maas
     group: maas
     mode: u=rwX,g=rX,o=rX
