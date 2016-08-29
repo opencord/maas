@@ -179,7 +179,7 @@ task publishHarvesterImage(type: Exec) {
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
 
-task updateDocker (type: Exec) {
+task updateDocker (type: Exec)  {
     commandLine 'sudo', 'utils/enable-remote-docker-registry', "$targetReg"
 }
 
@@ -195,7 +195,6 @@ task fetch(type: Exec) {
 // To be used to generate all needed binaries that need to be present on the target
 // as docker images in the local docker runner.
 task buildImages {
-    dependsOn fetch
     dependsOn buildBootstrapImage
     dependsOn buildHarvesterImage
     dependsOn buildAutomationImage
@@ -216,6 +215,7 @@ task tagImages {
 }
 
 task publish {
+    //FIXME: This works because the upstream project primes the nodes before running this.
     comps.each { name, spec -> if (spec.type == 'image') { dependsOn "publish" + name } }
     dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
@@ -226,9 +226,6 @@ task publish {
     dependsOn publishSwitchqImage
 }
 
-tasks.addRule(new DockerFetchRule(project))
-tasks.addRule(new DockerPublishRule(project))
-tasks.addRule(new DockerTagRule(project))
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -261,8 +258,7 @@ List.metaClass.p = { spec ->
   }
 }
 
-task prime (type: Exec) {
-    dependsOn updateDocker
+task prime (type: Exec)  {
     println "Using deployment config: $deployConfig"
     File configFile = new File(deployConfig)
     def yaml = new Yaml()
@@ -320,7 +316,7 @@ task prime (type: Exec) {
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "prime-node.yml"
 }
 
-task deployBase (type: Exec) {
+task deployBase(type: Exec)  {
     println "Using deployment config: $deployConfig"
     File configFile = new File(deployConfig)
     def yaml = new Yaml()
@@ -378,3 +374,13 @@ task deployBase (type: Exec) {
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
 }
+
+prime.dependsOn {
+    updateDocker
+}
+
+tasks.addRule(new DockerFetchRule(project))
+tasks.addRule(new DockerPublishRule(project, project(':maas').prime))
+tasks.addRule(new DockerTagRule(project))
+
+
