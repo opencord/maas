@@ -50,4 +50,5 @@
   command: docker-compose -f /etc/maas/{{ item }} up -d
   with_items:
     - registry-compose.yml
+  changed_when: true
   tags: [registry]

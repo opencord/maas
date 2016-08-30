@@ -13,7 +13,7 @@ seedServer:
 
   # Specifies tasks within the head node provisioning not to execute, including:
   #
-  # switch_support -   don't download the switch ONL images as there are no 
+  # switch_support -   don't download the switch ONL images as there are no
   #                    switches in this configuration
   # interface_config - don't update the network configuration of the headnode
   #                    as it is configured by vagrant to the proper settings

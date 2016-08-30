@@ -15,7 +15,7 @@
   changed_when: false
 
 - name: Openflow Agent Version
-  shell: ofdpa --version
+  command: ofdpa --version
   register: ofdpa_version
   changed_when: false
   when: ofdpa_exists.stdout != "0"

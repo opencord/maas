@@ -7,8 +7,8 @@
 
 - name: Debian Docker is present
   apt:
-    name: docker-engine
-    state: latest
+    name: docker-engine=1.12*
+    state: present
     force: yes
   tags: [docker]
 

@@ -21,6 +21,7 @@
   command: make install
   args:
     chdir: i40e-1.4.25/src
+  changed_when: true
 
 - name: Load i40e Driver
   become: yes

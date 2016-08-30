@@ -1,9 +1,9 @@
 - name: VirtualBox Power Support
   become: yes
-  apt: name={{ item }} state=latest
+  apt: name={{ item }} state=present
   with_items:
-    - amtterm
-    - wsmancli
+    - amtterm=1.4*
+    - wsmancli=2.3.*
 
 - name: VirtualBox Power Script
   become: yes

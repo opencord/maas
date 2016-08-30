@@ -1,20 +1,20 @@
 ---
 - name: Install add-apt-repository
-  sudo: yes
-  apt: name=software-properties-common state=latest update_cache=yes
+  become: yes
+  apt: name=software-properties-common=0.92* state=present update_cache=yes
 
 - name: Add Oracle Java repository
-  sudo: yes
+  become: yes
   apt_repository: repo='ppa:webupd8team/java' update_cache=yes
 
 - name: Accept Java 8 license
-  sudo: yes
+  become: yes
   debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
 
 - name: Install Oracle Java 8
-  sudo: yes
-  apt: name={{item}} state=latest
+  become: yes
+  apt: name={{item}} state=present
   with_items:
-  - oracle-java8-installer
-  - ca-certificates
-  - oracle-java8-set-default
+  - oracle-java8-installer=8*
+  - ca-certificates=14.04*
+  - oracle-java8-set-default=8*

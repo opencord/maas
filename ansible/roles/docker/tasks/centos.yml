@@ -2,7 +2,7 @@
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-  with_items: centos_files
+  with_items: "{{ centos_files }}"
   tags: [docker]
 
 - name: CentOS package is installed
@@ -13,6 +13,7 @@
 
 - name: CentOS Daemon is reloaded
   command: systemctl daemon-reload
+  changed_when: true
   tags: [docker]
 
 - name: CentOS service is running

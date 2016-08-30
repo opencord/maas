@@ -7,8 +7,10 @@
 - name: Get Remote Size
   shell: curl -sSL -I "{{ item.url }}" | grep Content-Length | tail -1 | cut "-d " -f2
   register: remote_size
+  changed_when: false
   tags:
     - switch_support
+    - skip_ansible_lint
 
 - name: Check Local File
   stat:
@@ -23,6 +25,7 @@
   when: local_size.stat.exists == false or remote_size.stdout|int != local_size.stat.size
   tags:
     - switch_support
+    - skip_ansible_lint
 
 - name: Switch Boot Resources Permissions
   become: yes

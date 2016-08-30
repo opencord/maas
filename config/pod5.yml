@@ -14,12 +14,12 @@ seedServer:
   #
   # management_ip - the IP address and mask bits to be used to configure the network
   #                 interface connecting the head node to the POD internal
-  #                 management network. The head node will deliver DHCP addresses to 
+  #                 management network. The head node will deliver DHCP addresses to
   #                 the other compute nodes over this interface
   #
   # external_ip   - the IP address and mask bits to be used to configure the network
-  #                 interface connecting the head node (and the POD) to the 
-  #                 Internet. All traffic in the POD to external hosts will be 
+  #                 interface connecting the head node (and the POD) to the
+  #                 Internet. All traffic in the POD to external hosts will be
   #                 NAT-ed through this interface
   fabric_ip: '10.6.1.1/24'
   management_ip: '10.6.0.1/24'

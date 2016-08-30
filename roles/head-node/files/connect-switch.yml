@@ -5,6 +5,7 @@
     - name: Lookup DHCP harvest
       shell: cat /etc/bind/maas/dhcp_harvest.inc | grep -i " cc:37:ab\| 70:72;cf" | awk '{print $1}'
       register: switches
+      changed_when: false
     - name: Add hosts into inventory
       add_host: name={{item}} group=fabric
       with_items: "{{switches.stdout_lines}}"
@@ -24,9 +25,11 @@
 
     - name: Purge hardware tables
       command: /root/purge
+      changed_when: true
 
     - name: Start indigo agent
       command: /root/connect -bg
+      changed_when: true
 
     - name: Verify indigo agent has been started
       command: ps aux

@@ -39,7 +39,9 @@
 
 - name: Mark Persist Openflow Agent
   command: persist /etc/accton/ofdpa.conf
+  changed_when: true
 
 - name: Persist Openflow Agent
   command: savepersist
   failed_when: false
+  changed_when: true

@@ -1,9 +1,9 @@
 - name: Apt Information
   become: yes
-  apt: name={{ item }} state=latest force=yes
+  apt: name={{ item }} state=present force=yes
   with_items:
-    - apt-transport-https
-    - ca-certificates
+    - apt-transport-https=1.0*
+    - ca-certificates=20160104*
 
 - name: Docker Apt Key
   become: yes
@@ -21,8 +21,8 @@
 - name: Docker Engine
   become: yes
   apt:
-    name: docker-engine
-    state: latest
+    name: docker-engine=1.12*
+    state: present
     force: yes
 
 - name: Docker Exposed via TCP

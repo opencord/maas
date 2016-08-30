@@ -9,17 +9,17 @@
 
 - name: Applications
   become: yes
-  apt: name={{ item }} state=latest force=yes
+  apt: name={{ item }} state=present force=yes
   with_items:
-    - build-essential
-    - git
-    - python-pip
-    - ifenslave-2.6
-    - bridge-utils
-    - ethtool
-    - minicom
-    - curl
-    - jq
+    - build-essential=11.6*
+    - git=1:1.9.*
+    - python-pip=1.5.4*
+    - ifenslave-2.6=2.4*
+    - bridge-utils=1.5-*
+    - ethtool=1:3.13*
+    - minicom=2.7*
+    - curl=7.35.*
+    - jq=1.4*
 
 - name: Ensure Docker Insecure Repository
   become: yes
@@ -139,13 +139,13 @@
     - interface_config
 
 - name: Update mlx4 Driver
-  include: tasks/mlx4_driver.yml
+  include: mlx4_driver.yml
   when: mlx_nic_present.stdout != "0" and mlx4_version.stdout != '3.1-1.0.4'
   tags:
     - interface_config
 
 - name: Update i40e Driver
-  include: tasks/i40e_driver.yml
+  include: i40e_driver.yml
   when: intel_nic_present.stdout != "0" and i40e_version.stdout != '1.4.25'
   tags:
     - interface_config
