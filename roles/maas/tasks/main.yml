@@ -20,7 +20,7 @@
     - python-pycurl=7.19.*
     - python-pip=1.5.4*
     - ethtool=1:3.13*
-    - jq=1.4*
+    - jq=1.3*
 
 - name: Install Python Prerequisites
   become: yes

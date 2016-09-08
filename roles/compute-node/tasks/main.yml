@@ -19,7 +19,7 @@
     - ethtool=1:3.13*
     - minicom=2.7*
     - curl=7.35.*
-    - jq=1.4*
+    - jq=1.3*
 
 - name: Ensure Docker Insecure Repository
   become: yes
