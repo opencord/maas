@@ -10,12 +10,15 @@
 - name: Ensure Ansible Roles
   become: yes
   copy:
-    src: roles
+    src: "{{ item }}"
     dest: /etc/maas/ansible
     owner: maas
     group: maas
     mode: u=rwX,g=rX,o=rX
     force: true
+  with_items:
+    - roles
+    - library
 
 - name: Ensure Role Permissions and Modes
   become: yes
@@ -79,7 +82,7 @@
   become: yes
   template:
     src=files/compute-node-vars.yml
-    dest=/etc/maas/ansible/vars/compute-node.yml
+    dest=/etc/maas/ansible/vars/compute-node-vars.yml
     owner=maas
     group=maas
     mode=0644

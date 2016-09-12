@@ -1,0 +1,213 @@
+---
+- name: Ensure Prerequisites
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-ethtool=0.7*
+
+- name: Gather Interface Information
+  netinfo:
+
+- name: Establish Interface Lists
+  set_fact:
+    reboot_required: false
+    fabric_iface_list: []
+    nonfabric_iface_list: []
+    search_list: "|{{ compute_node.fabric_iface_match }}|"
+  changed_when: false
+
+- name: Gather Fabric Interfaces
+  set_fact:
+    fabric_iface_list: "{{ fabric_iface_list + [item] }}"
+  with_items:
+    - "{{ netinfo.keys() | sort }}"
+  when: netinfo[item]['module'] is defined and search_list.find('|' + netinfo[item]['module'] + '|') != -1 and ( not compute_node.interfaces.external or item != compute_node.interfaces.external  )
+  changed_when: false
+
+- name: Gather Non-Fabric Interfaces
+  set_fact:
+    nonfabric_iface_list: "{{ nonfabric_iface_list + [item] }}"
+  with_items:
+    - "{{ netinfo.keys() | sort }}"
+  when: netinfo[item]['module'] is defined and search_list.find('|' + netinfo[item]['module'] + '|') == -1 and ( not compute_node.interfaces.external or item != compute_node.interfaces.external )
+  changed_when: false
+
+- name: Ensure Loopback
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: lo
+    config: loopback
+    auto: true
+    description: "Loopback interface"
+  register: net_changed
+
+- name: Verify Loopback Change
+  set_fact:
+    reboot_required: "{{ net_changed.changed }}"
+
+- name: Ensure Fabric
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: fabric
+    config: static
+    auto: true
+    address: "{{ compute_node.addresses.fabric }}"
+    bond-mode: active-backup
+    bond-miimon: 100
+    bond-slaves: none
+    description: "Leaf - Spine bonded fabric interface"
+  register: net_changed
+
+- name: Verify Network Change
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Gather Primary Fabric Interface
+  set_fact:
+    fabric_primary_iface: "{{ fabric_iface_list | sort | first }}"
+  changed_when: false
+  when: fabric_iface_list|length > 0
+
+- name: Ensure Primary Fabric Interface
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: true
+    name: "{{ fabric_primary_iface }}"
+    config: manual
+    bond-master: fabric
+    bond-primary: "{{ fabric_primary_iface }}"
+    description: "Primary fabric interface"
+  register: net_changed
+  when: fabric_iface_list|length > 0
+
+- name: Verify Primary Fabric Interface Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure Fabric Interfaces
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: true
+    name: "{{ item }}"
+    config: manual
+    bond-master: fabric
+    description: "Fabric interface"
+  register: net_changed
+  when: fabric_iface_list|length > 1 and item != fabric_primary_iface
+  with_items:
+    - "{{ fabric_iface_list | sort }}"
+
+- name: Verify Fabric Interfaces Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure Management Bridge DHCP
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: mgmtbr
+    config: "dhcp"
+    auto: true
+    bridge_ports: "{{ nonfabric_iface_list | join(' ') }}"
+    description: "Internal POD management interface"
+  register: net_changed
+  when: compute_node.addresses.management == "dhcp"
+
+- name: Verify Management Bridge DHCP Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure Management Bridge STATIC
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: mgmtbr
+    config: static
+    auto: true
+    address: "{{ compute_node.addresses.management }}"
+    gateway: "{{ compute_node.gateway.management | default(omit) }}"
+    broadcast: "{{ compute_node.broadcast.management | default(omit) }}"
+    bridge_ports: "{{ nonfabric_iface_list | join(' ') }}"
+    description: "Internal POD management interface"
+  register: net_changed
+  when: compute_node.addresses.management != "dhcp"
+
+- name: Verify Management Bridge STATIC Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure Management Bridge Interfaces
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: true
+    name: "{{ item }}"
+    config: manual
+    description: "Management interface"
+  register: net_changed
+  with_items:
+    - "{{ nonfabric_iface_list | sort }}"
+
+- name: Verify Management Bridge Interfaces Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure External Interface DHCP
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: true
+    name: "{{ compute_node.interfaces.external }}"
+    config: dhcp
+    description: "External interface from POD to Internet (uplink)"
+  register: net_changed
+  when: compute_node.interfaces.external and compute_node.addresses.external == "dhcp"
+
+- name: Verify External Interface DHCP Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure External Interface STATIC
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: true
+    name: "{{ compute_node.interfaces.external }}"
+    config: static
+    address: "{{ compute_node.addresses.external }}"
+    gateway: "{{ compute_node.gateway.external | default(omit) }}"
+    broadcast: "{{ compute_node.broadcast.external | default(omit) }}"
+    description: "External interface from POD to Internet (uplink)"
+  register: net_changed
+  when: compute_node.interfaces.external and compute_node.addresses.external != "dhcp"
+
+- name: Verify External Interface STATIC Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Reboot Required
+  command: /sbin/reboot
+  async: 0
+  poll: 0
+  ignore_errors: true
+  when: reboot_required
+  tags:
+    - interface_config
+    - reboot
+
+- name: Ensure Port Defined
+  set_fact:
+    ansible_ssh_port: 22
+  when: ansible_ssh_port is not defined
+
+- name: Wait For Restart
+  local_action: wait_for port={{ ansible_ssh_port }} host={{ inventory_hostname }} search_regex=OpenSSH delay=120 timeout=600 connect_timeout=15
+  when: reboot_required
+  tags:
+    - interface_config
+    - reboot

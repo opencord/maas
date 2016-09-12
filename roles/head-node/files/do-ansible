@@ -22,4 +22,4 @@ else
 fi
 
 echo "ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS" >> $LOG
-ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS >> $LOG
+ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS >> $LOG || exit $?
