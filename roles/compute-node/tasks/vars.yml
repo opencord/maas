@@ -13,7 +13,7 @@ compute_node:
         external: "{{ external_ip | default('manual') }}"
     gateway:
         external: "{{ external_gw | default(omit) }}"
-        management: "{{ management_gw | default('omit') }}"
+        management: "{{ management_gw | default(omit) }}"
     broadcast:
         external: "{{ external_bc | default(omit) }}"
-        management: "{{ management_bc | default('omit') }}"
+        management: "{{ management_bc | default(omit) }}"

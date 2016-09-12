@@ -4,7 +4,7 @@
   remote_user: ubuntu
   tasks:
   - name: Include variables
-    include_vars: vars/compute-node.yml
+    include_vars: vars/compute-node-vars.yml
 
 - name: Configure compute hosts to use DNS server
   hosts: all

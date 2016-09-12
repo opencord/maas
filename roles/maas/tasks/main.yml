@@ -49,6 +49,7 @@
     repo: ppa:maas/stable
     update_cache: yes
     state: present
+    validate_certs: no
 
 - name: MAAS
   become: yes
@@ -199,7 +200,7 @@
 
 - name: Configure MAAS
   become: yes
-  command: docker run docker-registry:5000/cord-maas-bootstrap:{{ docker.image_version }} --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}' --bridge='{{networks.bridge_name}}' --bridge-subnet='{{networks.bridge}}'
+  command: docker run docker-registry:5000/cord-maas-bootstrap:{{ docker.image_version }} --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}'
   register: maas_config_result
   changed_when: maas_config_result.stdout.find("CHANGED") != -1
   failed_when: "maas_config_result.rc != 0 or 'ERROR' in maas_config_result.stdout"
@@ -230,7 +231,7 @@
     line: '        inet 0.0.0.0 port 954'
     state: present
 
-- name: Ensure ENDC Allows Trusted
+- name: Ensure RNDC Allows Trusted
   become: yes
   lineinfile:
     dest: /etc/bind/maas/named.conf.rndc.maas
@@ -292,7 +293,6 @@
   service:
     name=bind9
     state=restarted
-  when: ns_nameserver.changed or ns_search.changed
 
 - name: MAAS Accepting API Requests
   action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp

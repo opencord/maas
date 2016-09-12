@@ -49,8 +49,6 @@ ext {
     // using the -PdeployConfig=<file-path> syntax.
     deployConfig = project.hasProperty('deployConfig') ? project.getProperty('deployConfig') : './config/default.yml'
 
-    dockerPath = project.hasProperty('dockerPath') ? project.getProperty('dockerPath') : '/usr/bin'
-
     comps = [
             'consul': [
                     'type':     'image',
@@ -68,113 +66,113 @@ task fetchUpstreamImages {
 // Switch Configuration Image
 
 task buildSwitchqImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-switchq', './switchq'
+    commandLine "docker", 'build', '-t', 'cord-maas-switchq', './switchq'
 }
 
 task tagSwitchqImage(type: Exec) {
    dependsOn buildSwitchqImage
-   commandLine "$dockerPath/docker", 'tag', 'cord-maas-switchq', "$targetReg/cord-maas-switchq:$targetTag"
+   commandLine "docker", 'tag', 'cord-maas-switchq', "$targetReg/cord-maas-switchq:$targetTag"
 }
 
 task publishSwitchqImage(type: Exec) {
     dependsOn tagSwitchqImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-switchq:$targetTag"
+    commandLine "docker", 'push', "$targetReg/cord-maas-switchq:$targetTag"
 }
 
 // Bootstrap Image
 
 task buildBootstrapImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
+    commandLine "docker", 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
 }
 
 task tagBootstrapImage(type: Exec) {
    dependsOn buildBootstrapImage
-   commandLine "$dockerPath/docker", 'tag', 'cord-maas-bootstrap', "$targetReg/cord-maas-bootstrap:$targetTag"
+   commandLine "docker", 'tag', 'cord-maas-bootstrap', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
 task publishBootstrapImage(type: Exec) {
     dependsOn tagBootstrapImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
+    commandLine "docker", 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
 // IP Allocator Image
 
 task buildAllocationImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'cord-ip-allocator', './ip-allocator'
+    commandLine "docker", 'build', '-t', 'cord-ip-allocator', './ip-allocator'
 }
 
 task tagAllocationImage(type: Exec) {
    dependsOn buildAllocationImage
-   commandLine "$dockerPath/docker", 'tag', 'cord-ip-allocator', "$targetReg/cord-ip-allocator:$targetTag"
+   commandLine "docker", 'tag', 'cord-ip-allocator', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
 task publishAllocationImage(type: Exec) {
     dependsOn tagAllocationImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
+    commandLine "docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
 // Provisioner Image
 
 task buildProvisionerImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'cord-provisioner', './provisioner'
+    commandLine "docker", 'build', '-t', 'cord-provisioner', './provisioner'
 }
 
 task tagProvisionerImage(type: Exec) {
    dependsOn buildProvisionerImage
-   commandLine "$dockerPath/docker", 'tag', 'cord-provisioner', "$targetReg/cord-provisioner:$targetTag"
+   commandLine "docker", 'tag', 'cord-provisioner', "$targetReg/cord-provisioner:$targetTag"
 }
 
 task publishProvisionerImage(type: Exec) {
     dependsOn tagProvisionerImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-provisioner:$targetTag"
+    commandLine "docker", 'push', "$targetReg/cord-provisioner:$targetTag"
 }
 
 // Config Generator Image
 
 task buildConfigGeneratorImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', 'config-generator', './config-generator'
+    commandLine "docker", 'build', '-t', 'config-generator', './config-generator'
 }
 
 task tagConfigGeneratorImage(type: Exec) {
    dependsOn buildConfigGeneratorImage
-   commandLine "$dockerPath/docker", 'tag', 'config-generator', "$targetReg/config-generator:$targetTag"
+   commandLine "docker", 'tag', 'config-generator', "$targetReg/config-generator:$targetTag"
 }
 
 task publishConfigGeneratorImage(type: Exec) {
     dependsOn tagConfigGeneratorImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/config-generator:$targetTag"
+    commandLine "docker", 'push', "$targetReg/config-generator:$targetTag"
 }
 
 // Automation Image
 
 task buildAutomationImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
+    commandLine "docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
 }
 
 task tagAutomationImage(type: Exec) {
     dependsOn buildAutomationImage
-    commandLine "$dockerPath/docker", 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "docker", 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
 }
 
 task publishAutomationImage(type: Exec) {
     dependsOn tagAutomationImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "docker", 'push', "$targetReg/cord-maas-automation:$targetTag"
 }
 
 // DHCP Harvester Images
 
 task buildHarvesterImage(type: Exec) {
-    commandLine "$dockerPath/docker", 'build', '-t', "cord-dhcp-harvester", "./harvester"
+    commandLine "docker", 'build', '-t', "cord-dhcp-harvester", "./harvester"
 }
 
 task tagHarvesterImage(type: Exec) {
     dependsOn buildHarvesterImage
-    commandLine "$dockerPath/docker", 'tag', 'cord-dhcp-harvester', "$targetReg/cord-dhcp-harvester:$targetTag"
+    commandLine "docker", 'tag', 'cord-dhcp-harvester', "$targetReg/cord-dhcp-harvester:$targetTag"
 }
 
 task publishHarvesterImage(type: Exec) {
     dependsOn tagHarvesterImage
-    commandLine "$dockerPath/docker", 'push', "$targetReg/cord-dhcp-harvester:$targetTag"
+    commandLine "docker", 'push', "$targetReg/cord-dhcp-harvester:$targetTag"
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,8 +186,8 @@ task fetch(type: Exec) {
     // this is where we fetch upstream artifacts that we do not need internet for the build phase"
     // Placeholdr example:
     dependsOn fetchUpstreamImages
-    commandLine "$dockerPath/docker", "pull", "golang:alpine"
-    commandLine "$dockerPath/docker", "pull", "python:2.7-alpine"
+    commandLine "docker", "pull", "golang:alpine"
+    commandLine "docker", "pull", "python:2.7-alpine"
 }
 
 // To be used to generate all needed binaries that need to be present on the target
@@ -283,10 +281,12 @@ task prime (type: Exec)  {
             .p(config.seedServer.fabric_ip, "fabric_ip")
             .p(config.seedServer.management_ip, "management_ip")
             .p(config.seedServer.management_gw, "management_gw")
+            .p(config.seedServer.management_bc, "management_bc")
             .p(config.seedServer.management_network, "management_network")
             .p(config.seedServer.management_iface, "management_iface")
             .p(config.seedServer.external_ip, "external_ip")
             .p(config.seedServer.external_gw, "external_gw")
+            .p(config.seedServer.external_bc, "external_bc")
             .p(config.seedServer.external_network, "external_network")
             .p(config.seedServer.external_iface, "external_iface")
             .p(config.seedServer.fabric_ip, "fabric_ip")
