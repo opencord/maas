@@ -1,0 +1,31 @@
+#!/bin/bash
+
+docker kill $(docker ps -q)
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images -aq)
+
+sudo apt-get remove --purge -y bind9 apache2 docker-engine ansible $(dpkg --get-selections | grep maas | cut -f1)
+
+sudo rm -rf \
+    /etc/maas \
+    /etc/bind \
+    /etc/apache2 \
+    /var/www \
+    /var/log/maas \
+    /var/lib/maas \
+    /etc/apt/apt.conf.d/02apt-cacher-ng \
+    /etc/apt/sources.list.d/apt_dockerproject_org_repo.list \
+    /etc/apt/sources.list.d/ppa_juju_stable_trusty.list \
+    /etc/apt/sources.list.d/docker.list \
+    /etc/apt/sources.list.d/ppa_maas_stable_trusty.list \
+    /etc/apt/sources.list.d/ppa_ansible_ansible_trusty.list \
+    /etc/network/if-pre-up.d/nat \
+    /docker-registry \
+    /docker-registry-mirror
+
+sudo apt-get update -y
+
+# remove NAT rules
+sudo iptables --table nat --delete POSTROUTING --out-interface eth3 -j MASQUERADE
+sudo iptables --delete FORWARD --in-interface mgmtbr -j ACCEPT
+

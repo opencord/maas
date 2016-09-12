@@ -107,6 +107,7 @@
     - get-fabric-config
     - get-node-prov-state
     - remove-xos-components
+    - remove-maas-components
     - post-fabric-config
     - pull-latest-docker-images
 
@@ -150,14 +151,6 @@
   tags:
     - interface_config
 
-- name: Consistent Interface Naming
-  become: yes
-  script: files/rename_ifaces.sh "{{ compute_node.interfaces.fabric }}" "{{ compute_node.addresses.fabric }}" "{{ compute_node.interfaces.external }}" "{{ compute_node.addresses.external }}" "{{ compute_node.gateway.external }}" "{{ compute_node.interfaces.management }}" "{{ compute_node.addresses.management }}" "{{ compute_node.gateway.management }}" "{{ compute_node.fabric_iface_match }}"
-  register: ifaces_changed
-  changed_when: ifaces_changed.stdout.find("true") != -1
-  tags:
-    - interface_config
-
 - name: Load modules at boot
   become: yes
   lineinfile:
@@ -169,25 +162,8 @@
    - rtc
    - bonding
 
-- name: Reboot Required
+- name: Ensure Network Configuration
   become: yes
-  command: /sbin/reboot
-  async: 0
-  poll: 0
-  ignore_errors: true
-  when: ifaces_changed.stdout.find("true") != -1
+  include: networking.yml
   tags:
     - interface_config
-    - reboot
-
-- name: Ensure Port Defined
-  set_fact:
-    ansible_ssh_port: 22
-  when: ansible_ssh_port is not defined
-
-- name: Wait For Restart
-  local_action: wait_for port={{ ansible_ssh_port }} host={{ inventory_hostname }} search_regex=OpenSSH delay=30 timeout=600 connect_timeout=15
-  when: ifaces_changed.stdout.find("true") != -1
-  tags:
-    - interface_config
-    - reboot
