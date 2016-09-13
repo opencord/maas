@@ -170,33 +170,9 @@
     state: present
 
 - name: Restart MAAS Services
-  become: yes
-  service:
-    name={{ item }}
-    state=restarted
-  with_items:
-    - maas-proxy
-    - maas-regiond
-    - maas-clusterd
-    - maas-dhcpd
-    - bind9
+  include: restart-maas.yml
   tags:
     - maas_restart
-
-- name: Wait for MAAS to Intialize (start)
-  pause:
-    seconds=30
-  changed_when: false
-  tags:
-    - maas_restart
-
-- name: MAAS Accepting API Requests
-  action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
-  register: api_test
-  until: api_test.status_code is defined and api_test.status_code == 403
-  retries: 5
-  delay: 60
-  failed_when: api_test.status_code is not defined or api_test.status_code != 403
 
 - name: Configure MAAS
   become: yes
@@ -269,32 +245,9 @@
   when: ns_nameserver.changed or ns_search.changed
 
 - name: Restart MAAS Services
-  become: yes
-  service:
-    name={{ item }}
-    state=restarted
-  with_items:
-    - maas-proxy
-    - maas-regiond
-    - maas-clusterd
-    - maas-dhcpd
+  include: restart-maas.yml
   tags:
     - maas_restart
-
-- name: Wait for MAAS to Intialize (start)
-  pause:
-    seconds=30
-  changed_when: false
-  tags:
-    - maas_restart
-
-- name: MAAS Accepting API Requests
-  action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
-  register: api_test2
-  until: api_test2.status_code is defined and api_test2.status_code == 403
-  retries: 5
-  delay: 60
-  failed_when: api_test2.status_code is not defined or api_test2.status_code != 403
 
 - name: Ensure Boot Resource Import Started
   become: yes

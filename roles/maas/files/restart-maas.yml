@@ -1,0 +1,30 @@
+---
+- name: Restart MAAS Services
+  become: yes
+  service:
+    name={{ item }}
+    state=restarted
+  with_items:
+    - maas-proxy
+    - maas-regiond
+    - maas-clusterd
+    - maas-dhcpd
+    - bind9
+  tags:
+    - maas_restart
+
+- name: Wait for MAAS to Intialize (start)
+  pause:
+    seconds=60
+  changed_when: false
+  tags:
+    - maas_restart
+
+- name: Verify MAAS Accepting API Requests
+  action: uri url='http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/version/' method=GET validate_certs=no return_content=no status_code=200
+  retries: 50
+  delay: 30
+  register: api_test
+  until: api_test.status is defined and api_test.status == 200
+  tags:
+    - maas_restart
