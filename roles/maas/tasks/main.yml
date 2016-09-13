@@ -288,12 +288,6 @@
   tags:
     - maas_restart
 
-- name: Ensure DNS
-  become: yes
-  service:
-    name=bind9
-    state=restarted
-
 - name: MAAS Accepting API Requests
   action: get_url url=http://{{ mgmt_ip_address.stdout }}/MAAS/api/1.0/maas/ dest=/tmp
   register: api_test2
@@ -384,3 +378,9 @@
   delay: 60
   failed_when: images_synced.stdout != "[]"
   changed_when: false
+
+- name: Ensure DNS
+  become: yes
+  service:
+    name=bind9
+    state=restarted
