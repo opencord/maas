@@ -3,7 +3,7 @@
   hosts: localhost
   tasks:
     - name: Lookup DHCP harvest
-      shell: cat /etc/bind/maas/dhcp_harvest.inc | grep -i " cc:37:ab\| 70:72;cf" | awk '{print $1}'
+      shell: cat /etc/bind/maas/dhcp_harvest.inc | grep -i " cc:37:ab\| 70:72:cf" | awk '{print $1}'
       register: switches
       changed_when: false
     - name: Add hosts into inventory
