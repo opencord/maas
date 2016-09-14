@@ -7,6 +7,14 @@
   tags:
     - interface_config
 
+- name: Verify Network Bits on Network Specifications
+  fail: msg="Network specification '{{ item }}' must include network bits"
+  when: "item != 'dhcp' and item != 'manual' and item | match('^([0-9]{1,3}.){3}[0-9]{1,3}$')"
+  with_items:
+    - "{{ compute_node.addresses.fabric }}"
+    - "{{ compute_node.addresses.management }}"
+    - "{{ compute_node.addresses.external }}"
+
 - name: Applications
   become: yes
   apt: name={{ item }} state=present force=yes

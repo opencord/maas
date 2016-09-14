@@ -1,4 +1,12 @@
 ---
+- name: Verify Network Bits on Network Specifications
+  fail: msg="Network specification '{{ item }}' must include network bits"
+  when: "item | match('^([0-9]{1,3}.){3}[0-9]{1,3}$')"
+  with_items:
+    - "{{ networks.management }}"
+    - "{{ networks.bridge }}"
+    - "{{ networks.fabric }}"
+
 - name: Ensure Management Bridge Interface
   become: yes
   command: ifconfig mgmtbr
