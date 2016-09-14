@@ -65,8 +65,33 @@ task fetchUpstreamImages {
 
 // Switch Configuration Image
 
+def getBuildTimestamp() {
+    def cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    def date = cal.getTime()
+    def formattedDate = date.format("yyyy-MM-dd'T'HH:mm:ss.ss'Z'")
+    return formattedDate
+}
+
+def getCommitHash = { ->
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "rev-parse", "HEAD"
+        standardOutput = hashStdOut
+    }
+    return hashStdOut.toString().trim()
+}
+
+def getBranchName = { ->
+    def branchStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
+        standardOutput = branchStdOut
+    }
+    return branchStdOut.toString().trim()
+}
+ 
 task buildSwitchqImage(type: Exec) {
-    commandLine "docker", 'build', '-t', 'cord-maas-switchq', './switchq'
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-maas-switchq', './switchq'
 }
 
 task tagSwitchqImage(type: Exec) {
@@ -82,7 +107,7 @@ task publishSwitchqImage(type: Exec) {
 // Bootstrap Image
 
 task buildBootstrapImage(type: Exec) {
-    commandLine "docker", 'build', '-t', 'cord-maas-bootstrap', './bootstrap'
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-maas-bootstrap', './bootstrap'
 }
 
 task tagBootstrapImage(type: Exec) {
@@ -98,7 +123,7 @@ task publishBootstrapImage(type: Exec) {
 // IP Allocator Image
 
 task buildAllocationImage(type: Exec) {
-    commandLine "docker", 'build', '-t', 'cord-ip-allocator', './ip-allocator'
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-ip-allocator', './ip-allocator'
 }
 
 task tagAllocationImage(type: Exec) {
@@ -114,7 +139,7 @@ task publishAllocationImage(type: Exec) {
 // Provisioner Image
 
 task buildProvisionerImage(type: Exec) {
-    commandLine "docker", 'build', '-t', 'cord-provisioner', './provisioner'
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-provisioner', './provisioner'
 }
 
 task tagProvisionerImage(type: Exec) {
@@ -130,7 +155,7 @@ task publishProvisionerImage(type: Exec) {
 // Config Generator Image
 
 task buildConfigGeneratorImage(type: Exec) {
-    commandLine "docker", 'build', '-t', 'config-generator', './config-generator'
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'config-generator', './config-generator'
 }
 
 task tagConfigGeneratorImage(type: Exec) {
@@ -146,7 +171,7 @@ task publishConfigGeneratorImage(type: Exec) {
 // Automation Image
 
 task buildAutomationImage(type: Exec) {
-    commandLine "docker", 'build', '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
 }
 
 task tagAutomationImage(type: Exec) {
@@ -162,7 +187,7 @@ task publishAutomationImage(type: Exec) {
 // DHCP Harvester Images
 
 task buildHarvesterImage(type: Exec) {
-    commandLine "docker", 'build', '-t', "cord-dhcp-harvester", "./harvester"
+    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', "cord-dhcp-harvester", "./harvester"
 }
 
 task tagHarvesterImage(type: Exec) {

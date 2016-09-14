@@ -17,4 +17,11 @@ MAINTAINER Open Networking Laboratory <info@onlab.us>
 RUN apk update && apk add bind
 
 ADD dhcpharvester.py /dhcpharvester.py
+
+LABEL org.label-schema.name="harvester" \
+      org.label-schema.description="Provides DHCP havesting and insertion into DNS" \
+      org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
+      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.schema-version="1.0"
+
 ENTRYPOINT [ "python", "/dhcpharvester.py" ]

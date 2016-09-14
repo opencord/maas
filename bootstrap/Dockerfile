@@ -23,4 +23,10 @@ RUN	pip install maasclient==0.3 && \
 
 ADD bootstrap.py /bootstrap.py
 
+LABEL org.label-schema.name="bootstrap" \
+      org.label-schema.description="Provides bootstrap configuration of MAAS for the CORD deployment" \
+      org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
+      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.schema-version="1.0"
+
 ENTRYPOINT [ "/bootstrap.py" ]

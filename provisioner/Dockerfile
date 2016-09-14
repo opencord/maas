@@ -58,4 +58,10 @@ RUN $GOPATH/bin/godep restore || true
 WORKDIR $GOPATH
 RUN go install gerrit.opencord.org/maas/cord-provisioner
 
+LABEL org.label-schema.name="provisioner" \
+      org.label-schema.description="Provides provisioning of compute and switch nodes for CORD" \
+      org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
+      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.schema-version="1.0"
+
 ENTRYPOINT ["/go/bin/cord-provisioner"]

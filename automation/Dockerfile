@@ -29,4 +29,10 @@ RUN go install gerrit.opencord.org/maas/cord-maas-automation
 RUN mkdir -p /root/.ssh
 COPY ssh-config /root/.ssh/config
 
+LABEL org.label-schema.name="automation" \
+      org.label-schema.description="Provides automation of the compute node deployment and provisioning process" \
+      org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
+      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.schema-version="1.0"
+
 ENTRYPOINT ["/go/bin/cord-maas-automation"]

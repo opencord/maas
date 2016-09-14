@@ -38,4 +38,10 @@ COPY devices.tpl /go/
 
 EXPOSE 1337
 
+LABEL org.label-schema.name="generator" \
+      org.label-schema.description="Provides generation of the fabric configuration" \
+      org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
+      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.schema-version="1.0"
+
 ENTRYPOINT ["/go/bin/config-generator"]
