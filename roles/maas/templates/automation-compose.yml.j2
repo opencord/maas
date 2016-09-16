@@ -72,6 +72,8 @@ services:
       - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
       - "SWITCHQ_LOG_LEVEL=debug"
       - "SWITCHQ_LOG_FORMAT=text"
+      - "SWITCHQ_MAAS_URL=http://{{ mgmt_ip_address.stdout }}/MAAS"
+      - "SWITCHQ_MAAS_API_KEY={{ apikey.stdout }}"
     volumes:
       - "/etc/bind/maas:/switchq/dhcp"
     restart: unless-stopped
