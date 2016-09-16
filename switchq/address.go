@@ -36,9 +36,9 @@ func NewAddressSource(spec string) (AddressSource, error) {
 }
 
 type AddressRec struct {
-	Name string
-	IP   string
-	MAC  string
+	Name string `json:"name"`
+	IP   string `json:"ip"`
+	MAC  string `json:"mac"`
 }
 
 type AddressSource interface {

@@ -218,7 +218,9 @@ will be completed before it is removed.
 |SWITCHQ_LOG_FORMAT|"text"|Format of the log messages|
 
 ### REST Resources
-None
+|URI|Operation|Description|
+|-|-|-|
+|/switch/|GET|returns a list of all known switches|
 
 ## Allocator
 **Docker image:** cord-ip-allocator
