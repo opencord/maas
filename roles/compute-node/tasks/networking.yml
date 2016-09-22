@@ -33,19 +33,19 @@
   when: netinfo[item]['module'] is defined and search_list.find('|' + netinfo[item]['module'] + '|') == -1 and ( not compute_node.interfaces.external or item != compute_node.interfaces.external )
   changed_when: false
 
-#- name: Ensure Loopback
-#  netfile:
-#    src: "{{ compute_node.interfaces.file }}"
-#    state: present
-#    name: lo
-#    config: loopback
-#    auto: true
-#    description: "Loopback interface"
-#  register: net_changed
+- name: Ensure Loopback
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: lo
+    config: loopback
+    auto: true
+    description: "Loopback interface"
+  register: net_changed
 
-#- name: Verify Loopback Change
-#  set_fact:
-#    reboot_required: "{{ net_changed.changed }}"
+- name: Verify Loopback Change
+  set_fact:
+    reboot_required: "{{ net_changed.changed }}"
 
 - name: Ensure Fabric
   netfile:
@@ -63,7 +63,7 @@
 
 - name: Verify Network Change
   set_fact:
-    reboot_required: "{{ reboot_required }}"
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
 - name: Gather Primary Fabric Interface
   set_fact:

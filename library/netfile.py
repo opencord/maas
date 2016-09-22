@@ -190,7 +190,6 @@ for arg in arguments:
             values["network"] = addr.network_address.exploded.encode('ascii','ignore')
             values["netmask"] = addr.netmask.exploded.encode('ascii','ignore')
             values["broadcast"] = addr.broadcast_address.exploded.encode('ascii','ignore')
-            values["gateway"] = addr.hosts().next().exploded.encode('ascii','ignore')
         else:
             values["address"] = value
     elif key[0] != '_':
