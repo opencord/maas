@@ -1,0 +1,119 @@
+#!/bin/bash
+
+PROG=$(basename $0)
+
+usage() {
+    echo "$PROG [-s|--server <head-node-ip>] [-p|--port <head-node-ssh-port>] [-u|--user <head-node-ssh-user>] <command> <options>"
+
+    # Find all files in path that match the pattern "cord-*"
+    ALL_FILES=
+    for DIR in $(echo $PATH | sed -e 's/:/ /g'); do
+        ALL_FILES="$ALL_FILES $(/bin/ls -1 $DIR/cord-* 2> /dev/null)"
+    done
+
+    # Filter that down to only those files that we can "execute"
+    COMMANDS=
+    for CMD in $ALL_FILES; do
+        test -x "$CMD" && COMMANDS="$COMMANDS $CMD"
+    done
+       
+    # Process comands for usage information
+    # Output all commands and their help information to file
+    # so it can be sorted. The format will be:
+    #
+    # command usage_message
+
+    # Find longest command name for table spacing
+    MAX=0
+    for CMD in $COMMANDS; do
+        LEN=$(echo $(basename $CMD | sed -e 's/^[^-]*-//g') | wc -c)
+        test $LEN -gt $MAX && MAX=$LEN
+    done
+
+    FILE=$(mktemp)
+    # Process all the commands into the usage file
+    for CMD in $COMMANDS; do
+        NAME=$(basename $CMD | sed -e 's/^[^-]*-//g')
+        DESC=$(grep "^#D " $CMD | head -1 | sed -e 's/^#D\w*//g' )
+        printf "    %-${MAX}s    %s\n" $NAME "$DESC" >> $FILE
+    done
+    sort -u $FILE
+
+    # clean up
+    rm -f $FILE
+    COMMANDS=$(echo $COMMANDS | sed -e 's/w+/ /g')
+}
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 1
+fi
+
+SHORT=
+while [ "$SHORT x" == " x" -a $# -gt 0 ]; do
+    case $1 in
+        help|-h|--help)
+            usage
+            exit 0
+            ;;
+        -s|--server)
+            shift
+	    if [ $# -eq 0 ]; then
+		>&2 echo "Server parameter must be specified with '--server' option"
+                usage
+		exit 1
+	    fi
+   	    export CORD_HEAD_NODE="$1"
+            ;;
+	-u|--user)
+	    shift
+	    if [ $# -eq 0 ]; then
+	        >&2 echo "User parameter must be specified with '--user' option"
+	        usage
+	        exit 1
+	    fi
+	    export CORD_HEAD_NODE_USER="$1"
+	    ;;
+	-p|--port)
+	    shift
+	    if [ $# -eq 0 ]; then
+                >&2 echo "Port parameter must be specified with '--port' option"
+		usage
+		exit 1
+            fi
+	    export CORD_HEAD_NODE_PORT="$1"
+	    ;;
+        -*)
+            >&2 echo "Unknown command line option '$1'."
+            usage
+            exit 1
+            ;;
+        *)
+            SHORT=$1
+            ;;
+    esac
+    shift
+done
+
+if [ "$SHORT x" == " x" ]; then
+    >&2 echo "CORD command must be specified"
+    usage
+    exit 1
+fi
+
+COMMAND="cord-$SHORT"
+FULL_COMMAND=$(which $COMMAND)
+
+if [ ! -x "$FULL_COMMAND" ]; then
+    >&2 echo "Unknown command specified '$SHORT'."
+    usage
+    exit 1
+fi
+
+test -z $CORD_HEAD_NODE && export CORD_HEAD_NODE="localhost"
+test -z $CORD_HEAD_NODE_USER && export CORD_HEAD_NODE_USER="ubuntu"
+test -z $CORD_HEAD_NODE_PORT && export CORD_HEAD_NODE_PORT="22"
+
+exec "$FULL_COMMAND" $*
+
+

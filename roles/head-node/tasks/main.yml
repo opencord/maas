@@ -106,3 +106,16 @@
     owner=maas
     group=maas
     mode=0755
+
+- name: Copy CORD Utility Scripts
+  become: yes
+  copy:
+    src=files/commands/{{ item }}
+    dest=/usr/local/bin/{{ item }}
+    owner=root
+    group=root
+    mode=0755
+  with_items:
+    - cord
+    - cord-harvest
+    - cord-prov

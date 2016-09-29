@@ -1,0 +1,56 @@
+#!/bin/bash
+#D provides access to the CORD POD fabric configuration generation
+
+PROG=$(echo $(basename $0) | sed -e 's/^cord-/cord /g')
+
+usage() {
+    echo "usage: $PROG [options]"
+    echo "    -hc|--host-count      number of hosts to expect to find in ONOS"
+    echo "    -sc|--switch-count    number of switches to expect to find in ONOS"
+    echo "    -o|--onos             ONOS to which to connect to get host / switch information"
+    echo "    -u|--user             ONOS user (not currently used)"
+    echo "    -p|--passwd           ONOS password (not currently used)"
+    echo "    -h|--help             this message"
+}
+
+HOST_COUNT=0
+SWITCH_COUNT=0
+ONOS_USER="karaf"
+ONOS_PASSWORD="karaf"
+ONOS_HOST="onos-fabric"
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 0
+fi 
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        -hc|--host-count)
+            shift
+	    HOST_COUNT=$1
+	    ;;
+	-sc|--switch-count)
+	    shift
+	    SWITCH_COUNT=$1
+	    ;;
+	-o|--onos)
+            shift
+	    ;;
+	-p|--passwd)
+	    shift
+	    ;;
+	-u|--user)
+            shift
+	    ;;
+        -h|--help)
+	    usage
+	    exit 0
+	    ;;
+    esac
+    shift
+done
+
+curl --fail -sSL -XPOST http://$CORD_HEAD_NODE:4245/config/ -d "{\"hostcount\":$HOST_COUNT,\"switchcount\":$SWITCH_COUNT,\"onosip\":\"$ONOS_HOST\"}"
+
+echo $?

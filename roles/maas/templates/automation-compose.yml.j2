@@ -17,6 +17,8 @@ services:
   allocator:
     image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
     container_name: allocator
+    ports:
+      - "4242:4242"
     labels:
       - "lab.solution=CORD"
       - "lab.component=allocator"
@@ -35,6 +37,8 @@ services:
     image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}"
     container_name: provisioner
     dns: {{ mgmt_ip_address.stdout }}
+    ports:
+      - "4243:4243"
     labels:
       - "lab.solution=CORD"
       - "lab.component=provisioner"
@@ -59,6 +63,8 @@ services:
   switchq:
     image: "docker-registry:5000/cord-maas-switchq:{{ docker.image_version }}"
     container_name: switchq
+    ports:
+      - "4244:4244"
     labels:
       - "lab.solution=CORD"
       - "lab.component=switchq"
@@ -109,13 +115,15 @@ services:
   generator:
     image: "docker-registry:5000/config-generator:{{ docker.image_version }}"
     container_name: generator
+    ports:
+      - "4245:4245"
     labels:
       - "lab.solution=CORD"
       - "lab.component=generator"
     environment:
       - "CONFIGGEN_PORT=8181"
       - "CONFIGGEN_IP=onos-fabric"
-      - "CONFIGGEN_CONFIGSERVERPORT=1337"
+      - "CONFIGGEN_CONFIGSERVERPORT=4245"
       - "CONFIGGEN_CONFIGSERVERIP=0.0.0.0"
     restart: unless-stopped
 

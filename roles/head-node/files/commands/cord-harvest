@@ -1,0 +1,115 @@
+#!/bin/bash
+#D provides access to the CORD POD DHCP havesting of IP addresses
+
+PROG=$(echo $(basename $0) | sed -e 's/^cord-/cord /g')
+
+usage() {
+    echo "usage: $PROG <sub-command> [options"
+    echo "    go     performs a harvest from the DHCP server"
+    echo "    list   list the currently harvested information"
+    echo "    check  check the error logs of the harvester for potential isseus"
+    echo "    help   this message"
+}
+
+COMMAND=$1; shift
+SSH_OPT=
+if [ $CORD_HEAD_NODE != "localhost" -a $CORD_HEAD_NODE != "127.0.0.1" ]; then
+    SSH_OPT="ssh -p $CORD_HEAD_NODE_PORT $CORD_HEAD_NODE_USER@$CORD_HEAD_NODE"
+fi
+case $COMMAND in
+    list)
+        DO_JSON=0
+        while [ $# -gt 0 ]; do
+            case $1 in
+                json|--json|-j)
+                    DO_JSON=1
+                    ;;
+                help|--help|-h)
+                    echo "usage $PROG list [--json|-j]"
+                    echo "    json    display output as JSON object"
+                    exit 0
+                    ;;
+                *)
+                    >&2 "Unknoan option '$1'"
+                    echo "usage: $PROG list [--json|-j]"
+                    echo "    json    display output as JSON object"
+                    exit 1
+                    ;;
+            esac
+            shift
+        done
+
+	if [ "$SSH_OPT x" == " x" -a ! -r /etc/bind/maas/dhcp_harvest.inc ]; then
+	    >&2 echo "Unable to find the DHCP harvest file locally, please specify the server option if you are not on the head node."
+	    exit 1
+	fi
+        if [ $DO_JSON -eq 1 ]; then
+            $SSH_OPT cat /etc/bind/maas/dhcp_harvest.inc | grep "^[^ ][^ ]*\s\s*IN A\s" | awk 'BEGIN{printf("[")} {printf("{\"name\":\"%s\",\"ip\":\"%s\",\"mac\":\"%s\"}", $1,$4,$6)} END{printf("]")}' | sed -e 's/}{/},{/g'
+        else
+            $SSH_OPT cat /etc/bind/maas/dhcp_harvest.inc | grep "^[^ ][^ ]*\s\s*IN A\s"
+        fi
+        ;;
+    check)
+        RUNNING=$($SSH_OPT docker inspect --format="'{{ .State.Running }}'" harvester) 
+	if [ $? -ne 0 ]; then
+	    >&2 echo "Unable to execute docker or locate harvester container, if not running on the head node please specify the server address"
+	    exit 1
+	fi
+	if [ "$RUNNING" == "false" ]; then
+	    >&2 echo "The harvester container is not currently running, results may not be of value"
+        fi
+	OUT=$(mktemp)
+	$SSH_OPT docker logs harvester 2>&1 | grep -v "Warning: Permanently added" > $OUT
+	ERROR_CNT=$(cat $OUT | grep -i error | wc -l)
+	LAST_100=$(cat $OUT | tail -100 | grep -i error | wc -l)
+	ERR_FOUND=$(cat $OUT | tail -100 | grep -i "failed to update DNS server" | wc -l)
+	LAST_ERR=$(cat $OUT | grep -i error | tail -1)
+	rm -f $OUT
+
+	if [ $ERROR_CNT -ne 0 ]; then
+	    if [ $LAST_100 -ne 0 ]; then
+		if [ $ERR_FOUND -ne 0 ]; then
+	            echo "There is a recent error in the log that may indicate the harvester is unable to update the DNS server"
+		    echo "This may be able to be fixed by restarting the DNS server, `sudo service bind9 restart`"
+		    echo "Restarting the DNS server will not immediately clear this message"
+		else
+                    echo "Recent errors have been found in the log, the last error was '$LAST_ERR'"
+		fi
+	    else
+		echo "There are errors in the log, but there are not errors in the last 100 log messages, so the harvester is likely ok"
+	    fi
+	else
+	    echo "There are no errors in the log, so the harvester is likely OK"
+	fi
+        ;;
+    go)
+        RESULT=$(curl --fail -sSL -XPOST http://$CORD_HEAD_NODE:8954/harvest 2>&1)
+        ERR=$?
+        if [ $ERR -ne 0 ]; then
+            >&2 "ERROR processing request, exit code '$ERR', '$RESULT'"
+            exit $ERR
+        fi
+        case $(echo $RESULT | jq .response | sed -e 's/"//g') in
+            OK)
+                echo "Havest complete"
+                ;;
+            QUIET)
+                echo "Too many requests, please try in a few seconds"
+                ;;
+            *)
+                >&2 "ERROR: unknown response '$RESULT'"
+                exit 1
+                ;;
+        esac
+        ;;
+    help|--help|-h)
+        usage
+        exit 0
+        ;;
+    *)
+        >&2 echo "Unknown subcommand '$COMMAND'"
+        usage
+        exit 1
+        ;;
+esac
+  

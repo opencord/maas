@@ -19,7 +19,7 @@ fi
 UVT=$(which uvt-kvm)
 test -z $UVT || uvt-kvm list | xargs uvt-kvm destroy
 
-sudo apt-get remove --purge -y $(dpkg --get-selections | grep "nagioas\|juju\|nova\|neutron" | awk '{print $1}') &&sudo apt-get autoremove -y && sudo rm -rf /etc/juju /etc/neutron /home/ubuntu/.juju && sudo find / -name "*juju*" -exec rm -r \{\} \;
+sudo apt-get remove --purge -y $(dpkg --get-selections | grep "nagioas\|juju\|nova\|neutron" | awk '{print $1}') &&sudo apt-get autoremove -y && sudo rm -rf /etc/juju /etc/neutron /home/ubuntu/.juju && sudo find / -name "*juju*" -exec rm -r \{\} \; && sudo rm -f /var/lib/uvtool/libvirt/images/*
 
 OVS=$(which ovs-vsctl)
 

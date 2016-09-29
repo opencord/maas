@@ -1,0 +1,143 @@
+#!/bin/bash
+#D provides access to the CORD POD base metal provisioning service
+
+PROG=$(echo $(basename $0) | sed -e 's/^cord-/cord /g')
+
+usage() {
+    echo "usage: $PROG <sub-command> [options]"
+    echo "    list    display the provisioning status of all nodes"
+    echo "    show    display the provisiniong status of a single node"
+    echo "    delete  delete node(s) provisioning state"
+    echo "    help    this message"
+}
+
+COMMAND=$1; shift
+case $COMMAND in
+    list)
+        DO_JSON=0
+        DO_MAP=0
+        while [ $# -gt 0 ]; do
+            case $1 in
+                json|--json|-j)
+                    DO_JSON=1
+                    ;;
+                map|--map|-m)
+                    DO_MAP=1
+                    ;;
+                help|--help|-h)
+                    echo "usage: $PROG list [--json|-j] [--map|-m]"
+                    echo "    json    display output as JSON object"
+                    echo "    map     map node provisioning status to state name"
+                    exit 0
+                    ;;
+                *)
+                    >&2 "Unknown option '$1'"
+                    echo "usage: $PROG list [--json|-j] [--map|-m]"
+                    echo "    json    display output as JSON object"
+                    echo "    map     map node provisioning status to state name"
+                    exit 1
+                    ;;
+            esac
+            shift
+        done
+	if [ $DO_JSON -eq 1 ]; then
+            if [ $DO_MAP -eq 1 ]; then
+		curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq -c -M 'def STATUS: ["Unknown","Processing","Complete","Error"]; [ .[] | . | .status|=STATUS[.] ]'
+            else
+                curl -sSL http://$CORD_HEAD_NODE:4243/provision/
+            fi
+        else
+            for LINE in "ID,NAME,MAC,IP,STATUS,MESSAGE" $(curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq 'def STATUS: ["Unknown","Processing","Complete","Error"]; .[] | . | .status|=STATUS[.] | .request.Info.id+","+.request.Info.name+","+.request.Info.mac+","+.request.Info.ip+","+.status+","+.message'); do
+                echo $LINE | sed -e 's/^"//;s/"$//'
+            done | column -s , -t
+        fi
+        ;;
+    show)
+        DO_JSON=0
+        DO_MAP=0
+        ID=
+        while [ $# -gt 0 ]; do
+            case $1 in
+                json|--json|-j)
+                    DO_JSON=1
+                    ;;
+                map|--map|-m)
+                    DO_MAP=1
+                    ;;
+                help)
+                    echo "usage: $PROG show [--json|-j] [--map|-m] <id>"
+                    echo "    json    display output as JSON object"
+                    echo "    map     map node provisioning status to state name"
+                    exit 0
+                    ;;
+                *)
+                    ID="$ID $1"
+                    ;;     
+            esac
+            shift
+        done
+        if [ $DO_JSON -eq 1 ]; then
+            if [ $DO_MAP -eq 1 ]; then
+                echo -n "["
+                for i in $ID; do
+                    curl -sSL http://$CORD_HEAD_NODE:4243/provision/$i | jq -c -M 'def STATUS: ["Unknown","Processing","Complete","Error"]; . | .status|=STATUS[.]'
+                done  | awk -vORS=, '{ print }' | sed 's/,$//'
+                echo -n "]"
+            else
+                echo -n "["
+                for i in $ID; do
+                    curl -sSL http://$CORD_HEAD_NODE:4243/provision/$i | jq -c -M .
+                done | awk -vORS=, '{ print }' | sed 's/,$//'
+                echo -n "]"
+            fi
+        else
+            for i in "__TITLE__" $ID; do
+                if [ $i == "__TITLE__" ]; then
+                    echo "ID,NAME,MAC,IP,STATUS,MESSAGE"
+                else
+                  VALUE=$(curl --fail -sSL http://$CORD_HEAD_NODE:4243/provision/$i)
+                  if [ $? -ne 0 ]; then
+                      echo "$i, , , ,Not Found"
+                  else
+  		      echo "$VALUE" | jq 'def STATUS: ["Unknown","Processing","Complete","Error"]; . | .status|=STATUS[.] | .request.Info.id+","+.request.Info.name+","+.request.Info.mac+","+.request.Info.ip+","+.status+","+.message'| sed -e 's/^"//;s/"$//'
+                  fi
+                fi
+            done | column -s , -t
+        fi
+        ;;
+    delete)
+        ID=
+        while [ $# -gt 0 ]; do
+            case $1 in
+                all|-a|--all)
+                    ID=$(curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq '.[] | .request.Info.id' | sed -e 's/^"//;s/"$//')
+                ;;
+                help|-h|--help)
+                    echo "$PROG delete [--all|-a] [<id> ...]"
+                    exit 0
+                ;;
+                *)
+                    ID="$ID $1"
+                    ;;
+            esac
+            shift
+        done
+        for i in $ID; do
+            curl --fail -sSL -XDELETE http://$CORD_HEAD_NODE:4243/provision/$i
+            if [ $? -eq 0 ]; then
+                echo "$i DELETED"
+            else
+                echo "$i FAILED"
+            fi
+        done | column -s , -t
+        ;;
+    help|-h|--help)
+        usage
+        exit 0
+        ;;
+    *)
+        >&2 echo "Unknown subcommand '$COMMAND'"
+        usage
+        exit 1
+        ;;
+esac
