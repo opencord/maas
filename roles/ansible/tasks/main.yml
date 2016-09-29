@@ -6,5 +6,5 @@
 - name: Ensure Ansible
   become: yes
   apt:
-    name=ansible=2.1.1.*
+    name=ansible=2.1.2.*
     state=present
