@@ -119,3 +119,5 @@
     - cord
     - cord-harvest
     - cord-prov
+    - cord-switch
+    - cord-generate
