@@ -16,6 +16,24 @@
       "revId": "33d788ddc562579e37aa75d1708bceb78a346e6f",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a014df3_6dd697c7",
+        "filename": "library/netinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-10-05T04:29:28Z",
+      "side": 1,
+      "message": "Not sure it applies. If the argument is specified in the play with an `\u003d` then it needs to be split, if it is specified with a `:` then it is pre-split. If it can be done, great. This pattern was just copied from other examples.",
+      "parentUuid": "1a014df3_adcc9f36",
+      "revId": "33d788ddc562579e37aa75d1708bceb78a346e6f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
