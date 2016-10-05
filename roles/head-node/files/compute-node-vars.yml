@@ -1,1 +1,54 @@
-fabric_iface_spec: '{{ compute_node.fabric_iface_match }}'
+{% if compute_node.fabric.include.names is defined and compute_node.fabric.include.names != omit %}
+fabric_include_names: '{{ compute_node.fabric.include.names }}'
+{% endif %}
+{% if compute_node.fabric.include.module_types is defined and compute_node.fabric.include.module_types != omit %}
+fabric_include_module_types: '{{ compute_node.fabric.include.module_types }}'
+{% endif %}
+{% if compute_node.fabric.include.bus_types is defined and compute_node.fabric.include.bus_types != omit %}
+fabric_include_bus_types: '{{ compute_node.fabric.include.bus_types }}'
+{% endif %}
+{% if compute_node.fabric.exclude.names is defined and compute_node.fabric.exclude.names != omit %}
+fabric_exclude_names: '{{ compute_node.fabric.exclude.names }}'
+{% endif %}
+{% if compute_node.fabric.exclude.module_types is defined and compute_node.fabric.exclude.module_types != omit %}
+fabric_exclude_module_types: '{{ compute_node.fabric.exclude.module_types }}'
+{% endif %}
+{% if compute_node.fabric.exclude.bus_types is defined and compute_node.fabric.exclude.bus_types != omit %}
+fabric_exclude_bus_types: '{{ compute_node.fabric.exclude.bus_types }}'
+{% endif %}
+{% if compute_node.fabric.ignore.names is defined and compute_node.fabric.ignore.names != omit %}
+fabric_ignore_names: '{{ compute_node.fabric.ignore.names }}'
+{% endif %}
+{% if compute_node.fabric.ignore.module_types is defined and compute_node.fabric.ignore.module_types != omit %}
+fabric_ignore_module_types: '{{ compute_node.fabric.ignore.module_types }}'
+{% endif %}
+{% if compute_node.fabric.ignore.bus_types is defined and compute_node.fabric.ignore.bus_types != omit %}
+fabric_ignore_bus_types: '{{ compute_node.fabric.ignore.bus_types }}'
+{% endif %}
+{% if compute_node.management.include.names is defined and compute_node.management.include.names != omit %}
+management_include_names: '{{ compute_node.management.include.names }}'
+{% endif %}
+{% if compute_node.management.include.module_types is defined and compute_node.management.include.module_types != omit %}
+management_include_module_types: '{{ compute_node.management.include.module_types }}'
+{% endif %}
+{% if compute_node.management.include.bus_types is defined and compute_node.management.include.bus_types != omit %}
+management_include_bus_types: '{{ compute_node.management.include.bus_types }}'
+{% endif %}
+{% if compute_node.management.exclude.names is defined and compute_node.management.exclude.names != omit %}
+management_exclude_names: '{{ compute_node.management.exclude.names }}'
+{% endif %}
+{% if compute_node.management.exclude.module_types is defined and compute_node.management.exclude.module_types != omit %}
+management_exclude_module_types: '{{ compute_node.management.exclude.module_types }}'
+{% endif %}
+{% if compute_node.management.exclude.bus_types is defined and compute_node.management.exclude.bus_types != omit %}
+management_exclude_bus_types: '{{ compute_node.management.exclude.bus_types }}'
+{% endif %}
+{% if compute_node.management.ignore.names is defined and compute_node.management.ignore.names != omit %}
+management_ignore_names: '{{ compute_node.management.ignore.names }}'
+{% endif %}
+{% if compute_node.management.ignore.module_types is defined and compute_node.management.ignore.module_types != omit %}
+management_ignore_module_types: '{{ compute_node.management.ignore.module_types }}'
+{% endif %}
+{% if compute_node.management.ignore.bus_types is defined and compute_node.management.ignore.bus_types != omit %}
+management_ignore_bus_types: '{{ compute_node.management.ignore.bus_types }}'
+{% endif %}

@@ -6,31 +6,128 @@
   with_items:
     - python-ethtool=0.7*
 
-- name: Gather Interface Information
-  netinfo:
-
 - name: Establish Interface Lists
   set_fact:
     reboot_required: false
     fabric_iface_list: []
-    nonfabric_iface_list: []
-    search_list: "|{{ compute_node.fabric_iface_match }}|"
+    fabric_iface_excluded_list: []
+    management_iface_list: []
+    management_iface_excluded_list: []
   changed_when: false
+
+- name: Explicitly Ignore External and Specified Interfaces From Fabric
+  set_fact:
+    ignore_names_combined: "{{ compute_node.interfaces.external }},{{ compute_node.fabric.ignore.names }}"
+  when:
+    - compute_node.interfaces.external
+    - compute_node.fabric.ignore.names is defined and compute_node.fabric.ignore.names != omit
+  changed_when: false
+
+- name: Ignore External Interface From Fabric
+  set_fact:
+    ignore_names_combined: "{{ compute_node.interfaces.external }}"
+  when:
+    - compute_node.interfaces.external
+    - compute_node.fabric.ignore.names is not defined or compute_node.fabric.ignore.names == omit
+  changed_when: false
+
+- name: Explicity Ingnore Specified Interfaces From Fabric
+  set_fact:
+    ignore_names_combined: "{{ compute_node.fabric.ignore.names }}"
+  when:
+    - not compute_node.interfaces.external
+    - compute_node.fabric.ignore.names is defined and compute_node.fabric.ignore.names != omit
+  changed_when: false
+
+- name: Discovery Fabric Interfaces
+  netinfo:
+    include-names: "{{ compute_node.fabric.include.names }}"
+    include-module-types: "{{ compute_node.fabric.include.module_types }}"
+    include-bus-types: "{{ compute_node.fabric.include.bus_types }}"
+    ignore-names: "{{ ignore_names_combined | default(omit) }}"
+    ignore-module-types: "{{ compute_node.fabric.ignore.module_types }}"
+    ignore-bus-types: "{{ compute_node.fabric.ignore.bus_types }}"
+    exclude-names: "{{ compute_node.fabric.exclude.names }}"
+    exclude-module-types: "{{ compute_node.fabric.exclude.module_types }}"
+    exclude-bus-types: "{{ compute_node.fabric.exclude.bus_types }}"
+    debug: on
 
 - name: Gather Fabric Interfaces
   set_fact:
     fabric_iface_list: "{{ fabric_iface_list + [item] }}"
   with_items:
-    - "{{ netinfo.keys() | sort }}"
-  when: netinfo[item]['module'] is defined and search_list.find('|' + netinfo[item]['module'] + '|') != -1 and ( not compute_node.interfaces.external or item != compute_node.interfaces.external  )
+    - "{{ netinfo.included.keys() | sort }}"
   changed_when: false
 
-- name: Gather Non-Fabric Interfaces
+- name: Gather Excluded Fabric Interfaces
   set_fact:
-    nonfabric_iface_list: "{{ nonfabric_iface_list + [item] }}"
+    fabric_iface_excluded_list: "{{ fabric_iface_excluded_list + [item] }}"
   with_items:
-    - "{{ netinfo.keys() | sort }}"
-  when: netinfo[item]['module'] is defined and search_list.find('|' + netinfo[item]['module'] + '|') == -1 and ( not compute_node.interfaces.external or item != compute_node.interfaces.external )
+    - "{{ netinfo.excluded.keys() | sort }}"
+  changed_when: false
+
+- name: Initialize Modules Ignored for Management Bridge
+  set_fact:
+    ignore_module_types_combined: "{{ compute_node.management.ignore.module_types }}"
+  changed_when: false
+
+- name: Ignore Fabric Modules for Management Bridge
+  set_fact:
+    ignore_module_types_combined: "{{ compute_node.fabric.include.module_types }}"
+  when:
+    - compute_node.management.ignore.module_types is not defined or compute_node.management.ignore.module_types == omit
+    - compute_node.fabric.include.module_types is defined and compute_node.fabric.include.module_types != omit
+  changed_when: false
+
+- name: Explicitly Ignore External and Specified Interfaces From Management Bridge
+  set_fact:
+    ignore_names_combined: "{{ compute_node.interfaces.external }},{{ compute_node.management.ignore.names }}"
+  when:
+    - compute_node.interfaces.external
+    - compute_node.management.ignore.names is defined and compute_node.management.ignore.names != omit
+  changed_when: false
+
+- name: Ignore External Interface From Management Bridge
+  set_fact:
+    ignore_names_combined: "{{ compute_node.interfaces.external }}"
+  when:
+    - compute_node.interfaces.external
+    - compute_node.management.ignore.names is not defined or compute_node.management.ignore.names == omit
+  changed_when: false
+
+- name: Explicity Ingnore Specified Interfaces From Management Bridge
+  set_fact:
+    exclude_names_combined: "{{ compute_node.management.ignore.names }}"
+  when:
+    - not compute_node.interfaces.external
+    - compute_node.management.ignore.names is defined and compute_node.management.ignore.names != omit
+  changed_when: false
+
+- name: Discover Management Interfaces
+  netinfo:
+    include-names: "{{ compute_node.management.include.names }}"
+    include-module-types: "{{ compute_node.management.include.module_types }}"
+    include-bus-types: "{{ compute_node.management.include.bus_types }}"
+    ignore-names: "{{ ignore_names_combined | default(omit) }}"
+    ignore-module-types: "{{ ignore_module_types_combined | default(omit) }}"
+    ignore-bus-types: "{{ compute_node.management.ignore.bus_types }}"
+    exclude-names: "{{ compute_node.management.exclude.names }}"
+    exclude-module-types: "{{ compute_node.management.exclude.module_types }}"
+    exclude-bus-types: "{{ compute_node.management.exclude.bus_types }}"
+    debug: on
+
+- name: Gather Management Interfaces
+  set_fact:
+    management_iface_list: "{{ management_iface_list + [item] }}"
+  with_items:
+    - "{{ netinfo.included.keys() | sort }}"
+  changed_when: false
+
+- name: Gather Excluded Management Interfaces
+  set_fact:
+    management_iface_excluded_list: "{{ management_iface_excluded_list + [item] }}"
+  with_items:
+    - "{{ netinfo.excluded.keys() | sort }}"
   changed_when: false
 
 #- name: Ensure Loopback
@@ -107,6 +204,22 @@
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
+- name: Mark Explicitly Excluded Fabric Interfaces as Manual
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: false
+    name: "{{ item }}"
+    config: manual
+    description: "Explicitly Excluded Fabric Interface"
+  register: net_changed
+  with_items:
+    - "{{ fabric_iface_excluded_list | sort }}"
+
+- name: Verify Fabric Interfaces Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
 - name: Ensure Management Bridge DHCP
   netfile:
     src: "{{ compute_node.interfaces.file }}"
@@ -114,7 +227,7 @@
     name: mgmtbr
     config: "dhcp"
     auto: true
-    bridge_ports: "{{ nonfabric_iface_list | join(' ') }}"
+    bridge_ports: "{{ management_iface_list | join(' ') }}"
     description: "Internal POD management interface"
   register: net_changed
   when: compute_node.addresses.management == "dhcp"
@@ -131,9 +244,9 @@
     config: static
     auto: true
     address: "{{ compute_node.addresses.management }}"
-    gateway: "{{ compute_node.gateway.management | default(omit) }}"
-    broadcast: "{{ compute_node.broadcast.management | default(omit) }}"
-    bridge_ports: "{{ nonfabric_iface_list | join(' ') }}"
+    gateway: "{{ compute_node.gateway.management }}"
+    broadcast: "{{ compute_node.broadcast.management }}"
+    bridge_ports: "{{ management_iface_list | join(' ') }}"
     description: "Internal POD management interface"
   register: net_changed
   when: compute_node.addresses.management != "dhcp"
@@ -152,7 +265,7 @@
     description: "Management interface"
   register: net_changed
   with_items:
-    - "{{ nonfabric_iface_list | sort }}"
+    - "{{ management_iface_list | sort }}"
 
 - name: Verify Management Bridge Interfaces Changed
   set_fact:
@@ -173,6 +286,22 @@
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
+- name: Mark Explicitly Excluded Management Bridge Interfaces as Manual
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: false
+    name: "{{ item }}"
+    config: manual
+    description: "Explicitly Excluded Management Bridge Interface"
+  register: net_changed
+  with_items:
+    - "{{ management_iface_excluded_list | sort }}"
+
+- name: Verify Explicitly Excluded Management Interfaces Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
 - name: Ensure External Interface STATIC
   netfile:
     src: "{{ compute_node.interfaces.file }}"
@@ -181,8 +310,8 @@
     name: "{{ compute_node.interfaces.external }}"
     config: static
     address: "{{ compute_node.addresses.external }}"
-    gateway: "{{ compute_node.gateway.external | default(omit) }}"
-    broadcast: "{{ compute_node.broadcast.external | default(omit) }}"
+    gateway: "{{ compute_node.gateway.external }}"
+    broadcast: "{{ compute_node.broadcast.external }}"
     description: "External interface from POD to Internet (uplink)"
   register: net_changed
   when: compute_node.interfaces.external and compute_node.addresses.external != "dhcp"
