@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a014df3_adcc9f36",
+        "filename": "library/netinfo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2016-10-05T04:26:04Z",
+      "side": 1,
+      "message": "I think you can use argparse to do this a little easier but then again it may not apply.",
+      "revId": "33d788ddc562579e37aa75d1708bceb78a346e6f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
