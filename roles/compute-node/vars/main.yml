@@ -1,7 +1,33 @@
 pub_ssh_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
 
 compute_node:
-    fabric_iface_match: "{{ fabric_iface_spec | default('i40e|mlx4_en') }}"
+    fabric:
+        include:
+            names: "{{ fabric_include_names | default(omit) }}"
+            module_types: "{{ fabric_include_module_types | default('i40e, mlx4_en') }}"
+            bus_types: "{{ fabric_include_bus_types | default(omit) }}"
+        exclude:
+            names: "{{ fabric_exclude_names | default(omit) }}"
+            module_types: "{{ fabric_exclude_module_types | default(omit) }}"
+            bus_types: "{{ fabric_exclude_bus_types | default(omit) }}"
+        ignore:
+            names: "{{ fabric_ignore_names | default(omit) }}"
+            module_types: "{{ fabric_ignore_module_types | default(omit) }}"
+            bus_types: "{{ fabric_ignore_bus_types | default(omit) }}"
+    management:
+        include:
+            names: "{{ management_include_names | default(omit) }}"
+            module_types: "{{ management_include_module_types | default(omit) }}"
+            bus_types: "{{ management_include_bus_types | default(omit) }}"
+        exclude:
+            names: "{{ management_exclude_names | default(omit) }}"
+            module_types: "{{ management_exclude_module_types | default(omit) }}"
+            bus_types: "{{ management_exclude_bus_types | default(omit) }}"
+        ignore:
+            names: "{{ management_ignore_names | default(omit) }}"
+            module_types: "{{ management_ignore_module_types | default(omit) }}"
+            bus_types: "{{ management_ignore_bus_types | default(omit) }}"
+
     interfaces:
         fabric: "{{ fabric_iface | default('fabric') }}"
         management: "{{ management_iface | default('mgmtbr') }}"
@@ -13,7 +39,7 @@ compute_node:
         external: "{{ external_ip | default('manual') }}"
     gateway:
         external: "{{ external_gw | default(omit) }}"
-        management: "{{ management_gw | default('omit') }}"
+        management: "{{ management_gw | default(omit) }}"
     broadcast:
         external: "{{ external_bc | default(omit) }}"
-        management: "{{ management_bc | default('omit') }}"
+        management: "{{ management_bc | default(omit) }}"
