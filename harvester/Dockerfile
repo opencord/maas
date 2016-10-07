@@ -11,12 +11,19 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM python:2.7-alpine
+FROM golang:1.6-alpine
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk update && apk add bind
+RUN apk --update add openssh-client git bind
 
-ADD dhcpharvester.py /dhcpharvester.py
+RUN go get github.com/tools/godep
+ADD . /go/src/gerrit.opencord.com/maas/harvester
+
+WORKDIR /go/src/gerrit.opencord.com/maas/harvester
+RUN /go/bin/godep restore || true
+
+WORKDIR /go
+RUN go install gerrit.opencord.com/maas/harvester
 
 LABEL org.label-schema.name="harvester" \
       org.label-schema.description="Provides DHCP havesting and insertion into DNS" \
@@ -24,4 +31,4 @@ LABEL org.label-schema.name="harvester" \
       org.label-schema.vendor="Open Networking Labratory" \
       org.label-schema.schema-version="1.0"
 
-ENTRYPOINT [ "python", "/dhcpharvester.py" ]
+ENTRYPOINT ["/go/bin/harvester"]

@@ -1,0 +1,54 @@
+{
+	"ImportPath": "gerrit.opencord.org/maas/cord-provisioner",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v72",
+	"Deps": [
+		{
+			"ImportPath": "github.com/tatsushid/go-fastping",
+			"Rev": "d7bb493dee3e090e2ffb6914adddf17c1e7c026c"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Comment": "v1.1-4-gaed02d1",
+			"Rev": "aed02d124ae4a0e94fea4541c8effd05bf0c8296"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.1-13-g9fa818a",
+			"Rev": "9fa818a44c2bf1396a17f9d5a3c0f6dd39d2ff8e"
+		},
+		{
+			"ImportPath": "github.com/kelseyhightower/envconfig",
+			"Comment": "1.1.0-17-g91921eb",
+			"Rev": "91921eb4cf999321cdbeebdba5a03555800d493b"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Rev": "f3cfb454f4c209e6668c95216c4744b8fddb2356"
+		},
+		{
+			"ImportPath": "golang.org/x/net/icmp",
+			"Rev": "88c1a61b3dd4d98651f24775ca288fac5d2544ce"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/iana",
+			"Rev": "88c1a61b3dd4d98651f24775ca288fac5d2544ce"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/netreflect",
+			"Rev": "88c1a61b3dd4d98651f24775ca288fac5d2544ce"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/nettest",
+			"Rev": "88c1a61b3dd4d98651f24775ca288fac5d2544ce"
+		},
+		{
+			"ImportPath": "golang.org/x/net/ipv4",
+			"Rev": "88c1a61b3dd4d98651f24775ca288fac5d2544ce"
+		},
+		{
+			"ImportPath": "golang.org/x/net/ipv6",
+			"Rev": "88c1a61b3dd4d98651f24775ca288fac5d2544ce"
+		}
+	]
+}
