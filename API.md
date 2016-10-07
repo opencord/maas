@@ -299,38 +299,36 @@ deleted.
 **Docker image:** cord-dhcp-harvester
 
 ### Configuration
-|Command Line Flag|Default|Description|
+|Environment Variable|Default|Description|
 |-|-|-|
-|'-l', '--leases'|'/dhcp/dhcpd.leases'|specifies the DHCP lease file from which to harvest|
-|'-x', '--reservations'|'/etc/dhcp/dhcpd.reservations'|specified the reservation file as ISC DHCP doesn't update the lease file for fixed addresses|
-|'-d', '--dest'|'/bind/dhcp_harvest.inc'|specifies the file to write the additional DNS information|
-|'-i', '--include'|None|list of hostnames to include when harvesting DNS information|
-|'-f', '--filter'|None|list of regex expressions to use as an include filter|
-|'-r', '--repeat'|None|continues to harvest DHCP information every specified interval|
-|'-c', '--command'|'rndc'|shell command to execute to cause reload|
-|'-k', '--key'|None|rndc key file to use to access DNS server|
-|'-s', '--server'|'127.0.0.1'|server to reload after generating updated dns information|
-|'-p', '--port'|'954'|port on server to contact to reload server|
-|'-z', '--zone'|None|zone to reload after generating updated dns information|
-|'-u', '--update'|False, action='store_true'|update the DNS server, by reloading the zone|
-|'-y', '--verify'|False, action='store_true'|verify the hosts with a ping before pushing them to DNS|
-|'-t', '--timeout'|'1s'|specifies the duration to wait for a verification ping from a host|
-|'-a', '--apiserver'|'0.0.0.0'|specifies the interfaces on which to listen for API requests|
-|'-e', '--apiport'|'8954'|specifies the port on which to listen for API requests|
-|'-q', '--quiet'|'1m'|specifieds a minimum quiet period between actually harvest times.|
-|'-w', '--workers'|5|specifies the number of workers to use when verifying IP addresses|
+| HARVESTER_PORT | 4246 | port on which the service will listen for requests |
+| HARVESTER_LISTEN | 0.0.0.0 | IP on which the service will listen for requests |
+| HARVESTER_LOG_LEVEL | warning | log output level |
+| HARVESTER_LOG_FORMAT | text | format of log messages |
+| HARVESTER_DHCP_LEASE_FILE | /harvester/dhcpd.leases | lease file to parse for lease information |
+| HARVESTER_OUTPUT_FILE | | name of file to output discovered lease in bind9 format |
+| HARVESTER_OUTPUT_FORMAT | {{.ClientHostname}}\tIN A {{.IPAddress}}\t; {{.HardwareAddress}} | specifies the single entry format when outputing to a file |
+| HARVESTER_VERIFY_LEASES | true | verifies leases with a ping |
+| HARVESTER_VERIFY_TIMEOUT | 1s | max timeout (RTT) to wait for verification pings |
+| HARVESTER_VERIFY_WITH_UDP | false | use UDP instead of raw sockets for ping verification |
+| HARVESTER_QUERY_PERIOD | 30s | period at which the DHCP lease file is processed |
+| HARVESTER_QUIET_PERIOD | 2s | period to wait between accepting parse requests |
+| HARVESTER_REQUEST_TIMEOUT | 10s | period to wait for processing when requesting a DHCP lease database parsing |
+| HARVESTER_RNDC_UPDATE | false | determines if the harvester reloads the DNS servers after harvest |
+| HARVESTER_RNDC_ADDRESS | 127.0.0.1 | IP address of the DNS server to contact via RNDC |
+| HARVESTER_RNDC_PORT | 954 | port of the DNS server to contact via RNDC |
+| HARVESTER_RNDC_KEY_FILE | /key/rndc.conf.maas | key file, with default, to contact DNS server |
+| HARVESTER_RNDC_ZONE | cord.lab | zone to reload |
 
 ### REST Resources
 
 |URI|Operation|Description|
 |-|-|-|
-|/harvest|POST|Forces the service to perform an IP harvest against the DHCP
-server and update DNS|
-
-##### POST /harvest
-The service periodically harvests IP information from the specified DHCP
-server and updates DNS zones accordingly. This request force an harvest to
-be performed immediately.
+| /harvest | POST | Requests the processing of the DHCP lease database |
+| /lease | GET | Returns the list of DHCP leases harvested from the DHCP server |
+| /lease/{ip} | GET | Returns a single DHCP lease associated with the given IP |
+| /lease/hostname/{name} | GET | Returns a single DHCP lease associated with the given client hostname |
+| /lease/hardware/{mac} | GET | Returns a single DHCP lease associated with the given hardware addreaa |
 
 ## config-generator
 **Docker image:** cord-config-generator
