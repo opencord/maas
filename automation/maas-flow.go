@@ -20,51 +20,28 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"net/url"
 	"os"
-	"strings"
 	"time"
-	"unicode"
 
 	maas "github.com/juju/gomaasapi"
 )
 
-const (
-	// defaultFilter specifies the default filter to use when none is specified
-	defaultFilter = `{
-	  "hosts" : {
-	    "include" : [ ".*" ],
-		"exclude" : []
-	  },
-	  "zones" : {
-	    "include" : ["default"],
-		"exclude" : []
-           }
-	}`
-	defaultMapping = "{}"
-)
-
 type Config struct {
-	PowerHelperUser   string `default:"cord" envconfig:"POWER_HELPER_USER"`
-	PowerHelperHost   string `default:"127.0.0.1" envconfig:"POWER_HELPER_HOST"`
-	PowerHelperScript string `default:"" envconfig:"POWER_HELPER_SCRIPT"`
-	ProvisionUrl      string `default:"" envconfig:"PROVISION_URL"`
-	ProvisionTtl      string `default:"1h" envconfig:"PROVISION_TTL"`
-	LogLevel          string `default:"warning" envconfig:"LOG_LEVEL"`
-	LogFormat         string `default:"text" envconfig:"LOG_FORMAT"`
+	PowerHelperUser   string        `default:"cord" envconfig:"POWER_HELPER_USER"`
+	PowerHelperHost   string        `default:"127.0.0.1" envconfig:"POWER_HELPER_HOST"`
+	PowerHelperScript string        `default:"" envconfig:"POWER_HELPER_SCRIPT"`
+	ProvisionUrl      string        `default:"" envconfig:"PROVISION_URL"`
+	ProvisionTtl      string        `default:"1h" envconfig:"PROVISION_TTL"`
+	LogLevel          string        `default:"warning" envconfig:"LOG_LEVEL"`
+	LogFormat         string        `default:"text" envconfig:"LOG_FORMAT"`
+	ApiKey            string        `envconfig:"MAAS_API_KEY" required:"true" desc:"API key to access MAAS server"`
+	MaasUrl           string        `default:"http://localhost/MAAS" envconfig:"MAAS_URL" desc:"URL to access MAAS server"`
+	ApiVersion        string        `default:"1.0" envconfig:"MAAS_API_VERSION" desc:"API version to use with MAAS server"`
+	QueryInterval     time.Duration `default:"15s" envconfig:"MAAS_QUERY_INTERVAL" desc:"frequency to query MAAS service for nodes"`
+	PreviewOnly       bool          `default:"false" envconfig:"PREVIEW_ONLY" desc:"display actions that would be taken, but don't execute them"`
+	AlwaysRename      bool          `default:"true" envconfig:"ALWAYS_RENAME" desc:"attempt to rename hosts at every stage or workflow"`
+	Mappings          string        `default:"{}" envconfig:"MAC_TO_NAME_MAPPINGS" desc:"custom MAC address to host name mappings"`
+	FilterSpec        string        `default:"{\"hosts\":{\"include\":[\".*\"]},\"zones\":{\"include\":[\"default\"]}}" envconfig:"HOST_FILTER_SPEC" desc:"constrain hosts that are automated"`
 }
-
-var apiKey = flag.String("apikey", "", "key with which to access MAAS server")
-var maasURL = flag.String("maas", "http://localhost/MAAS", "url over which to access MAAS")
-var apiVersion = flag.String("apiVersion", "1.0", "version of the API to access")
-var queryPeriod = flag.String("period", "15s", "frequency the MAAS service is polled for node states")
-var preview = flag.Bool("preview", false, "displays the action that would be taken, but does not do the action, in this mode the nodes are processed only once")
-var mappings = flag.String("mappings", "{}", "the mac to name mappings")
-var always = flag.Bool("always-rename", true, "attempt to rename at every stage of workflow")
-var filterSpec = flag.String("filter", strings.Map(func(r rune) rune {
-	if unicode.IsSpace(r) {
-		return -1
-	}
-	return r
-}, defaultFilter), "constrain by hostname what will be automated")
 
 // checkError if the given err is not nil, then fatally log the message, else
 // return false.
@@ -119,8 +96,8 @@ func main() {
 	}
 
 	options := ProcessingOptions{
-		Preview:         *preview,
-		AlwaysRename:    *always,
+		Preview:         config.PreviewOnly,
+		AlwaysRename:    config.AlwaysRename,
 		Provisioner:     NewProvisioner(&ProvisionerConfig{Url: config.ProvisionUrl}),
 		ProvisionURL:    config.ProvisionUrl,
 		PowerHelper:     config.PowerHelperScript,
@@ -150,70 +127,79 @@ func main() {
 	// Determine the filter, this can either be specified on the the command
 	// line as a value or a file reference. If none is specified the default
 	// will be used
-	if len(*filterSpec) > 0 {
-		if (*filterSpec)[0] == '@' {
-			name := os.ExpandEnv((*filterSpec)[1:])
+	if len(config.FilterSpec) > 0 {
+		if config.FilterSpec[0] == '@' {
+			name := os.ExpandEnv((config.FilterSpec)[1:])
 			file, err := os.OpenFile(name, os.O_RDONLY, 0)
 			checkError(err, "unable to open file '%s' to load the filter : %s", name, err)
 			decoder := json.NewDecoder(file)
 			err = decoder.Decode(&options.Filter)
 			checkError(err, "unable to parse filter configuration from file '%s' : %s", name, err)
 		} else {
-			err := json.Unmarshal([]byte(*filterSpec), &options.Filter)
-			checkError(err, "unable to parse filter specification: '%s' : %s", *filterSpec, err)
+			err := json.Unmarshal([]byte(config.FilterSpec), &options.Filter)
+			checkError(err, "unable to parse filter specification: '%s' : %s", config.FilterSpec, err)
 		}
-	} else {
-		err := json.Unmarshal([]byte(defaultFilter), &options.Filter)
-		checkError(err, "unable to parse default filter specificiation: '%s' : %s", defaultFilter, err)
 	}
 
 	// Determine the mac to name mapping, this can either be specified on the the command
 	// line as a value or a file reference. If none is specified the default
 	// will be used
-	if len(*mappings) > 0 {
-		if (*mappings)[0] == '@' {
-			name := os.ExpandEnv((*mappings)[1:])
+	if len(config.Mappings) > 0 {
+		if config.Mappings[0] == '@' {
+			name := os.ExpandEnv(config.Mappings[1:])
 			file, err := os.OpenFile(name, os.O_RDONLY, 0)
 			checkError(err, "unable to open file '%s' to load the mac name mapping : %s", name, err)
 			decoder := json.NewDecoder(file)
 			err = decoder.Decode(&options.Mappings)
 			checkError(err, "unable to parse filter configuration from file '%s' : %s", name, err)
 		} else {
-			err := json.Unmarshal([]byte(*mappings), &options.Mappings)
-			checkError(err, "unable to parse mac name mapping: '%s' : %s", *mappings, err)
+			err := json.Unmarshal([]byte(config.Mappings), &options.Mappings)
+			checkError(err, "unable to parse mac name mapping: '%s' : %s", config.Mappings, err)
 		}
-	} else {
-		err := json.Unmarshal([]byte(defaultMapping), &options.Mappings)
-		checkError(err, "unable to parse default mac name mappings: '%s' : %s", defaultMapping, err)
 	}
 
-	// Verify the specified period for queries can be converted into a Go duration
-	period, err := time.ParseDuration(*queryPeriod)
-	checkError(err, "unable to parse specified query period duration: '%s': %s", queryPeriod, err)
+	// Get human readable strings for config output
+	mappingsAsJson, err := json.Marshal(options.Mappings)
+	checkError(err, "Unable to marshal MAC to hostname mappings to JSON : %s", err)
+	mappingsPrefix := ""
+
+	if len(config.Mappings) > 0 && config.Mappings[0] == '@' {
+		mappingsPrefix = "[" + config.Mappings + "]"
+	}
+
+	filterAsJson, err := json.Marshal(options.Filter)
+	checkError(err, "Unable to marshal host filter to JSON : %s", err)
+	filterPrefix := ""
+	if len(config.FilterSpec) > 0 && config.FilterSpec[0] == '@' {
+		filterPrefix = "[" + config.FilterSpec + "]"
+	}
 
 	log.Infof(`Configuration:
-	    MAAS URL:            %s
-	    MAAS API Version:    %s
-	    MAAS Query Interval: %s
-	    Node Filter:         %s
-	    Node Name Mappings:  %s
-	    Preview:             %v
-	    Always Rename:       %v
-	    Provision URL:       %s
-	    Provision TTL:       %s
-	    Power Helper:        %s
-	    Power Helper User:   %s
-	    Power Helper Host:   %s
-	    Log Level:           %s
-	    Log Format:		 %s`,
-		*maasURL, *apiVersion, *queryPeriod, *filterSpec, *mappings, options.Preview,
-		options.AlwaysRename, options.ProvisionURL, options.ProvisionTTL,
-		options.PowerHelper, options.PowerHelperUser, options.PowerHelperHost, config.LogLevel, config.LogFormat)
+            POWER_HELPER_USER:   %s
+	    POWER_HELPER_HOST:   %s
+	    POWER_HELPER_SCRIPT: %s
+	    PROVISION_URL:       %s
+	    PROVISION_TTL:       %s
+	    MAAS_URL:            %s
+	    MAAS_API_KEY:        %s
+	    MAAS_API_VERSION:    %s
+	    MAAS_QUERY_INTERVAL: %s
+	    HOST_FILTER_SPEC:    %+v
+	    MAC_TO_NAME_MAPPINGS:%+v
+	    PREVIEW_ONLY:        %t
+	    ALWAYS_RENAME:       %t
+	    LOG_LEVEL:           %s
+	    LOG_FORMAT:		 %s`,
+		config.PowerHelperUser, config.PowerHelperHost, config.PowerHelperScript,
+		config.ProvisionUrl, config.ProvisionTtl,
+		config.MaasUrl, config.ApiKey, config.ApiVersion, config.QueryInterval,
+		filterPrefix+string(filterAsJson), mappingsPrefix+string(mappingsAsJson),
+		config.PreviewOnly, config.AlwaysRename,
+		config.LogLevel, config.LogFormat)
 
-	authClient, err := maas.NewAuthenticatedClient(*maasURL, *apiKey, *apiVersion)
-	if err != nil {
-		checkError(err, "Unable to use specified client key, '%s', to authenticate to the MAAS server: %s", *apiKey, err)
-	}
+	authClient, err := maas.NewAuthenticatedClient(config.MaasUrl, config.ApiKey, config.ApiVersion)
+	checkError(err, "Unable to use specified client key, '%s', to authenticate to the MAAS server: %s",
+		config.ApiKey, err)
 
 	// Create an object through which we will communicate with MAAS
 	client := maas.NewMAAS(*authClient)
@@ -227,13 +213,15 @@ func main() {
 	nodes, _ := fetchNodes(client)
 	ProcessAll(client, nodes, options)
 
-	if !(*preview) {
+	if !(config.PreviewOnly) {
 		// Create a ticker and fetch and process the nodes every "period"
-		ticker := time.NewTicker(period)
-		for t := range ticker.C {
-			log.Infof("query server at %s", t)
+		for {
+			log.Infof("query server at %s", time.Now())
 			nodes, _ := fetchNodes(client)
 			ProcessAll(client, nodes, options)
+
+			// Sleep for the Interval and then process again.
+			time.Sleep(config.QueryInterval)
 		}
 	}
 }

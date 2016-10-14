@@ -311,6 +311,26 @@
   when: virtualbox_support is defined and virtualbox_host == ''
   changed_when: false
 
+- name: Ensure Secrets Directory
+  become: yes
+  file:
+    path: /etc/maas/secrets
+    state: directory
+    owner: root
+    group: docker
+    mode: 0755
+
+- name: Ensure MAAS API Key Secret
+  become: yes
+  lineinfile:
+    dest: /etc/maas/secrets/automation.env
+    create: true
+    regexp: "^AUTOMATION_MAAS_API_KEY=.*$"
+    line: "AUTOMATION_MAAS_API_KEY={{ apikey.stdout }}"
+    owner: root
+    group: docker
+    mode: 0440
+
 - name: Custom Automation Compose Configurations
   become: yes
   template:
@@ -321,14 +341,12 @@
     mode: 0644
   with_items:
     - automation-compose.yml
-    - harvest-compose.yml
 
 - name: Automation
   become: yes
   command: docker-compose -f /etc/maas/{{ item }} up -d
   with_items:
     - automation-compose.yml
-    - harvest-compose.yml
   changed_when: true
 
 - name: Wait For Image Download

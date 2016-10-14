@@ -43,19 +43,21 @@ type Power struct {
 	PowerAddress  string `json:"power_address"`
 }
 
+type HostFilter struct {
+	Zones struct {
+		Include []string `json:"include,omitempty"`
+		Exclude []string `json:"exclude,omitempty"`
+	} `json:"zones,omitempty"`
+	Hosts struct {
+		Include []string `json:"include,omitempty"`
+		Exclude []string `json:"exclude,omitempty"`
+	} `json:"hosts,omitempty"`
+}
+
 // ProcessingOptions used to determine on what hosts to operate
 type ProcessingOptions struct {
-	Filter struct {
-		Zones struct {
-			Include []string
-			Exclude []string
-		}
-		Hosts struct {
-			Include []string
-			Exclude []string
-		}
-	}
-	Mappings        map[string]interface{}
+	Filter          HostFilter
+	Mappings        map[string]string
 	Preview         bool
 	AlwaysRename    bool
 	Provisioner     Provisioner
@@ -137,14 +139,14 @@ func updateNodeName(client *maas.MAASObject, node MaasNode, options ProcessingOp
 		current = current[:i]
 	}
 	for _, mac := range macs {
-		if entry, ok := options.Mappings[mac]; ok {
-			if name, ok := entry.(map[string]interface{})["hostname"]; ok && current != name.(string) {
+		if name, ok := options.Mappings[mac]; ok {
+			if current != name {
 				nodesObj := client.GetSubObject("nodes")
 				nodeObj := nodesObj.GetSubObject(node.ID())
-				log.Infof("RENAME '%s' to '%s'\n", node.Hostname(), name.(string))
+				log.Infof("RENAME '%s' to '%s'\n", node.Hostname(), name)
 
 				if !options.Preview {
-					nodeObj.Update(url.Values{"hostname": []string{name.(string)}})
+					nodeObj.Update(url.Values{"hostname": []string{name}})
 				}
 			}
 		}
