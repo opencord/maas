@@ -66,12 +66,12 @@
     - "{{ netinfo.excluded.keys() | sort }}"
   changed_when: false
 
-- name: Initialize Modules Ignored for Management Bridge
+- name: Initialize Modules Ignored for Management Bond
   set_fact:
     ignore_module_types_combined: "{{ compute_node.management.ignore.module_types }}"
   changed_when: false
 
-- name: Ignore Fabric Modules for Management Bridge
+- name: Ignore Fabric Modules for Management Bond
   set_fact:
     ignore_module_types_combined: "{{ compute_node.fabric.include.module_types }}"
   when:
@@ -79,7 +79,7 @@
     - compute_node.fabric.include.module_types is defined and compute_node.fabric.include.module_types != omit
   changed_when: false
 
-- name: Explicitly Ignore External and Specified Interfaces From Management Bridge
+- name: Explicitly Ignore External and Specified Interfaces From Management Bond
   set_fact:
     ignore_names_combined: "{{ compute_node.interfaces.external }},{{ compute_node.management.ignore.names }}"
   when:
@@ -87,7 +87,7 @@
     - compute_node.management.ignore.names is defined and compute_node.management.ignore.names != omit
   changed_when: false
 
-- name: Ignore External Interface From Management Bridge
+- name: Ignore External Interface From Management Bond
   set_fact:
     ignore_names_combined: "{{ compute_node.interfaces.external }}"
   when:
@@ -95,7 +95,7 @@
     - compute_node.management.ignore.names is not defined or compute_node.management.ignore.names == omit
   changed_when: false
 
-- name: Explicity Ingnore Specified Interfaces From Management Bridge
+- name: Explicity Ingnore Specified Interfaces From Management Bond
   set_fact:
     exclude_names_combined: "{{ compute_node.management.ignore.names }}"
   when:
@@ -227,8 +227,8 @@
     name: mgmtbr
     config: "dhcp"
     auto: true
-    bridge_ports: "{{ management_iface_list | join(' ') }}"
-    description: "Internal POD management interface"
+    bridge_ports: "mgmtbond"
+    description: "Internal POD management bridge"
   register: net_changed
   when: compute_node.addresses.management == "dhcp"
 
@@ -246,8 +246,8 @@
     address: "{{ compute_node.addresses.management }}"
     gateway: "{{ compute_node.gateway.management }}"
     broadcast: "{{ compute_node.broadcast.management }}"
-    bridge_ports: "{{ management_iface_list | join(' ') }}"
-    description: "Internal POD management interface"
+    bridge_ports: "mgmtbond"
+    description: "Internal POD management bridge"
   register: net_changed
   when: compute_node.addresses.management != "dhcp"
 
@@ -255,19 +255,77 @@
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
-- name: Ensure Management Bridge Interfaces
+- name: Ensure Management Bond
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: mgmtbond
+    config: "manual"
+    auto: true
+    bond-mode: active-backup
+    bond-miimon: 100
+    bond-slaves: none
+    description: "Internal POD management bond"
+  register: net_changed
+
+- name: Verify Management Bond DHCP Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Gather Primary Management Interface
+  set_fact:
+    management_primary_iface: "{{ management_iface_list | sort | first }}"
+  changed_when: false
+  when: management_iface_list|length > 0
+
+- name: Ensure Primary Management Interface
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: true
+    name: "{{ management_primary_iface }}"
+    config: manual
+    bond-master: mgmtbond
+    bond-primary: "{{ management_primary_iface }}"
+    description: "Primary management interface"
+  register: net_changed
+  when: management_iface_list|length > 0
+
+- name: Verify Primary Management Interface Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Ensure Management Interfaces
   netfile:
     src: "{{ compute_node.interfaces.file }}"
     state: present
     auto: true
     name: "{{ item }}"
     config: manual
+    bond-master: mgmtbond
     description: "Management interface"
   register: net_changed
+  when: management_iface_list|length > 1 and item != management_primary_iface
   with_items:
     - "{{ management_iface_list | sort }}"
 
-- name: Verify Management Bridge Interfaces Changed
+- name: Verify Management Interfaces Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
+- name: Mark Explicitly Excluded Management Bond Interfaces as Manual
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    auto: false
+    name: "{{ item }}"
+    config: manual
+    description: "Explicitly Excluded Management Bond Interface"
+  register: net_changed
+  with_items:
+    - "{{ management_iface_excluded_list | sort }}"
+
+- name: Verify Explicitly Excluded Management Interfaces Changed
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
@@ -283,22 +341,6 @@
   when: compute_node.interfaces.external and compute_node.addresses.external == "dhcp"
 
 - name: Verify External Interface DHCP Changed
-  set_fact:
-    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
-
-- name: Mark Explicitly Excluded Management Bridge Interfaces as Manual
-  netfile:
-    src: "{{ compute_node.interfaces.file }}"
-    state: present
-    auto: false
-    name: "{{ item }}"
-    config: manual
-    description: "Explicitly Excluded Management Bridge Interface"
-  register: net_changed
-  with_items:
-    - "{{ management_iface_excluded_list | sort }}"
-
-- name: Verify Explicitly Excluded Management Interfaces Changed
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 

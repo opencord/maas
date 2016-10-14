@@ -21,5 +21,5 @@ else
 	SKIP_TAGS="--skip-tags=interface_config"
 fi
 
-echo "ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS" >> $LOG
-ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $IP, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS >> $LOG || exit $?
+echo "ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $HOSTNAME, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS" >> $LOG
+ANSIBLE_ROLES_PATH=/etc/maas/ansible/roles ansible-playbook --private-key=/etc/maas/ansible/id_rsa -i $HOSTNAME, /etc/maas/ansible/compute-node.yml $SKIP_TAGS $EXTRA_VARS >> $LOG || exit $?
