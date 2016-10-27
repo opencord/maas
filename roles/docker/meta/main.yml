@@ -12,4 +12,5 @@ galaxy_info:
   galaxy_tags:
     - development
     - system
-dependencies: []
+dependencies:
+  - { role: local-ubuntu-repository, when: ubuntu_apt_repo is defined }

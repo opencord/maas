@@ -1,0 +1,46 @@
+---
+- name: Ensure Local Repository Settings
+  become: yes
+  template:
+    backup: yes
+    dest: /etc/apt/sources.list
+    src: files/sources.list.j2
+    group: root
+    owner: root
+    mode: 0644
+  when: ubuntu_apt_repo is defined
+
+- name: Capture Existing Respositories
+  command: find /etc/apt/sources.list.d \! -type d -name '*.list'
+  changed_when: false
+  register: existing_repo_lists
+  when: ubuntu_apt_repo is defined
+
+- name: Capture Timestamp
+  set_fact:
+    timestamp: "{{ lookup('pipe', 'date +%Y-%m-%d@%H:%M:%S') }}"
+  changed_when: false
+  when: ubuntu_apt_repo is defined
+
+- name: Backup Existing Respositories
+  become: yes
+  copy:
+    remote_src: True
+    src:  "{{ item }}"
+    dest: "{{ item }}.{{ timestamp }}~"
+  with_items: "{{ existing_repo_lists.stdout_lines }}"
+  when: ubuntu_apt_repo is defined
+
+- name: Remove Existing Repositories
+  become: yes
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items: "{{ existing_repo_lists.stdout_lines }}"
+  when: ubuntu_apt_repo is defined
+
+- name: Ensure Update Repository List
+  become: yes
+  apt:
+    update_cache: yes
+  when: ubuntu_apt_repo is defined

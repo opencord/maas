@@ -43,12 +43,17 @@ networks:
     #                the leaf - spine fabric
     management: "{{ management_network | default('10.6.0.0/24') }}"
     bridge: "{{ bridge_network | default('172.42.0.0/24') }}"
-    fabric: "{{ fabric_network | default('10.6.1.0/24') }}"
+    fabric: "{{ fabric_ip | default('10.6.1.0/24') | ipaddr('0') }}"
 
     # CHANGE:
     #   'bridge' name of the bride to create that is used when connecting
     #            the VMs created in support of XOS
     bridge_name: "{{ bridge_name | default('mgmtbr') }}"
+
+ranges:
+    fabric:
+        low: "{{ fabric_range_low | default(fabric_ip | default('10.6.1.0/24')) | ipaddr(2) | ipaddr('address') }}"
+        high: "{{ fabric_range_high | default(fabric_ip | default('10.6.1.0/24')) | ipaddr(-3) | ipaddr('address') }}"
 
 docker:
     registry: "{{ docker_registry | default('opencord') }}"

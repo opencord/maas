@@ -52,3 +52,27 @@ management_ignore_module_types: '{{ compute_node.management.ignore.module_types 
 {% if compute_node.management.ignore.bus_types is defined and compute_node.management.ignore.bus_types != omit %}
 management_ignore_bus_types: '{{ compute_node.management.ignore.bus_types }}'
 {% endif %}
+{% if ubuntu_apt_repo is defined %}
+ubuntu_apt_repo: '{{ ubuntu_apt_repo }}'
+{% endif %}
+{% if ubuntu_updates_apt_repo is defined %}
+ubuntu_updates_apt_repo: '{{ ubuntu_updates_apt_repo }}'
+{% endif %}
+{% if docker_apt_repo is defined %}
+docker_apt_repo: '{{ docker_apt_repo }}'
+{% endif %}
+{% if java_apt_repo is defined %}
+java_apt_repo: '{{ java_apt_repo }}'
+{% endif %}
+{% if ansible_apt_repo is defined %}
+ansible_apt_repo: '{{ ansible_apt_repo }}'
+{% endif %}
+{% if maas_apt_repo is defined %}
+maas_apt_repo: '{{ maas_apt_repo }}'
+{% endif %}
+{% if dell_apt_repo is defined %}
+dell_apt_repo: '{{ dell_apt_repo }}'
+{% endif %}
+{% if juju_apt_repo is defined %}
+juju_apt_repo: '{{ juju_apt_repo }}'
+{% endif %}

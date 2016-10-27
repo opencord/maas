@@ -28,7 +28,8 @@ services:
       - "ALLOCATE_PORT=4242"
       - "ALLOCATE_LISTEN=0.0.0.0"
       - "ALLOCATE_NETWORK={{ networks.fabric }}"
-      - "ALLOCATE_SKIP=2"
+      - "ALLOCATE_RANGE_LOW={{ ranges.fabric.low }}"
+      - "ALLOCATE_RANGE_HIGH={{ ranges.fabric.high }}"
       - "ALLOCATE_LOG_LEVEL=debug"
       - "ALLOCATE_LOG_FORMAT=text"
     restart: unless-stopped
@@ -54,6 +55,7 @@ services:
       - "PROVISION_DEFAULT_ROLE=compute-node"
       - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
       - "PROVISION_STORAGE_URL=consul://{{ mgmt_ip_address.stdout }}:8500"
+      - "PROVISION_NUMBER_OF_WORKERS=1"
       - "PROVISION_LOG_LEVEL=debug"
       - "PROVISION_LOG_FORMAT=text"
     volumes:

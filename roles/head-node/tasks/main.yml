@@ -81,7 +81,7 @@
 - name: Ensure Compute and Switch Node Variables
   become: yes
   template:
-    src=files/compute-node-vars.yml
+    src=files/compute-node-vars.yml.j2
     dest=/etc/maas/ansible/vars/compute-node-vars.yml
     owner=maas
     group=maas

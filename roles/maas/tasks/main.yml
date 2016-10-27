@@ -54,7 +54,7 @@
 - name: MAAS Repository
   become: yes
   apt_repository:
-    repo: ppa:maas/stable
+    repo: "{{ maas_apt_repo | default('ppa:maas/stable') }}"
     update_cache: yes
     state: present
     validate_certs: no

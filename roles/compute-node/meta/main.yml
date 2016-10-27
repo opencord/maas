@@ -12,4 +12,5 @@ galaxy_info:
   galaxy_tags:
     - cord
 dependencies:
+  - { role: local-ubuntu-repository, when: ubuntu_apt_repo is defined }
   - { role : docker }

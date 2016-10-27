@@ -24,10 +24,11 @@ import (
 type Config struct {
 	Port            int    `default:"4243"`
 	Listen          string `default:"0.0.0.0"`
-	RoleSelectorURL string `default:"" envconfig:"role_selector_url"`
-	DefaultRole     string `default:"compute-node" envconfig:"default_role"`
+	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL"`
+	DefaultRole     string `default:"compute-node" envconfig:"DEFAULT_ROLE"`
 	Script          string `default:"do-ansible"`
-	StorageURL      string `default:"memory:" envconfig:"storage_url"`
+	StorageURL      string `default:"memory:" envconfig:"STORAGE_URL"`
+	NumberOfWorkers int    `default:"5" envconfig:"NUMBER_OF_WORKERS"`
 	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL"`
 	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
 }
@@ -66,16 +67,18 @@ func main() {
 	log.Level = level
 
 	log.Infof(`Configuration:
-	    Listen:          %s
-	    Port:            %d
-	    RoleSelectorURL: %s
-	    DefaultRole:     %s
-	    Script:          %s
-	    StorageURL:      %s
-	    Log Level:       %s
-	    Log Format:      %s`,
+	    LISTEN:             %s
+	    PORT:               %d
+	    ROLE_SELECTION_URL: %s
+	    DEFAULT_ROLE:       %s
+	    SCRIPT:             %s
+	    STORAGE_URL:        %s
+	    NUMBER_OF_WORERS:   %d
+	    LOG_LEVEL:          %s
+	    LOG_FORMAT:         %s`,
 		context.config.Listen, context.config.Port, context.config.RoleSelectorURL,
 		context.config.DefaultRole, context.config.Script, context.config.StorageURL,
+		context.config.NumberOfWorkers,
 		context.config.LogLevel, context.config.LogFormat)
 
 	context.storage, err = NewStorage(context.config.StorageURL)
@@ -92,7 +95,7 @@ func main() {
 	http.Handle("/", router)
 
 	// Start the dispatcher and workers
-	context.dispatcher = NewDispatcher(5, context.storage)
+	context.dispatcher = NewDispatcher(context.config.NumberOfWorkers, context.storage)
 	context.dispatcher.Start()
 
 	http.ListenAndServe(fmt.Sprintf("%s:%d", context.config.Listen, context.config.Port), nil)

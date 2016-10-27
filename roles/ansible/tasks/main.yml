@@ -1,7 +1,7 @@
 - name: Ansible Repository
   become: yes
   apt_repository:
-    repo="ppa:ansible/ansible"
+    repo: "{{ ansible_apt_repo | default('ppa:ansible/ansible') }}"
 
 - name: Ensure Ansible
   become: yes

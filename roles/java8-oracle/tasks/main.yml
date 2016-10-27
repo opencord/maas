@@ -5,7 +5,9 @@
 
 - name: Add Oracle Java Repository
   become: yes
-  apt_repository: repo='ppa:webupd8team/java' update_cache=yes
+  apt_repository:
+    repo: "{{ java_apt_repo | default('ppa:webupd8team/java') }}"
+    update_cache: yes
 
 - name: Accept Java 8 License
   become: yes

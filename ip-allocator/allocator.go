@@ -25,7 +25,8 @@ type Config struct {
 	Port      int    `default:"4242"`
 	Listen    string `default:"0.0.0.0"`
 	Network   string `default:"10.0.0.0/24"`
-	Skip      int    `default:"1"`
+	RangeLow  string `default:"10.0.0.2" envconfig:"RANGE_LOW"`
+	RangeHigh string `default:"10.0.0.253" envconfig:"RANGE_HIGH"`
 	LogLevel  string `default:"warning" envconfig:"LOG_LEVEL"`
 	LogFormat string `default:"text" envconfig:"LOG_FORMAT"`
 }
@@ -62,16 +63,19 @@ func main() {
 	log.Level = level
 
 	log.Infof(`Configuration:
-	    Listen:       %s
-	    Port:         %d
-	    Network:      %s
-	    SKip:         %d
-	    Log Level:    %s
-	    Log Format:   %s`, config.Listen, config.Port, config.Network, config.Skip,
+	    LISTEN:       %s
+	    PORT:         %d
+	    NETWORK:      %s
+	    RANGE_LOW:    %s
+	    RANGE_HIGH:   %s
+	    LOG_LEVEL:    %s
+	    LOG_FORMAT:   %s`,
+		config.Listen, config.Port,
+		config.Network, config.RangeLow, config.RangeHigh,
 		config.LogLevel, config.LogFormat)
 
 	context.storage = &MemoryStorage{}
-	context.storage.Init(config.Network, config.Skip)
+	context.storage.Init(config.Network, config.RangeLow, config.RangeHigh)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/allocations/{mac}", context.ReleaseAllocationHandler).Methods("DELETE")
