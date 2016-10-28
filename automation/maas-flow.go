@@ -18,8 +18,10 @@ import (
 	"flag"
 	"github.com/Sirupsen/logrus"
 	"github.com/kelseyhightower/envconfig"
+	"io/ioutil"
 	"net/url"
 	"os"
+	"regexp"
 	"time"
 
 	maas "github.com/juju/gomaasapi"
@@ -33,7 +35,9 @@ type Config struct {
 	ProvisionTtl      string        `default:"1h" envconfig:"PROVISION_TTL"`
 	LogLevel          string        `default:"warning" envconfig:"LOG_LEVEL"`
 	LogFormat         string        `default:"text" envconfig:"LOG_FORMAT"`
-	ApiKey            string        `envconfig:"MAAS_API_KEY" required:"true" desc:"API key to access MAAS server"`
+	ApiKey            string        `envconfig:"MAAS_API_KEY" desc:"API key to access MAAS server"`
+	ApiKeyFile        string        `default:"/secrets/maas_api_key" envconfig:"MAAS_API_KEY_FILE" desc:"file to hold the secret"`
+	ShowApiKey        bool          `default:"false" envconfig:"MAAS_SHOW_API_KEY" desc:"Show API in clear text in logs"`
 	MaasUrl           string        `default:"http://localhost/MAAS" envconfig:"MAAS_URL" desc:"URL to access MAAS server"`
 	ApiVersion        string        `default:"1.0" envconfig:"MAAS_API_VERSION" desc:"API version to use with MAAS server"`
 	QueryInterval     time.Duration `default:"15s" envconfig:"MAAS_QUERY_INTERVAL" desc:"frequency to query MAAS service for nodes"`
@@ -174,32 +178,59 @@ func main() {
 		filterPrefix = "[" + config.FilterSpec + "]"
 	}
 
+	re := regexp.MustCompile("[^:]")
+	pubKey := config.ApiKey
+	if !config.ShowApiKey {
+		pubKey = re.ReplaceAllString(config.ApiKey, "X")
+	}
+
 	log.Infof(`Configuration:
-            POWER_HELPER_USER:   %s
-	    POWER_HELPER_HOST:   %s
-	    POWER_HELPER_SCRIPT: %s
-	    PROVISION_URL:       %s
-	    PROVISION_TTL:       %s
-	    MAAS_URL:            %s
-	    MAAS_API_KEY:        %s
-	    MAAS_API_VERSION:    %s
-	    MAAS_QUERY_INTERVAL: %s
-	    HOST_FILTER_SPEC:    %+v
-	    MAC_TO_NAME_MAPPINGS:%+v
-	    PREVIEW_ONLY:        %t
-	    ALWAYS_RENAME:       %t
-	    LOG_LEVEL:           %s
-	    LOG_FORMAT:		 %s`,
+            POWER_HELPER_USER:    %s
+	    POWER_HELPER_HOST:    %s
+	    POWER_HELPER_SCRIPT:  %s
+	    PROVISION_URL:        %s
+	    PROVISION_TTL:        %s
+	    MAAS_URL:             %s
+	    MAAS_SHOW_API_KEY:    %t
+	    MAAS_API_KEY:         %s
+	    MAAS_API_KEY_FILE:    %s
+	    MAAS_API_VERSION:     %s
+	    MAAS_QUERY_INTERVAL:  %s
+	    HOST_FILTER_SPEC:     %+v
+	    MAC_TO_NAME_MAPPINGS: %+v
+	    PREVIEW_ONLY:         %t
+	    ALWAYS_RENAME:        %t
+	    LOG_LEVEL:            %s
+	    LOG_FORMAT:		  %s`,
 		config.PowerHelperUser, config.PowerHelperHost, config.PowerHelperScript,
 		config.ProvisionUrl, config.ProvisionTtl,
-		config.MaasUrl, config.ApiKey, config.ApiVersion, config.QueryInterval,
+		config.MaasUrl, config.ShowApiKey,
+		pubKey, config.ApiKeyFile, config.ApiVersion, config.QueryInterval,
 		filterPrefix+string(filterAsJson), mappingsPrefix+string(mappingsAsJson),
 		config.PreviewOnly, config.AlwaysRename,
 		config.LogLevel, config.LogFormat)
 
+	// Attempt to load the API key from a file if it was not set via the environment
+	// and if the file exists
+	if config.ApiKey == "" {
+		log.Debugf("Attempting to read MAAS API key from file '%s', because it was not set via environment", config.ApiKeyFile)
+		keyBytes, err := ioutil.ReadFile(config.ApiKeyFile)
+		if err != nil {
+			log.Warnf("Failed to read MAAS API key from file '%s', was the file mounted as a volume? : %s ",
+				config.ApiKeyFile, err)
+		} else {
+			config.ApiKey = string(keyBytes)
+			if config.ShowApiKey {
+				pubKey = config.ApiKey
+			} else {
+				pubKey = re.ReplaceAllString(config.ApiKey, "X")
+			}
+		}
+	}
+
 	authClient, err := maas.NewAuthenticatedClient(config.MaasUrl, config.ApiKey, config.ApiVersion)
 	checkError(err, "Unable to use specified client key, '%s', to authenticate to the MAAS server: %s",
-		config.ApiKey, err)
+		pubKey, err)
 
 	// Create an object through which we will communicate with MAAS
 	client := maas.NewMAAS(*authClient)
