@@ -72,6 +72,8 @@ services:
       - "lab.component=switchq"
     links:
       - provisioner
+    env_file:
+      - "/etc/maas/secrets/switchq.env"
     environment:
       - "SWITCHQ_SCRIPT=/etc/maas/ansible/do-switch"
       - "SWITCHQ_PROVISION_URL=http://provisioner:4243/provision/"
@@ -81,7 +83,6 @@ services:
       - "SWITCHQ_LOG_LEVEL=debug"
       - "SWITCHQ_LOG_FORMAT=text"
       - "SWITCHQ_MAAS_URL=http://{{ mgmt_ip_address.stdout }}/MAAS"
-      - "SWITCHQ_MAAS_API_KEY={{ apikey.stdout }}"
     volumes:
       - "/etc/bind/maas:/switchq/dhcp"
     restart: unless-stopped

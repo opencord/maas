@@ -207,7 +207,7 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 		})
 
 		if err != nil {
-			log.Errorf("unable to provision '%s' (%s) : %s", node.ID, node.Hostname(), err)
+			log.Errorf("unable to provision '%s' (%s) : %s", node.ID(), node.Hostname(), err)
 		}
 
 	} else if options.ProvisionTTL > 0 &&

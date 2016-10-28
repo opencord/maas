@@ -21,19 +21,21 @@ import (
 	"github.com/gorilla/mux"
 	maas "github.com/juju/gomaasapi"
 	"github.com/kelseyhightower/envconfig"
+	"io/ioutil"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 )
 
 type Config struct {
-	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"vendors_url"`
-	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"address_url"`
-	PollInterval    string `default:"1m" envconfig:"poll_interval"`
-	ProvisionTTL    string `default:"1h" envconfig:"provision_ttl"`
-	ProvisionURL    string `default:"" envconfig:"provision_url"`
-	RoleSelectorURL string `default:"" envconfig:"role_selector_url"`
-	DefaultRole     string `default:"fabric-switch" envconfig:"default_role"`
+	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"VENDORS_URL"`
+	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"ADDRESS_URL"`
+	PollInterval    string `default:"1m" envconfig:"POLL_INTERVAL"`
+	ProvisionTTL    string `default:"1h" envconfig:"PROVISION_TTL"`
+	ProvisionURL    string `default:"" envconfig:"PROVISION_URL"`
+	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL"`
+	DefaultRole     string `default:"fabric-switch" envconfig:"DEFAULT_ROLE"`
 	Script          string `default:"do-ansible"`
 	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL"`
 	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
@@ -41,6 +43,8 @@ type Config struct {
 	Port            int    `default:"4244"`
 	MaasURL         string `default:"http://localhost/MAAS" envconfig:"MAAS_URL"`
 	MaasKey         string `default:"" envconfig:"MAAS_API_KEY"`
+	ShowApiKey      bool   `default:"false" envconfig:"MAAS_SHOW_API_KEY"`
+	ApiKeyFile      string `default:"/secrets/maas_api_key" envconfig:"MAAS_API_KEY_FILE"`
 
 	vendors       Vendors
 	addressSource AddressSource
@@ -302,25 +306,33 @@ func main() {
 	}
 	log.Level = level
 
+	re := regexp.MustCompile("[^:]")
+	pubKey := context.config.MaasKey
+	if !context.config.ShowApiKey {
+		pubKey = re.ReplaceAllString(context.config.MaasKey, "X")
+	}
+
 	log.Infof(`Configuration:
-		Vendors URL:       %s
-		Poll Interval:     %s
-		Address Source:    %s
-		Provision TTL:     %s
-		Provision URL:     %s
-		Role Selector URL: %s
-		Default Role:      %s
-		Script:            %s
-		API Listen IP:     %s
-		API Listen Port:   %d
-		MAAS URL:          %s
-		MAAS APIKEY:       %s
-		Log Level:         %s
-		Log Format:        %s`,
+		VENDORS_URL:       %s
+		POLL_INTERVAL:     %s
+		ADDRESS_URL:       %s
+		PROVISION_TTL:     %s
+		PROVISION_URL:     %s
+		ROLE_SELECTOR_URL: %s
+		DEFAULT_ROLE:      %s
+		SCRIPT:            %s
+		LISTEN:            %s
+		PORT:              %d
+		MAAS_URL:          %s
+		MAAS_SHOW_API_KEY  %t
+		MAAS_API_KEY:      %s
+		MAAS_API_KEY_FILE: %s
+		LOG_LEVEL:         %s
+		LOG_FORMAT:        %s`,
 		context.config.VendorsURL, context.config.PollInterval, context.config.AddressURL, context.config.ProvisionTTL,
 		context.config.ProvisionURL, context.config.RoleSelectorURL, context.config.DefaultRole, context.config.Script,
-		context.config.Listen, context.config.Port, context.config.MaasURL, context.config.MaasKey,
-		context.config.LogLevel, context.config.LogFormat)
+		context.config.Listen, context.config.Port, context.config.MaasURL, context.config.ShowApiKey, pubKey,
+		context.config.ApiKeyFile, context.config.LogLevel, context.config.LogFormat)
 
 	context.config.vendors, err = NewVendors(context.config.VendorsURL)
 	checkError(err, "Unable to create known vendors list from specified URL '%s' : %s", context.config.VendorsURL, err)
@@ -333,6 +345,24 @@ func main() {
 
 	context.config.ttl, err = time.ParseDuration(context.config.ProvisionTTL)
 	checkError(err, "Unable to parse specified provision TTL value of '%s' : %s", context.config.ProvisionTTL, err)
+
+	// Attempt to load the API key from a file if it was not set via the environment
+	// and if the file exists
+	if context.config.MaasKey == "" {
+		log.Debugf("Attempting to read MAAS API key from file '%s', because it was not set via environment", context.config.ApiKeyFile)
+		keyBytes, err := ioutil.ReadFile(context.config.ApiKeyFile)
+		if err != nil {
+			log.Warnf("Failed to read MAAS API key from file '%s', was the file mounted as a volume? : %s ",
+				context.config.ApiKeyFile, err)
+		} else {
+			context.config.MaasKey = string(keyBytes)
+			if context.config.ShowApiKey {
+				pubKey = context.config.MaasKey
+			} else {
+				pubKey = re.ReplaceAllString(context.config.MaasKey, "X")
+			}
+		}
+	}
 
 	if len(context.config.MaasURL) > 0 {
 

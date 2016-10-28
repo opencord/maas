@@ -320,16 +320,17 @@
     group: docker
     mode: 0755
 
-- name: Ensure MAAS API Key Secret
+- name: Ensure Automation Container Secrets
   become: yes
-  lineinfile:
-    dest: /etc/maas/secrets/automation.env
-    create: true
-    regexp: "^AUTOMATION_MAAS_API_KEY=.*$"
-    line: "AUTOMATION_MAAS_API_KEY={{ apikey.stdout }}"
+  template:
+    src: templates/{{ item }}.j2
+    dest: /etc/maas/secrets/{{ item }}
     owner: root
     group: docker
     mode: 0440
+  with_items:
+    - automation.env
+    - switchq.env
 
 - name: Custom Automation Compose Configurations
   become: yes
@@ -342,7 +343,28 @@
   with_items:
     - automation-compose.yml
 
-- name: Automation
+- name: Kill Automation Containers
+  become: yes
+  command: docker-compose -f /etc/maas/{{ item }} kill
+  with_items:
+    - automation-compose.yml
+  changed_when: true
+
+- name: Remove Automation Containers
+  become: yes
+  command: docker-compose -f /etc/maas/{{ item }} rm -f
+  with_items:
+    - automation-compose.yml
+  changed_when: true
+
+- name: Pull Latest Automation Images
+  become: yes
+  command: docker-compose -f /etc/maas/{{ item }} pull
+  with_items:
+    - automation-compose.yml
+  changed_when: true
+
+- name: Start Automation
   become: yes
   command: docker-compose -f /etc/maas/{{ item }} up -d
   with_items:
