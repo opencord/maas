@@ -60,7 +60,7 @@
 - name: Ensure Compute and Switch Node Playbooks
   become: yes
   template:
-    src=files/{{ item }}
+    src=templates/{{ item }}
     dest=/etc/maas/ansible/{{ item }}
     owner=maas
     group=maas
@@ -81,7 +81,7 @@
 - name: Ensure Compute and Switch Node Variables
   become: yes
   template:
-    src=files/compute-node-vars.yml.j2
+    src=templates/compute-node-vars.yml.j2
     dest=/etc/maas/ansible/vars/compute-node-vars.yml
     owner=maas
     group=maas
@@ -101,7 +101,7 @@
 - name: Ensure Dynamic Inventory Script
   become: yes
   template:
-    src=files/pod-inventory
+    src=templates/pod-inventory
     dest=/etc/maas/ansible/pod-inventory
     owner=maas
     group=maas
