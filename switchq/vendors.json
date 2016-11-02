@@ -8,5 +8,10 @@
         "prefix" : "70:72:CF",
         "vendor" : "Edgecore Networks Corportation",
         "provision" : true
+    },
+    {
+        "prefix" : "C4:39:3A",
+        "vendor" : "Edgecore Networks Corportation",
+        "provision" : true
     }
 ]
