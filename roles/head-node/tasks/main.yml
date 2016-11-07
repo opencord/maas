@@ -60,7 +60,7 @@
 - name: Ensure Compute and Switch Node Playbooks
   become: yes
   template:
-    src=templates/{{ item }}
+    src={{ item }}.j2
     dest=/etc/maas/ansible/{{ item }}
     owner=maas
     group=maas
