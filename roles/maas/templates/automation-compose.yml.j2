@@ -30,7 +30,7 @@ services:
       - "ALLOCATE_NETWORK={{ networks.fabric }}"
       - "ALLOCATE_RANGE_LOW={{ ranges.fabric.low }}"
       - "ALLOCATE_RANGE_HIGH={{ ranges.fabric.high }}"
-      - "ALLOCATE_LOG_LEVEL=debug"
+      - "ALLOCATE_LOG_LEVEL=warn"
       - "ALLOCATE_LOG_FORMAT=text"
     restart: unless-stopped
 
@@ -56,7 +56,7 @@ services:
       - "PROVISION_SCRIPT=/etc/maas/ansible/do-ansible"
       - "PROVISION_STORAGE_URL=consul://{{ mgmt_ip_address.stdout }}:8500"
       - "PROVISION_NUMBER_OF_WORKERS=1"
-      - "PROVISION_LOG_LEVEL=debug"
+      - "PROVISION_LOG_LEVEL=warn"
       - "PROVISION_LOG_FORMAT=text"
     volumes:
       - "/etc/maas/ansible:/etc/maas/ansible"
@@ -80,7 +80,7 @@ services:
       - "SWITCHQ_PROVISION_TTL=0s"
       - "SWITCHQ_DEFAULT_ROLE=fabric-switch"
       - "SWITCHQ_ADDRESS_URL=file:///switchq/dhcp/dhcp_harvest.inc"
-      - "SWITCHQ_LOG_LEVEL=debug"
+      - "SWITCHQ_LOG_LEVEL=warn"
       - "SWITCHQ_LOG_FORMAT=text"
       - "SWITCHQ_MAAS_URL=http://{{ mgmt_ip_address.stdout }}/MAAS"
     volumes:
@@ -108,7 +108,7 @@ services:
       - "AUTOMATION_POWER_HELPER_HOST={{ virtualbox_host }}"
 {% endif %}
       - "AUTOMATION_LOG_FORMAT=text"
-      - "AUTOMATION_LOG_LEVEL=debug"
+      - "AUTOMATION_LOG_LEVEL=warn"
       - "AUTOMATION_MAAS_API_VERSION=1.0"
       - "AUTOMATION_MAAS_URL=http://{{ mgmt_ip_address.stdout }}/MAAS"
       - "AUTOMATION_QUERY_INTERVAL=30s"
@@ -134,7 +134,7 @@ services:
           - "/etc/bind/maas:/key"
           - "/etc/dhcp:/etc/dhcp"
       environment:
-          - "HARVESTER_LOG_LEVEL=debug"
+          - "HARVESTER_LOG_LEVEL=warn"
           - "HARVESTER_PORT=8954"
           - "HARVESTER_OUTPUT_FILE=/bind/dhcp_harvest.inc"
           - "HARVESTER_VERIFY_LEASES=true"
