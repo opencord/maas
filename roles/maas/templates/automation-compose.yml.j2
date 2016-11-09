@@ -159,9 +159,11 @@ services:
       - "lab.solution=CORD"
       - "lab.component=generator"
     environment:
-      - "CONFIGGEN_PORT=8181"
-      - "CONFIGGEN_IP=onos-fabric"
-      - "CONFIGGEN_CONFIGSERVERPORT=4245"
-      - "CONFIGGEN_CONFIGSERVERIP=0.0.0.0"
+      - "CONFIGGEN_PORT=4245"
+      - "CONFIGGEN_LISTEN=0.0.0.0"
+      - "CONFIGGEN_CONTROLLER=http://%s:%s@onos-fabric:8181"
+      - "CONFIGGEN_USERNAME=karaf"
+      - "CONFIGGEN_PASSWORD=karaf"
+      - "CONFIGGEN_LOG_LEVEL=warn"
     restart: unless-stopped
 
