@@ -31,10 +31,7 @@ WORKDIR /go/
 RUN go install gerrit.opencord.org/maas/config-generator
 
 # copy templates to the image
-COPY hosts.tpl /go/
-COPY links.tpl /go/
-COPY ports.tpl /go/
-COPY devices.tpl /go/
+COPY netconfig.tpl /go/
 
 EXPOSE 1337
 
