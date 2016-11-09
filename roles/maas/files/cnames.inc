@@ -1,3 +1,4 @@
+mongodb                 CNAME mongodb-1
 nagios                  CNAME nagios-1
 openstack-dashboard     CNAME openstack-dashboard-1
 onos-fabric             CNAME onos-fabric-1
