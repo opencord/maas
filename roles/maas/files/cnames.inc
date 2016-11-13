@@ -2,6 +2,7 @@ mongodb                 CNAME mongodb-1
 nagios                  CNAME nagios-1
 openstack-dashboard     CNAME openstack-dashboard-1
 onos-fabric             CNAME onos-fabric-1
+xos                     CNAME xos-1
 juju                    CNAME juju-1
 neutron-api             CNAME neutron-api-1
 rabbitmq-server         CNAME rabbitmq-server-1
