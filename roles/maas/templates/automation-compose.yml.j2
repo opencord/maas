@@ -2,7 +2,7 @@ version: '2'
 
 services:
   storage:
-    image: "docker-registry:5000/consul:{{ docker.image_version }}"
+    image: "docker-registry:5000/consul:{{ docker.tag }}"
     container_name: storage
     labels:
       - "lab.solution=CORD"
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   allocator:
-    image: "docker-registry:5000/cord-ip-allocator:{{ docker.image_version }}"
+    image: "docker-registry:5000/cord-ip-allocator:{{ docker.tag }}"
     container_name: allocator
     ports:
       - "4242:4242"
@@ -35,7 +35,7 @@ services:
     restart: unless-stopped
 
   provisioner:
-    image: "docker-registry:5000/cord-provisioner:{{ docker.image_version }}"
+    image: "docker-registry:5000/cord-provisioner:{{ docker.tag }}"
     container_name: provisioner
     dns: {{ mgmt_ip_address.stdout }}
     ports:
@@ -63,7 +63,7 @@ services:
     restart: unless-stopped
 
   switchq:
-    image: "docker-registry:5000/cord-maas-switchq:{{ docker.image_version }}"
+    image: "docker-registry:5000/cord-maas-switchq:{{ docker.tag }}"
     container_name: switchq
     ports:
       - "4244:4244"
@@ -88,7 +88,7 @@ services:
     restart: unless-stopped
 
   automation:
-    image: "docker-registry:5000/cord-maas-automation:{{ docker.image_version }}"
+    image: "docker-registry:5000/cord-maas-automation:{{ docker.tag }}"
     container_name: automation
     labels:
       - "lab.solution=CORD"
@@ -122,7 +122,7 @@ services:
     restart: unless-stopped
 
   harvester:
-      image: "docker-registry:5000/cord-dhcp-harvester:{{ docker.image_version }}"
+      image: "docker-registry:5000/cord-dhcp-harvester:{{ docker.tag }}"
       container_name: harvester
       restart: always
       labels:
@@ -151,7 +151,7 @@ services:
       restart: unless-stopped
 
   generator:
-    image: "docker-registry:5000/config-generator:{{ docker.image_version }}"
+    image: "docker-registry:5000/config-generator:{{ docker.tag }}"
     container_name: generator
     ports:
       - "4245:4245"
