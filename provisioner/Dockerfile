@@ -44,7 +44,7 @@ RUN apt-get update && \
 	apt-get install -y  software-properties-common && \
 	apt-add-repository ppa:ansible/ansible && \
 	apt-get update -y  -m && \
-	apt-get install -y git ansible
+	apt-get install -y git ansible python-netaddr
 
 RUN mkdir -p /root/.ssh
 COPY ssh-config /root/.ssh/config
