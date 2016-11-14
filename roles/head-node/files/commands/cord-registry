@@ -1,0 +1,94 @@
+#!/bin/bash
+#D Displays information about Docker images in the CORD POD registry
+
+PROG=$(echo $(basename $0) | sed -e 's/^cord-/cord /g')
+
+usage() {
+    echo "usage: $PROG [-r|--registry <registry] <sub-command> [options]"
+    echo "    list    display the Docker images in the registry"
+    echo "    help    this message"
+}
+
+usage_list() {
+    echo "usage $PROG list [--json|-j]"
+    echo "    json    display output as JSON object"
+    echo "    help    this message"
+}
+
+REG=docker-registry:5000
+while [ $# -gt 0 ]; do
+    case $1 in
+      -r|--registry)
+          shift
+          REG=$1
+          ;;
+      -*)
+          echo "Unknown option '$1'"
+          usage
+          exit 1
+          ;;
+      *)
+          break
+          ;;
+    esac
+    shift
+done
+
+COMMAND=$1; shift
+
+case $COMMAND in
+    list)
+        DO_JSON=0
+        while [ $# -gt 0 ]; do
+            case $1 in
+                json|--json|-j)
+                    DO_JSON=1
+                    ;;
+                help|--help|-h)
+                    usage_list
+                    exit 0
+                    ;;
+                *)
+                    >&2 echo "Unknown option '$1'"
+                    usage_list
+                    exit 1
+                    ;;
+            esac
+            shift
+        done
+
+        if [ $DO_JSON -eq 1 ]; then
+            /bin/echo -n '{"registries":['
+            COMMA=
+            for i in $(curl -sSL http://$REG/v2/_catalog | jq '.repositories | .[]' | sed -e 's/"//g'); do
+                /bin/echo -n "$COMMA{\"registry\":\"${REG}/$i\",\"tags\":["
+                C2=
+                for t in $(curl -sSL http://$REG/v2/redis/tags/list | jq '.tags | .[]' | sed -e 's/"//g'); do
+                    echo -n "${C2}\"$t\""
+                    C2=","
+                done
+                /bin/echo -n "]}"
+                COMMA=","
+            done
+            echo -n "]}"
+        else
+            OUT=$(mktemp)
+            echo "REPOSITORY,TAG" > $OUT
+            for i in $(curl -sSL http://$REG/v2/_catalog | jq '.repositories | .[]' | sed -e 's/"//g'); do
+                for t in $(curl -sSL http://$REG/v2/redis/tags/list | jq '.tags | .[]' | sed -e 's/"//g'); do
+                    /bin/echo -e "${REG}/$i,$t" >> $OUT
+                done
+            done
+            cat $OUT | column -s , -t
+            rm -f $OUT
+        fi
+        ;;
+    help)
+        usage
+        exit 0
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac

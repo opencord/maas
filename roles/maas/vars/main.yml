@@ -56,5 +56,4 @@ ranges:
         high: "{{ fabric_range_high | default(fabric_ip | default('10.6.1.0/24')) | ipaddr(-3) | ipaddr('address') }}"
 
 docker:
-    registry: "{{ docker_registry | default('opencord') }}"
-    image_version: "{{ docker_image_version | default('latest') }}"
+    tag: "{{ deploy_docker_tag | default('candidate') }}"
