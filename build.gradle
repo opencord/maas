@@ -53,7 +53,9 @@ ext {
         ? project.getProperty('targetReg')
         : config.docker && config.docker.registry
             ? config.docker.registry
-            : 'localhost:5000'
+            : config.seedServer.ip
+                ? config.seedServer.ip + ":5000"
+                : 'localhost:5000'
 
     // The tag used to tag the docker images push to the target registry
     targetTag = project.hasProperty('targetTag')
