@@ -7,6 +7,7 @@ import sys
 import shlex
 import string
 import ipaddress
+# WANT_JSON
 
 # Regular expressions to identify comments and blank lines
 comment = re.compile("^\s*#")
@@ -55,7 +56,7 @@ def parse_auto(data, current, words, description):
     if len(description) > 0:
         iface["description"] = description
 
-    iface["auto"] = "True"
+    iface["auto"] = True
     data[words[1]] = iface
     return words[1]
 
@@ -75,9 +76,12 @@ def parse_iface(data, current, words, description):
     data[words[1]] = iface
     return words[1]
 
+allow_lists = ["pre-up", "post-up", "pre-down", "post-down"]
+
 # Used to evaluate attributes and add a generic name / value pair to the interface
 # model
 def parse_add_attr(data, current, words, description):
+    global allow_lists
     if current == "":
         raise SyntaxError("Attempt to add attribute '%s' without an interface" % words[0])
 
@@ -89,7 +93,15 @@ def parse_add_attr(data, current, words, description):
     if len(description) > 0:
         iface["description"] = description
 
-    iface[words[0]] = " ".join(words[1:])
+    if words[0] in iface and words[0] in allow_lists:
+        have = iface[words[0]]
+        if type(have) is list:
+            iface[words[0]].append(" ".join(words[1:]))
+        else:
+            iface[words[0]] = [have, " ".join(words[1:])]
+    else:
+        iface[words[0]] = " ".join(words[1:])
+
     data[current] = iface
     return current
 
@@ -103,7 +115,11 @@ def parse_add_attr(data, current, words, description):
 
 # Writes a generic name / value pair indented
 def write_attr(out, name, value):
-    out.write("  %s %s\n" % (name, value))
+    if isinstance(value, list):
+        for line in value:
+            out.write("  %s %s\n" % (name, line))
+    else:
+        out.write("  %s %s\n" % (name, value))
 
 # Writes an interface definition to the output stream
 def write_iface(out, name, iface):
@@ -112,7 +128,7 @@ def write_iface(out, name, iface):
         if len(val) > 0 and val[0] != "#":
             val = "# " + val
         out.write("%s\n" % (val))
-    if "auto" in iface.keys() and iface["auto"] == "True":
+    if "auto" in iface.keys() and iface["auto"]:
         out.write("auto %s\n" % (name))
     out.write("iface %s %s %s\n" % (name, iface["type"], iface["config"]))
     for attr in sorted(iface.keys(), key=lambda x:x in write_sort_order.keys() and write_sort_order[x] or 100):
@@ -157,16 +173,13 @@ args_file = sys.argv[1]
 args_data = file(args_file).read()
 
 # parse the task options
-arguments = shlex.split(args_data)
-for arg in arguments:
-    # ignore any arguments without an equals in it
-    if "=" in arg:
-        (key, value) = arg.split("=")
+arguments = json.loads(args_data)
+for key, value in arguments.iteritems():
     # if setting the time, the key 'time'
     # will contain the value we want to set the time to
 
     # Strip off quotes that ansible sometimes adds
-    value = value.strip("\"\' ")
+    #value = value.strip("\"\' ")
 
     if key == "src":
         src_file = value
@@ -185,7 +198,7 @@ for arg in arguments:
     elif key == "address":
         if string.find(value, "/") != -1:
             parts = value.split('/')
-            addr = ipaddress.ip_network(unicode(value, "UTF-8"), strict=False)
+            addr = ipaddress.ip_network(value, strict=False)
             values["address"] = parts[0]
             values["network"] = addr.network_address.exploded.encode('ascii','ignore')
             values["netmask"] = addr.netmask.exploded.encode('ascii','ignore')
@@ -210,11 +223,15 @@ write_ignore = ["auto", "type", "config", "description"]
 # interface. Any attribute note in this list is sorted by default
 # order after the attributes specified.
 write_sort_order = {
-    "address" :   1,
-    "network" :   2,
-    "netmask" :   3,
-    "broadcast" : 4,
-    "gateway" :   5
+    "address"   :  1,
+    "network"   :  2,
+    "netmask"   :  3,
+    "broadcast" :  4,
+    "gateway"   :  5,
+    "pre-up"    : 10,
+    "post-up"   : 11,
+    "pre-down"  : 12,
+    "post-down" : 13
 }
 
 write_iface_sort_order = {

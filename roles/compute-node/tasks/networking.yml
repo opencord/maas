@@ -220,6 +220,27 @@
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
+- name: Ensure Veth Interface
+  netfile:
+    src: "{{ compute_node.interfaces.file }}"
+    state: present
+    name: veth3
+    config: static
+    auto: true
+    address: 0.0.0.0
+    pre-up:
+      - /sbin/ip link add name veth3 type veth peer name veth2
+      - /sbin/ip link set veth2 up
+      - /sbin/brctl addif mgmtbr veth2
+    pre-down: /sbin/brctl delif mgmtbr veth2
+    post-down: /sbin/ip link del veth2
+    description: "Veth interfaces for VTN app"
+  register: net_changed
+
+- name: Verify Veth Interface Changed
+  set_fact:
+    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
+
 - name: Ensure Management Bridge DHCP
   netfile:
     src: "{{ compute_node.interfaces.file }}"
@@ -227,7 +248,7 @@
     name: mgmtbr
     config: "dhcp"
     auto: true
-    bridge_ports: "mgmtbond"
+    bridge_ports: "mgmtbond veth2"
     description: "Internal POD management bridge"
   register: net_changed
   when: compute_node.addresses.management == "dhcp"
@@ -246,7 +267,7 @@
     address: "{{ compute_node.addresses.management }}"
     gateway: "{{ compute_node.gateway.management }}"
     broadcast: "{{ compute_node.broadcast.management }}"
-    bridge_ports: "mgmtbond"
+    bridge_ports: "mgmtbond veth2"
     description: "Internal POD management bridge"
   register: net_changed
   when: compute_node.addresses.management != "dhcp"
