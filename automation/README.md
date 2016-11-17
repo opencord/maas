@@ -91,20 +91,8 @@ MAAS except the states Provisioning, ProvisionError, and Provisioned. These
 states are used to track the post-deployment provisioning that is part of the
 automation.
 
-Post deployment provisioning can be accomplished either by the specification of
-a script to execute or the specification of a URL to trigger.
-
-#### Executing a Script
-A script to execute to post deploy provision a node can be specified via the
-environment as `PROVISION_URL`. After a node is deployed this script will be
-executed with three (3) parameters:
-- node ID - the node ID that MAAS uses to track the node
-- name - the name of the node in MAAS
-- ip - the IP address assigned to the node
-
-It is important to note that when executing a script that the script is run
-within the docker container that is running the automation. Thus any script
-must be mounted as a volume into the container.
+Post deployment provisioning can be accomplished either by the specification
+of a URL to trigger.
 
 #### Triggering a URL
 Alternatively the automation can trigger a URL to POST deploy provision a node.

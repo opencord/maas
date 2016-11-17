@@ -98,7 +98,7 @@ var Transitions = map[string]map[string][]Action{
 const (
 	// defaultStateMachine Would be nice to drive from a graph language
 	defaultStateMachine string = `
-	(New)->(Commissioning)
+        (New)->(Commissioning)
         (Commissioning)->(FailedCommissioning)
         (FailedCommissioning)->(New)
         (Commissioning)->(Ready)
@@ -118,14 +118,12 @@ const (
         (DiskErasing)->(Ready)
         (Broken)->(Ready)
         (Deployed)->(Provisioning)
-	(Provisioning)->|a|
-	|a|->(Execute Script)->|b|
-	|a|->(HTTP PUT)
-	(HTTP PUT)->(HTTP GET)
-	(HTTP GET)->(HTTP GET)
-	(HTTP GET)->|b|
-	|b|->(Provisioned)
-	|b|->(ProvisionError)
+        (Provisioning)->(HTTP PUT)
+        (HTTP PUT)->(HTTP GET)
+        (HTTP GET)->(HTTP GET)
+        (HTTP GET)->|b|
+        |b|->(Provisioned)
+        |b|->(ProvisionError)
         (ProvisionError)->(Provisioning)`
 )
 
