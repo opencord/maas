@@ -30,7 +30,7 @@ RUN go install gerrit.opencord.org/maas/cord-ip-allocator
 LABEL org.label-schema.name="allocator" \
       org.label-schema.description="Provides IP address allocation for fabric interfaces" \
       org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
-      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
 ENTRYPOINT ["/go/bin/cord-ip-allocator"]

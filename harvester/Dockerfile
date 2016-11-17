@@ -28,7 +28,7 @@ RUN go install gerrit.opencord.com/maas/harvester
 LABEL org.label-schema.name="harvester" \
       org.label-schema.description="Provides DHCP havesting and insertion into DNS" \
       org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
-      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
 ENTRYPOINT ["/go/bin/harvester"]

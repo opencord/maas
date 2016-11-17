@@ -31,7 +31,7 @@ RUN go install gerrit.opencord.com/maas/switchq
 LABEL org.label-schema.name="switchq" \
       org.label-schema.description="Provides fabric switch discovery and provisioning" \
       org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
-      org.label-schema.vendor="Open Networking Labratory" \
+      org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
 ENTRYPOINT ["/go/bin/switchq"]
