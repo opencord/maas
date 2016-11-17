@@ -16,6 +16,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/url"
 	"os/exec"
 	"regexp"
@@ -190,6 +191,25 @@ var Provision = func(client *maas.MAASObject, node MaasNode, options ProcessingO
 		ip := ""
 		if len(ips) > 0 {
 			ip = ips[0]
+		} else {
+			// An IP is required by the provisioner, so if we don't have one then attempt
+			// to resolve the name
+			log.Debugf("MAAS did not return the IP address of host '%s', attempting to resolve independently",
+				node.Hostname())
+			addrs, err := net.LookupHost(node.Hostname())
+			if err != nil || len(addrs) == 0 {
+				log.Errorf("Unable to determine IP address of '%s', thus unable to provision node '%s'",
+					node.Hostname(), node.ID())
+				if err == nil {
+					err = fmt.Errorf("Unable to determine IP address of host '%s'", node.Hostname)
+				} else {
+					err = fmt.Errorf("Unable to determine IP address of host '%s' : %s",
+						node.Hostname, err)
+				}
+				return err
+			}
+			ip = addrs[0]
+			log.Debugf("Resolved hostname '%s' to IP address '%s'", node.Hostname(), ip)
 		}
 		macs := node.MACs()
 		mac := ""
