@@ -29,11 +29,16 @@ blank = re.compile("^\s*$")
 # the highest priority of change is returned, i.e. if there is both
 # a semantic and non-semantic change a 1 is returned indicating a
 # semantic change.
+def value_equal(left, right):
+    if type(left) == type(right):
+        return left == right
+    return str(left) == str(right)
+
 def compare(have, want):
     result = 0
     for key in list(set().union(have.keys(), want.keys())):
         if key in have.keys() and key in want.keys():
-            if have[key] != want[key]:
+            if not value_equal(have[key], want[key]):
                 if key in ["description"]:
                     result = -1
                 else:
