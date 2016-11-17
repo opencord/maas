@@ -180,12 +180,6 @@ args_data = file(args_file).read()
 # parse the task options
 arguments = json.loads(args_data)
 for key, value in arguments.iteritems():
-    # if setting the time, the key 'time'
-    # will contain the value we want to set the time to
-
-    # Strip off quotes that ansible sometimes adds
-    #value = value.strip("\"\' ")
-
     if key == "src":
         src_file = value
     elif key == "dest":
@@ -212,6 +206,17 @@ for key, value in arguments.iteritems():
             values["address"] = value
     elif key[0] != '_':
         values[key] = value
+
+# If name is not set we need to error out
+if name == "":
+    result = {
+        "changed": False,
+	"failed": True,
+        "msg": "Name is a mansitory parameter",
+    }
+    print json.dumps(result)
+    sys.stdout.flush()
+    exit(1)
 
 # If no destination file was specified, write it back to the same file
 if not dest_file:
@@ -298,7 +303,6 @@ elif state == "present":
         result["change_type"] = change_type
         if change_type != 0:
             ifaces[name] = values
-            result["desc"] = ifaces[name]["description"]
             if merge_comments and "description" in have.keys() and len(have["description"]) > 0:
                 result["merge_comments"] = True
                 if "description" in values.keys() and len(values["description"]) > 0:
