@@ -42,12 +42,12 @@ case $COMMAND in
         done
         if [ $DO_JSON -eq 1 ]; then
             if [ $DO_MAP -eq 1 ]; then
-                curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq -c -M 'def STATUS: ["Unknown","Processing","Complete","Error"]; [ .[] | . | .status|=STATUS[.] ]'
+                curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq -c -M 'def STATUS: ["Pending","Processing","Complete","Error"]; [ .[] | . | .status|=STATUS[.] ]'
             else
                 curl -sSL http://$CORD_HEAD_NODE:4243/provision/
             fi
         else
-            for LINE in "ID,NAME,MAC,IP,STATUS,MESSAGE" $(curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq 'def STATUS: ["Unknown","Processing","Complete","Error"]; .[] | . | .status|=STATUS[.] | .request.Info.id+","+.request.Info.name+","+.request.Info.mac+","+.request.Info.ip+","+.status+","+.message' | sed -e 's/ /__SPACE__/g'); do
+            for LINE in "ID,NAME,MAC,IP,STATUS,MESSAGE" $(curl -sSL http://$CORD_HEAD_NODE:4243/provision/ | jq 'def STATUS: ["Pending","Processing","Complete","Error"]; .[] | . | .status|=STATUS[.] | .request.Info.id+","+.request.Info.name+","+.request.Info.mac+","+.request.Info.ip+","+.status+","+.message' | sed -e 's/ /__SPACE__/g'); do
                 echo $LINE | sed -e 's/__SPACE__/ /g' -e 's/^"//;s/"$//'
             done | column -s , -t
         fi
@@ -72,7 +72,7 @@ case $COMMAND in
                     ;;
                 *)
                     ID="$ID $1"
-                    ;;     
+                    ;;
             esac
             shift
         done
@@ -80,7 +80,7 @@ case $COMMAND in
             if [ $DO_MAP -eq 1 ]; then
                 echo -n "["
                 for i in $ID; do
-                    curl -sSL http://$CORD_HEAD_NODE:4243/provision/$i | jq -c -M 'def STATUS: ["Unknown","Processing","Complete","Error"]; . | .status|=STATUS[.]'
+                    curl -sSL http://$CORD_HEAD_NODE:4243/provision/$i | jq -c -M 'def STATUS: ["Pending","Processing","Complete","Error"]; . | .status|=STATUS[.]'
                 done  | awk -vORS=, '{ print }' | sed 's/,$//'
                 echo -n "]"
             else
@@ -99,7 +99,7 @@ case $COMMAND in
                   if [ $? -ne 0 ]; then
                       echo "$i, , , ,Not Found"
                   else
-                        echo "$VALUE" | jq 'def STATUS: ["Unknown","Processing","Complete","Error"]; . | .status|=STATUS[.] | .request.Info.id+","+.request.Info.name+","+.request.Info.mac+","+.request.Info.ip+","+.status+","+.message'| sed -e 's/^"//;s/"$//'
+                        echo "$VALUE" | jq 'def STATUS: ["Pending","Processing","Complete","Error"]; . | .status|=STATUS[.] | .request.Info.id+","+.request.Info.name+","+.request.Info.mac+","+.request.Info.ip+","+.status+","+.message'| sed -e 's/^"//;s/"$//'
                   fi
                 fi
             done | column -s , -t
