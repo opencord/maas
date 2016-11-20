@@ -125,7 +125,7 @@
   changed_when: False
 
 - name: Verify Intel 40Gb NIC
-  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c "XL710 for 40GbE QSFP+" || true
+  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c -E "XL710 for 40GbE QSFP+|X710 for 10GbE SFP+" || true
   register: intel_nic_present
   changed_when: False
 
