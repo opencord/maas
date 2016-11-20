@@ -129,6 +129,11 @@
   register: intel_nic_present
   changed_when: False
 
+- name: Verify Intel 10Gbx4 NIC(X710)
+  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c "X710 for 10GbE SFP+" || true
+  register: intel_nic_present
+  changed_when: False
+
 - name: Verify i40e Driver
   command: modinfo --field=version i40e
   register: i40e_version
