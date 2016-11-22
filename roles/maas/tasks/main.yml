@@ -15,7 +15,7 @@
   changed_when: false
 
 - name: Verify Management Bridge
-  fail: msg="The head node must have a network bridge named 'mgmtbr' to continue the deployment. Please see docuemataiton at 'http://github.com/opencord/cord`."
+  fail: msg="The head node must have a network bridge named 'mgmtbr' to continue the deployment. Please see docuemataiton at 'http://github.com/opencord/cord'."
   when: have_mgmtbr.rc != 0
 
 - name: Install Prerequisites
