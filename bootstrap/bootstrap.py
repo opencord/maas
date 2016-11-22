@@ -16,7 +16,7 @@ def put(client, url, params=None):
                             auth=client._oauth(),
                             data=params)
 
-def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet):
+def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet, low, high):
     ip = ipaddress.IPv4Network(unicode(subnet, 'utf-8'))
     hosts = list(ip.hosts())
 
@@ -24,8 +24,8 @@ def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet
     gw = gw or str(hosts[0])
 
     ifc = {
-        'ip_range_high': str(hosts[-1]),
-        'ip_range_low': str(hosts[2]),
+        'ip_range_low': low if low != "" else str(hosts[2]),
+        'ip_range_high': high if high != "" else str(hosts[-1]),
 	'static_ip_range_high' : None,
 	'static_ip_range_low' : None,
         'management': 2,
@@ -140,6 +140,10 @@ def main():
         help="the interface on which to set up DHCP for POD local hosts")
     parser.add_option('-n', '--network', dest='network', default='10.0.0.0/16',
         help="subnet to use for POD local DHCP")
+    parser.add_option('-l', '--network-low', dest='network_low', default='',
+        help="low address in network to lease via DHCP")
+    parser.add_option('-H', '--network-high', dest='network_high', default='',
+	help="high address in network to lease via DHCP")
     parser.add_option('-b', '--bridge', dest='bridge', default='mgmtbr',
         help="bridge to use for host local VM allocation")
     parser.add_option('-t', '--bridge-subnet', dest='bridge_subnet', default='172.18.0.0/16',
@@ -179,6 +183,10 @@ def main():
         config['interface'] = options.interface
     if options.network != None:
         config['network'] = options.network
+    if options.network_low != None:
+        config['network_low'] = options.network_low
+    if options.network_high != None:
+        config['network_high'] = options.network_high
     if options.bridge != None:
         config['bridge'] = options.bridge
     if options.bridge_subnet != None:
@@ -289,7 +297,8 @@ def main():
         localIfc = ifc if ifc['name'] == config['interface'] else localIfc
         hostIfc = ifc if ifc['name'] == config['bridge'] else hostIfc
 
-    add_or_update_node_group_interface(client, ng, config['gw'], localIfc, config['interface'], config['network'])
+    add_or_update_node_group_interface(client, ng, config['gw'], localIfc, config['interface'], config['network'],
+	 config['network_low'], config['network_high'])
     #add_or_update_node_group_interface(client, ng, config['gw'], hostIfc, config['bridge'], config['bridge-subnet'])
 
     # Update the server settings to upstream DNS request to Google
