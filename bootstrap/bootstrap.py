@@ -16,7 +16,7 @@ def put(client, url, params=None):
                             auth=client._oauth(),
                             data=params)
 
-def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet):
+def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet, low, high):
     ip = ipaddress.IPv4Network(unicode(subnet, 'utf-8'))
     hosts = list(ip.hosts())
 
@@ -24,10 +24,10 @@ def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet
     gw = gw or str(hosts[0])
 
     ifc = {
-        'ip_range_high': str(hosts[-1]),
-        'ip_range_low': str(hosts[2]),
-	'static_ip_range_high' : None,
-	'static_ip_range_low' : None,
+        'ip_range_low': low if low != "" else str(hosts[2]),
+        'ip_range_high': high if high != "" else str(hosts[-1]),
+        'static_ip_range_high' : None,
+        'static_ip_range_low' : None,
         'management': 2,
         'name': ifcName,
         #'router_ip' : gw,
@@ -41,46 +41,46 @@ def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet
     if foundIfc is not None:
         print("INFO: network for specified interface, '%s', already exists" % (ifcName))
 
-	resp = client.get('/nodegroups/' + ng['uuid'] + '/interfaces/' + ifcName + '/', dict())
-	if int(resp.status_code / 100) != 2:
-	    print("ERROR: unable to read specified interface, '%s', '%d : %s'"
-	          % (ifcName, resp.status_code, resp.text), file=sys.stderr)
-	    sys.exit(1)
+        resp = client.get('/nodegroups/' + ng['uuid'] + '/interfaces/' + ifcName + '/', dict())
+        if int(resp.status_code / 100) != 2:
+            print("ERROR: unable to read specified interface, '%s', '%d : %s'"
+                  % (ifcName, resp.status_code, resp.text), file=sys.stderr)
+            sys.exit(1)
 
-	# A bit of a hack here. Turns out MAAS won't return the router_ip / gateway_ip value
-	# so we can't really tell if that value is set correctly. So we will compare the
-	# values we can and use that as the "CHANGED" value, but always set all values.
+        # A bit of a hack here. Turns out MAAS won't return the router_ip / gateway_ip value
+        # so we can't really tell if that value is set correctly. So we will compare the
+        # values we can and use that as the "CHANGED" value, but always set all values.
 
-	# Save the compare value
-	same = ifc == json.loads(resp.text)
+        # Save the compare value
+        same = ifc == json.loads(resp.text)
 
-	# Add router_ip and gateway_ip to the desired state so that those will be set
-	ifc['router_ip'] = gw
-	ifc['gateway_ip'] = gw
+        # Add router_ip and gateway_ip to the desired state so that those will be set
+        ifc['router_ip'] = gw
+        ifc['gateway_ip'] = gw
 
         # If the network already exists, update it with the information we want
         resp = put(client, '/nodegroups/' + ng['uuid'] + '/interfaces/' + ifcName + '/', ifc)
         if int(resp.status_code / 100) != 2:
             print("ERROR: unable to update specified network, '%s', on specified interface '%s', '%d : %s'"
                    % (subnet, ifcName, resp.status_code, resp.text), file=sys.stderr)
-	    sys.exit(1)
+            sys.exit(1)
 
         if not same:
             print("CHANGED: updated network, '%s', for interface '%s'" % (subnet, ifcName))
-	else:
+        else:
             print("INFO: Network settings for interface '%s' unchanged" % ifcName)
 
     else:
         # Add the operation
         ifc['op'] = 'new'
-	ifc['router_ip'] = gw
+        ifc['router_ip'] = gw
         ifc['gateway_ip'] = gw
 
         resp = client.post('/nodegroups/' + ng['uuid'] + '/interfaces/', ifc)
         if int(resp.status_code / 100) != 2:
             print("ERROR: unable to create specified network, '%s', on specified interface '%s', '%d : %s'"
                 % (subnet, ifcName, resp.status_code, resp.text), file=sys.stderr)
-	    sys.exit(1)
+            sys.exit(1)
         else:
             print("CHANGED: created network, '%s', for interface '%s'" % (subnet, ifcName))
 
@@ -89,7 +89,7 @@ def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet
     resp = client.get('/subnets/', dict())
     if int(resp.status_code / 100) != 2:
         print("ERROR: unable to query subnets: '%d : %s'" % (resp.status_code, resp.text))
-	sys.exit(1)
+        sys.exit(1)
     else:
         subnets = json.loads(resp.text)
 
@@ -101,30 +101,30 @@ def add_or_update_node_group_interface(client, ng, gw, foundIfc, ifcName, subnet
 
     if id == None:
         print("ERROR: unable to find subnet entry for network '%s'" % (subnet))
-	sys.exit(1)
+        sys.exit(1)
 
     resp = client.get('/subnets/' + id + '/')
     if int(resp.status_code / 100) != 2:
         print("ERROR: unable to query subnet '%s': '%d : %s'" % (subnet, resp.status_code, resp.text))
-	sys.exit(1)
+        sys.exit(1)
 
     data = json.loads(resp.text)
 
     found = False
     for ns in data['dns_servers']:
         if unicode(ns) == unicode(hosts[0]):
-	    found = True
+            found = True
 
     if not found:
         resp = put(client, '/subnets/' + id + '/', dict(dns_servers=[hosts[0]]))
-	if int(resp.status_code / 100) != 2:
+        if int(resp.status_code / 100) != 2:
             print("ERROR: unable to query subnet '%s': '%d : %s'" % (subnet, resp.status_code, resp.text))
-	    sys.exit(1)
-	else:
-	    print("CHANGED: updated DNS server information")
+            sys.exit(1)
+        else:
+            print("CHANGED: updated DNS server information")
     else:
         print("INFO: DNS already set correctly")
-    
+
 
 def main():
     parser = OptionParser()
@@ -140,6 +140,10 @@ def main():
         help="the interface on which to set up DHCP for POD local hosts")
     parser.add_option('-n', '--network', dest='network', default='10.0.0.0/16',
         help="subnet to use for POD local DHCP")
+    parser.add_option('-l', '--network-low', dest='network_low', default='',
+        help="low address in network to lease via DHCP")
+    parser.add_option('-H', '--network-high', dest='network_high', default='',
+        help="high address in network to lease via DHCP")
     parser.add_option('-b', '--bridge', dest='bridge', default='mgmtbr',
         help="bridge to use for host local VM allocation")
     parser.add_option('-t', '--bridge-subnet', dest='bridge_subnet', default='172.18.0.0/16',
@@ -179,6 +183,10 @@ def main():
         config['interface'] = options.interface
     if options.network != None:
         config['network'] = options.network
+    if options.network_low != None:
+        config['network_low'] = options.network_low
+    if options.network_high != None:
+        config['network_high'] = options.network_high
     if options.bridge != None:
         config['bridge'] = options.bridge
     if options.bridge_subnet != None:
@@ -196,21 +204,21 @@ def main():
         sys.exit(1)
     else:
         config['sshkey'] = options.sshkey
-    
+
     auth = MaasAuth(config['url'], config['key'])
     client = MaasClient(auth)
 
     resp = client.get('/account/prefs/sshkeys/', dict(op='list'))
     if int(resp.status_code / 100) != 2:
         print("ERROR: unable to query SSH keys from server '%d : %s'"
-	        % (resp.status_code, resp.text), file=sys.stderr)
-	sys.exit(1)
+                % (resp.status_code, resp.text), file=sys.stderr)
+        sys.exit(1)
 
     found_key = False
     keys = json.loads(resp.text)
     for key in keys:
-	if key['key'] == config['sshkey']:
-	    print("INFO: specified SSH key already exists")
+        if key['key'] == config['sshkey']:
+            print("INFO: specified SSH key already exists")
             found_key = True
 
     # Add the SSH key to the user
@@ -221,9 +229,9 @@ def main():
             print("ERROR: unable to add sshkey for user: '%d : %s'"
                     % (resp.status_code, resp.text), file=sys.stderr)
             sys.exit(1)
-	else:
-	    print("CHANGED: updated ssh key")
-    
+        else:
+            print("CHANGED: updated ssh key")
+
     # Check to see if an "administrative" zone exists and if not
     # create one
     found = None
@@ -231,7 +239,7 @@ def main():
     for zone in zones:
         if zone['name'] == config['zone']:
             found=zone
-    
+
     if found is not None:
         print("INFO: administrative zone, '%s', already exists" % config['zone'], file=sys.stderr)
     else:
@@ -240,7 +248,7 @@ def main():
             sys.exit(1)
         else:
             print("CHANGED: Zone '%s' created" % config['zone'])
-    
+
     # If the interface doesn't already exist in the cluster then
     # create it. Look for the "Cluster Master" node group, but
     # if it is not found used the first one in the list, if the
@@ -251,7 +259,7 @@ def main():
         if ng['cluster_name'] == config['cluster']:
             found = ng
             break
-    
+
     if found is None:
         print("ERROR: unable to find cluster with specified name, '%s'" % config['cluster'], file=sys.stderr)
         sys.exit(1)
@@ -259,23 +267,23 @@ def main():
     resp = client.get('/nodegroups/' + ng['uuid'] + '/', dict())
     if int(resp.status_code / 100) != 2:
         print("ERROR: unable to get node group information for cluster '%s': '%d : %s'"
-	    % (config['cluster'], resp.status_code, resp.text), file=sys.stderr)
-	sys.exit(1)
+            % (config['cluster'], resp.status_code, resp.text), file=sys.stderr)
+        sys.exit(1)
 
     data = json.loads(resp.text)
-    
+
     # Set the DNS domain name (zone) for the cluster
     if data['name'] != config['domain']:
         resp = put(client, '/nodegroups/' + ng['uuid'] + '/', dict(name=config['domain']))
         if int(resp.status_code / 100) != 2:
             print("ERROR: unable to set the DNS domain name for the cluster with specified name, '%s': '%d : %s'"
                 % (config['cluster'], resp.status_code, resp.text), file=sys.stderr)
-	    sys.exit(1)
+            sys.exit(1)
         else:
             print("CHANGE: updated name of cluster to '%s' : %s" % (config['domain'], resp))
     else:
         print("INFO: domain name already set")
-    
+
     found = None
     resp = client.get('/nodegroups/' + ng['uuid'] + '/interfaces/', dict(op='list'))
     if int(resp.status_code / 100) != 2:
@@ -284,12 +292,13 @@ def main():
         sys.exit(1)
     ifcs = json.loads(resp.text)
 
-    localIfc = hostIfc = None 
+    localIfc = hostIfc = None
     for ifc in ifcs:
         localIfc = ifc if ifc['name'] == config['interface'] else localIfc
         hostIfc = ifc if ifc['name'] == config['bridge'] else hostIfc
 
-    add_or_update_node_group_interface(client, ng, config['gw'], localIfc, config['interface'], config['network'])
+    add_or_update_node_group_interface(client, ng, config['gw'], localIfc, config['interface'], config['network'],
+         config['network_low'], config['network_high'])
     #add_or_update_node_group_interface(client, ng, config['gw'], hostIfc, config['bridge'], config['bridge-subnet'])
 
     # Update the server settings to upstream DNS request to Google
@@ -298,7 +307,7 @@ def main():
     if int(resp.status_code / 100) != 2:
         print("ERROR: unable to get the upstream DNS servers: '%d : %s'"
               % (resp.status_code, resp.text), file=sys.stderr)
-	sys.exit(1)
+        sys.exit(1)
 
     if unicode(json.loads(resp.text)) != u'8.8.8.8 8.8.8.4':
         resp = client.post('/maas/', dict(op='set_config', name='upstream_dns', value='8.8.8.8 8.8.8.4'))
@@ -314,27 +323,27 @@ def main():
     resp = client.get('/boot-resources/', None)
     if int(resp.status_code / 100) != 2:
         print("ERROR: unable to read existing images download: '%d : %s'" % (resp.status_code, resp.text), file=sys.stderr)
-	sys.exit(1)
+        sys.exit(1)
 
     imgs = json.loads(resp.text)
     found = False
     for img in imgs:
-	if img['name'] == u'ubuntu/trusty' and img['architecture'] == u'amd64/hwe-t':
-	    found = True
+        if img['name'] == u'ubuntu/trusty' and img['architecture'] == u'amd64/hwe-t':
+            found = True
 
     if not found:
         resp = client.post('/boot-resources/', dict(op='import'))
         if int(resp.status_code / 100) != 2:
             print("ERROR: unable to start image download: '%d : %s'" % (resp.status_code, resp.text), file=sys.stderr)
-	    sys.exit(1)
+            sys.exit(1)
         else:
             print("CHANGED: Image download started")
     else:
-	print("INFO: required images already available")
-    
+        print("INFO: required images already available")
+
 if __name__ == '__main__':
     #try:
         main()
     #except:
-#	e = sys.exc_info()[0]
-#	print("ERROR: Unexpected exception: '%s'" % e, file=sys.stderr)
+#        e = sys.exc_info()[0]
+#        print("ERROR: Unexpected exception: '%s'" % e, file=sys.stderr)
