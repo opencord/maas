@@ -182,9 +182,15 @@
   tags:
     - maas_restart
 
+- name: Ensure latest bootstrap image
+  become: yes
+  docker_image:
+    name: docker-registry:5000/cord-maas-bootstrap:{{ docker.tag }}
+    pull: yes
+
 - name: Configure MAAS
   become: yes
-  command: docker run docker-registry:5000/cord-maas-bootstrap:{{ docker.tag }} --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}'
+  command: docker run docker-registry:5000/cord-maas-bootstrap:{{ docker.tag }} --apikey='{{apikey.stdout}}' --sshkey='{{maas.user_sshkey}}' --url='http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0' --network='{{networks.management}}' --network-low='{{ranges.management.low}}' --network-high='{{ranges.management.high}}' --interface='{{interfaces.management}}' --zone='administrative' --cluster='Cluster master' --domain='{{maas.domain}}'
   register: maas_config_result
   changed_when: maas_config_result.stdout.find("CHANGED") != -1
   failed_when: "maas_config_result.rc != 0 or 'ERROR' in maas_config_result.stdout"

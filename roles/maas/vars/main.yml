@@ -54,6 +54,9 @@ ranges:
     fabric:
         low: "{{ fabric_range_low | default(fabric_ip | default('10.6.1.0/24')) | ipaddr(2) | ipaddr('address') }}"
         high: "{{ fabric_range_high | default(fabric_ip | default('10.6.1.0/24')) | ipaddr(-3) | ipaddr('address') }}"
+    management:
+        low: "{{ management_range_low | default(management_ip | default('10.6.0.0/24')) | ipaddr(2) | ipaddr('address') }}"
+        high: "{{ management_range_high | default(management_ip | default('10.6.0.0/24')) | ipaddr(-3) | ipaddr('address') }}"
 
 docker:
     tag: "{{ deploy_docker_tag | default('candidate') }}"
