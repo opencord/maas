@@ -1,14 +1,14 @@
 # SSH Key access from the current machine to the target node is required for the
 # synchronize action to work.
 - name: Ensure User SSH Keys
-  local_action: user name='{{ansible_user_id}}' generate_ssh_key=yes ssh_key_bits=2048
+  local_action: user name='{{ansible_user}}' generate_ssh_key=yes ssh_key_bits=2048
   tags:
     - establish_ssh_keys
 
 - name: Ensure Key Authorized on Target Head Node
   authorized_key:
-    user: "{{ ansible_user }}"
-    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    user: '{{ansible_ssh_user}}'
+    key: "{{lookup('file', '~/.ssh/id_rsa.pub')}}"
   tags:
     - establish_ssh_keys
 
