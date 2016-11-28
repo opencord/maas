@@ -58,6 +58,8 @@ cat <<EOT >> $OUT
 \$INCLUDE "/etc/bind/maas/dhcp_harvest.inc"
 $HOSTNAME IN A $LHOST
 xos CNAME $HOSTNAME
+onos-cord CNAME $HOSTNAME
+onos-fabric CNAME $HOSTNAME
 docker-registry CNAME $HOSTNAME
 apt-cache CNAME $HOSTNAME
 mavenrepo CNAME $HOSTNAME
