@@ -16,6 +16,24 @@
       "revId": "89624c5f33cc208ff4dbaa48610dc5775fa95897",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a014df3_ac41380d",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000030
+      },
+      "writtenOn": "2016-11-29T17:21:41Z",
+      "side": 1,
+      "message": "Agree, I didn\u0027t notice that.\nI have modified the grep with -E in new patch so that can match 40G and 10G at the same time.",
+      "parentUuid": "1a014df3_acca589f",
+      "revId": "89624c5f33cc208ff4dbaa48610dc5775fa95897",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
