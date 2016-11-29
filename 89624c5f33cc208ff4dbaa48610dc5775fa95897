@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a014df3_acca589f",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-11-29T16:49:39Z",
+      "side": 1,
+      "message": "If the compute node has 40Gb interfaces but not 10Gb interfaces, I think this will fail because after setting intel_nic_present for the 40b interfaces this task will set it to 0.\n\nI would think the proper solution would be to modify the `grep` so that it matches both the 40G and 10G case or use multiple variables and \"or\" them for the case to install the intel NIC.",
+      "revId": "89624c5f33cc208ff4dbaa48610dc5775fa95897",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
