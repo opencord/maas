@@ -5,7 +5,7 @@
     state=directory
     owner={{ ansible_user }}
     group={{ ansible_user }}
-    mode=0755
+    mode="0755"
 
 - name: Copy Utility Commands
   copy:
@@ -13,7 +13,7 @@
     dest=/home/{{ ansible_user }}/bin
     owner={{ ansible_user }}
     group={{ ansible_user }}
-    mode=0755
+    mode="0755"
   with_items:
     - minify
     - onos-cfg-get
@@ -41,4 +41,4 @@
     dest=/home/{{ ansible_user }}/fabric-network.config.json
     owner={{ ansible_user }}
     group={{ ansible_user }}
-    mode=0644
+    mode="0644"

@@ -1,1 +1,1 @@
-pub_ssh_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
+pub_ssh_key: "{{ lookup('file', '/etc/maas/.ssh/cord_rsa.pub') }}"

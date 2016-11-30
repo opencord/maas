@@ -60,6 +60,7 @@ services:
       - "PROVISION_LOG_FORMAT=text"
     volumes:
       - "/etc/maas/ansible:/etc/maas/ansible"
+      - "/etc/maas/.ssh:/etc/maas/.ssh"
     restart: unless-stopped
 
   switchq:

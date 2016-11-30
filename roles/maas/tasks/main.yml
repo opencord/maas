@@ -74,7 +74,7 @@
     path: /etc/maas
     owner: maas
     group: maas
-    mode: 0755
+    mode: "0755"
     state: directory
 
 - name: MAAS Automation Storage
@@ -83,7 +83,7 @@
     path: /etc/maas/automation/storage
     owner: maas
     group: maas
-    mode: 0777
+    mode: "0777"
     state: directory
 
 - name: Host Name Mapping File
@@ -93,7 +93,7 @@
     dest: /etc/maas/mappings.json
     owner: maas
     group: maas
-    mode: 0644
+    mode: "0644"
 
 - name: Verify MAAS admin User
   become: yes
@@ -103,7 +103,7 @@
 
 - name: MAAS admin User
   become: yes
-  command: maas-region-admin createadmin --username=admin --password=admin --email={{ maas.admin_email }}
+  command: maas-region-admin createadmin --username=admin --password={{ maas.admin_password }} --email={{ maas.admin_email }}
   when: maas_admin_user_exists.stdout == '0'
 
 - name: Verify MAAS User
@@ -140,7 +140,7 @@
     dest: /etc/network/if-pre-up.d/nat
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Ensure Masquerading (NAT)
   become: yes
@@ -202,7 +202,7 @@
     dest: "{{ item.dest }}"
     owner: maas
     group: maas
-    mode: 0644
+    mode: "0644"
   with_items:
     - { src: 'dhcpd.blacklist', dest: '/etc/dhcp' }
     - { src: 'dhcpd.reservations', dest: '/etc/dhcp' }
@@ -291,7 +291,7 @@
     path: /etc/maas/ansible/id_rsa
     owner: root
     group: root
-    mode: 0400
+    mode: "0400"
 
 - name: Initialize Interface Configuration Fact
   set_fact:
@@ -324,7 +324,7 @@
     state: directory
     owner: root
     group: docker
-    mode: 0755
+    mode: "0755"
 
 - name: Ensure Automation Container Secrets
   become: yes
@@ -333,7 +333,7 @@
     dest: /etc/maas/secrets/{{ item }}
     owner: root
     group: docker
-    mode: 0440
+    mode: "0440"
   with_items:
     - automation.env
     - switchq.env
@@ -345,7 +345,7 @@
     dest: /etc/maas/{{ item }}
     owner: maas
     group: maas
-    mode: 0644
+    mode: "0644"
   with_items:
     - automation-compose.yml
 

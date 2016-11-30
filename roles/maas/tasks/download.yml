@@ -33,6 +33,6 @@
     path: "/var/www/html/{{ item.dest }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   tags:
     - switch_support

@@ -12,7 +12,7 @@
     dest: /etc/maas/templates/power/amt.template
     owner: maas
     group: maas
-    mode: 0755
+    mode: "0755"
 
 - name: Ensure SSH Discovery Directory
   become: yes
@@ -21,16 +21,16 @@
     state: directory
     owner: maas
     group: maas
-    mode: 0755
+    mode: "0755"
 
 - name: VirtualBox Power Discovery Support
   become: yes
   copy:
-    src: files/cord_id_rsa
+    src: /etc/maas/.ssh/cord_rsa
     dest: /etc/maas/virtualbox/id_rsa
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
 
 - name: VirtualBox Power Discovery Script
   become: yes
@@ -39,7 +39,7 @@
     dest: /etc/maas/virtualbox/power_discovery
     owner: maas
     group: maas
-    mode: 0755
+    mode: "0755"
 
 - name: Ensure SSH Power Script Directory
   become: yes
@@ -48,19 +48,29 @@
     state: directory
     owner: maas
     group: maas
-    mode: 0700
+    mode: "0700"
 
-- name: VirtualBox Power Script Support
+- name: VirtualBox Power Script Key Pair Support
   become: yes
   copy:
-    src: files/{{ item.src }}
+    src: /etc/maas/.ssh/{{ item.src }}
     dest: /var/lib/maas/.ssh/{{ item.dest }}
     owner: maas
     group: maas
-    mode: 0600
+    mode: "0600"
   with_items:
-    - { src: cord_id_rsa, dest: id_rsa }
-    - { src: cord_id_rsa.pub, dest: id_rsa.pub }
+    - { src: cord_rsa, dest: id_rsa }
+    - { src: cord_rsa.pub, dest: id_rsa.pub }
+
+- name: VirtualBox Power Script SSH Config Support
+  become: yes
+  copy:
+    src: "files/{{ item.src }}"
+    dest: /var/lib/maas/.ssh/{{ item.dest }}
+    owner: maas
+    group: maas
+    mode: "0600"
+  with_items:
     - { src: ssh_config, dest: config }
 
 - name: Discover VirtualBox Host

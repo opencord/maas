@@ -1,6 +1,7 @@
-pub_ssh_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
+pub_ssh_key: "{{ lookup('file', '/etc/maas/.ssh/cord_rsa.pub') }}"
 
 compute_node:
+    password: "{{password_compute_node | default(lookup('password', 'passwords/compute_node.txt'))}}"
     fabric:
         include:
             names: "{{ fabric_include_names | default(omit) }}"

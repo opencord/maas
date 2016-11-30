@@ -30,7 +30,7 @@
     dest=/etc/default/docker
     state=present
     insertafter='#DOCKER_OPTS'
-    line='DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock"'
+    line='DOCKER_OPTS="-H unix:///var/run/docker.sock"'
   register: docker_config
 
 - name: Docker Restart
@@ -54,4 +54,4 @@
     dest=/usr/local/bin/docker-compose
     owner=root
     group=root
-    mode=0755
+    mode="0755"

@@ -1,4 +1,16 @@
-# Compiled Object files, Static and Dynamic libs (Shared Objects)
+# Ignore the generated password storage area
+passwords
+
+# Ignore Ansible retry files
+*.retry
+
+# Ignore vim swap files
+*.swp
+
+# Ignore Gradle build files
+.gradle
+
+## Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a
 *.so

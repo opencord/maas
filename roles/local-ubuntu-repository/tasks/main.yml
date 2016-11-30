@@ -7,7 +7,7 @@
     src: sources.list.j2
     group: root
     owner: root
-    mode: 0644
+    mode: "0644"
   when: ubuntu_apt_repo is defined
 
 - name: Capture Existing Respositories

@@ -5,7 +5,7 @@
     line: 127.0.0.1 docker-registry
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Directories are present
   become: yes
@@ -31,7 +31,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Local Docker Registry
   become: yes
@@ -40,7 +40,7 @@
     dest: /etc/maas/{{ item }}
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   with_items:
     - registry-compose.yml
   tags: [registry]
