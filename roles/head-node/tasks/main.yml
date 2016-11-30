@@ -19,7 +19,7 @@
     owner=maas
     group=maas
     state=directory
-    mode=0755
+    mode="0755"
 
 - name: Ensure Ansible Roles
   become: yes
@@ -47,7 +47,7 @@
     src=files/{{ item }}
     owner=maas
     group=maas
-    mode=0755
+    mode="0755"
   with_items:
     - do-ansible
     - do-switch
@@ -59,7 +59,7 @@
     state=directory
     owner=maas
     group=maas
-    mode=0755
+    mode="0755"
 
 - name: Capture MAAS API Key
   become: yes
@@ -74,7 +74,7 @@
     dest=/etc/maas/ansible/{{ item }}
     owner=maas
     group=maas
-    mode=0644
+    mode="0644"
   with_items:
     - compute-node.yml
     - switch-node.yml
@@ -85,7 +85,7 @@
     path=/etc/maas/ansible/vars
     owner=maas
     group=maas
-    mode=0755
+    mode="0755"
     state=directory
 
 - name: Ensure Compute and Switch Node Variables
@@ -95,7 +95,7 @@
     dest=/etc/maas/ansible/vars/compute-node-vars.yml
     owner=maas
     group=maas
-    mode=0644
+    mode="0644"
 
 - name: Ensure Connect Switch Ansible Playbook
   become: yes
@@ -104,7 +104,7 @@
     src=files/{{ item }}
     owner=maas
     group=maas
-    mode=0644
+    mode="0644"
   with_items:
     - connect-switch.yml
 
@@ -115,7 +115,7 @@
     dest=/etc/maas/ansible/pod-inventory
     owner=maas
     group=maas
-    mode=0755
+    mode="0755"
 
 - name: Copy CORD Utility Scripts
   become: yes
@@ -124,7 +124,7 @@
     dest=/usr/local/bin/{{ item }}
     owner=root
     group=root
-    mode=0755
+    mode="0755"
   with_items:
     - cord
     - cord-harvest
@@ -132,3 +132,24 @@
     - cord-switch
     - cord-generate
     - cord-registry
+
+- name: Ensure SSH Key Storage
+  become: yes
+  file:
+    path: /etc/maas/.ssh
+    mode: "0755"
+    owner: maas
+    group: maas
+    state: directory
+
+- name: Copy SSH Key Pair for POD
+  become: yes
+  copy:
+    src: /etc/maas/.ssh/{{item}}
+    dest: /etc/maas/.ssh/{{item}}
+    owner: maas
+    group: maas
+    mode: "0644"
+  with_items:
+    - cord_rsa
+    - cord_rsa.pub

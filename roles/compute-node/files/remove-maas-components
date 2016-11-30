@@ -1,10 +1,27 @@
 #!/bin/bash
 
+KEEP_DOCKER=0
+DOCKER_ENGINE=docker-engine
+DOCKER_REGISTRY=/docker-registry /docker-registry-mirror
+
+while $# -gt 0; do
+    case $1 in
+        -k|--keep-docker)
+            KEEP_DOCKER=1
+            DOCKER_ENGINE=
+            DOCKER_REGISTRY=
+            ;;
+    esac
+    shift
+done
+
 docker kill $(docker ps -q)
 docker rm -f $(docker ps -aq)
-docker rmi -f $(docker images -aq)
+if [ $KEEP_DOCKER -eq 0 ]; then
+    docker rmi -f $(docker images -aq)
+fi
 
-sudo apt-get remove --purge -y bind9 apache2 docker-engine ansible $(dpkg --get-selections | grep maas | cut -f1)
+sudo apt-get remove --purge -y bind9 apache2 $DOCKER_ENGINE ansible $(dpkg --get-selections | grep maas | cut -f1)
 
 sudo rm -rf \
     /etc/maas \
@@ -20,8 +37,7 @@ sudo rm -rf \
     /etc/apt/sources.list.d/ppa_maas_stable_trusty.list \
     /etc/apt/sources.list.d/ppa_ansible_ansible_trusty.list \
     /etc/network/if-pre-up.d/nat \
-    /docker-registry \
-    /docker-registry-mirror
+    $DOCKER_REGISTRY
 
 sudo apt-get update -y
 
