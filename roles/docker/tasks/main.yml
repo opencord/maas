@@ -54,4 +54,4 @@
     dest=/usr/local/bin/docker-compose
     owner=root
     group=root
-    mode=0755
+    mode="0755"

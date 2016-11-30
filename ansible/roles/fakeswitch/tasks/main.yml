@@ -10,7 +10,7 @@
     path: "{{ item }}"
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
     state: directory
   with_items:
     - /mnt/flash2
@@ -23,7 +23,7 @@
     dest: /usr/bin/{{ item }}
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   with_items:
     - persist
     - savepersist
