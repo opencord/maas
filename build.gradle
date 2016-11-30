@@ -336,6 +336,11 @@ task prime (type: Exec)  {
             .p(config.seedServer.port, "ansible_ssh_port")
     }
 
+    if (config.passwords) {
+        extraVars = extraVars.p(config.passwords.compute_node, "password_compute_node")
+        .p(config.passwords.maas, "password_maas")
+    }
+
     if (config.otherServers) {
         extraVars = extraVars.p(config.otherServers.location, "prov_location")
         .p(config.otherServers.rolesPath, "prov_role_path")
@@ -387,6 +392,11 @@ task deployBase(type: Exec)  {
             .p(config.seedServer.power_helper_user, "power_helper_user")
             .p(config.seedServer.power_helper_host, "power_helper_host")
             .p(config.seedServer.port, "ansible_ssh_port")
+    }
+
+    if (config.passwords) {
+        extraVars = extraVars.p(config.passwords.compute_node, "password_compute_node")
+        .p(config.passwords.maas, "password_maas")
     }
 
     if (config.otherServers) {
