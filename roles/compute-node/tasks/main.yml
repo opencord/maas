@@ -19,6 +19,7 @@
   become: yes
   apt: name={{ item }} state=present force=yes
   with_items:
+    - whois
     - build-essential=11.6*
     - git=1:1.9.*
     - python-pip=1.5.4*
@@ -28,6 +29,31 @@
     - minicom=2.7*
     - curl=7.35.*
     - jq=1.3*
+
+- name: Validate Encyrpted Compute Node Password
+  set_fact:
+    already_encrypted: "{{compute_node.password.startswith('enc:')}}"
+
+# If the compute_node.password begins with 'enc:' then it is an
+# encyrpted password, which is what we need so we are done. Thus
+# if it is not encrypted then we have to encrypt it
+
+- name: Encyrpt Compute Node Password
+  command: "mkpasswd --method=sha-512 {{compute_node.password}}"
+  register: encrypted
+  changed_when: false
+  when: "not already_encrypted"
+
+- name: Update Compute Node Password
+  set_fact:
+    compute_node_update:
+      password: "enc:{{encrypted.stdout}}"
+  when: "not already_encrypted"
+
+- name: Merge Compute Node Properties
+  set_fact:
+    compute_node: "{{compute_node|combine(compute_node_update,recursive=True)}}"
+  when: "not already_encrypted"
 
 - name: Ensure Docker Insecure Repository
   become: yes
@@ -61,16 +87,18 @@
 - name: Set Default Password
   become: yes
   user:
-    name={{ ansible_user }}
-    password="$6$TjhJuOgh8xp.v$z/4GwFbn5koVmkD6Ex9wY7bgP7L3uP2ujZkZSs1HNdzQdz9YclbnZH9GvqMC/M1iwC0MceL05.13HoFz/bai0/"
+    name: "{{ansible_user}}"
+    password: "{{compute_node.password.split(':',1)[1]}}"
   when: '"{{ ansible_user }}" == "ubuntu"'
+  tags:
+    - set_compute_node_password
 
 - name: Authorize SSH Key
   become: yes
   authorized_key:
-    key="{{ pub_ssh_key }}"
-    user={{ ansible_user }}
-    state=present
+    key: "{{ pub_ssh_key }}"
+    user: "{{ ansible_user }}"
+    state: present
 
 - name: Verify Private SSH Key
   become: yes
@@ -78,16 +106,26 @@
     path=/home/{{ ansible_user }}/.ssh/id_rsa
   register: private_key
 
-- name: Ensure SSH Key
+- name: Ensure SSH Key Pair
+  become: yes
+  copy:
+    src: "/etc/maas/.ssh/{{item.src}}"
+    dest: "{{ansible_env['PWD']}}/.ssh/{{item.dest}}"
+    owner: "{{ansible_user}}"
+    group: "docker"
+    mode: "0600"
+  with_items:
+    - { "src": "cord_rsa", "dest": "id_rsa" }
+    - { "src": "cord_rsa.pub", "dest": "id_rsa.pub" }
+
+- name: Ensure SSH config
   become: no
   copy:
-    src=files/{{ item }}
-    dest={{ ansible_env['PWD'] }}/.ssh/{{ item }}
-    owner={{ ansible_user }}
-    mode=0600
+    src: "files/{{item}}"
+    dest: "{{ansible_env['PWD']}}/.ssh/{{item}}"
+    owner: "{{ansible_user}}"
+    mode: "0600"
   with_items:
-    - id_rsa
-    - id_rsa.pub
     - config
 
 - name: Ensure CORD SUDO
@@ -97,7 +135,7 @@
     dest=/etc/sudoers.d/99-cord-sudoers
     owner=root
     group=root
-    mode=0600
+    mode="0600"
 
 - name: Ensure Utility Scripts
   become: yes
@@ -106,7 +144,7 @@
     dest=/usr/local/bin/{{ item }}
     owner=root
     group=root
-    mode=0755
+    mode="0755"
   with_items:
     - delete-fabric-config
     - delete-node-prov-state

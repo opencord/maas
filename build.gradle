@@ -336,6 +336,12 @@ task prime (type: Exec)  {
             .p(config.seedServer.port, "ansible_ssh_port")
     }
 
+    if (config.passwords) {
+        extraVars = extraVars.p(config.passwords.compute_node, "password_compute_node")
+        .p(config.passwords.maas_admin, "password_maas_admin")
+        .p(config.passwords.maas_user, "password_maas_user")
+    }
+
     if (config.otherServers) {
         extraVars = extraVars.p(config.otherServers.location, "prov_location")
         .p(config.otherServers.rolesPath, "prov_role_path")
@@ -345,7 +351,10 @@ task prime (type: Exec)  {
     extraVars = extraVars.p("$targetReg", "deploy_docker_registry")
         .p("$targetTag", "deploy_docker_tag")
 
-    def skipTags = [].p(config.seedServer.skipTags)
+    // the password set on the compute node is skipped because this is being run against the 
+    // head node and we don't want to change the head node password as this node was manualy 
+    // set up.
+    def skipTags = [].p(config.seedServer.skipTags).p('set_compute_node_password')
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "prime-node.yml"
 }
@@ -389,6 +398,12 @@ task deployBase(type: Exec)  {
             .p(config.seedServer.port, "ansible_ssh_port")
     }
 
+    if (config.passwords) {
+        extraVars = extraVars.p(config.passwords.compute_node, "password_compute_node")
+        .p(config.passwords.maas_admin, "password_maas_admin")
+        .p(config.passwords.maas_user, "password_maas_user")
+    }
+
     if (config.otherServers) {
         extraVars = extraVars.p(config.otherServers.location, "prov_location")
         .p(config.otherServers.rolesPath, "prov_role_path")
@@ -398,7 +413,10 @@ task deployBase(type: Exec)  {
     extraVars = extraVars.p("$targetReg", "deploy_docker_registry")
         .p("$targetTag", "deploy_docker_tag")
 
-    def skipTags = [].p(config.seedServer.skipTags)
+    // the password set on the compute node is skipped because this is being run against the
+    // head node and we don't want to change the head node password as this node was manualy
+    // set up.
+    def skipTags = [].p(config.seedServer.skipTags).p('set_compute_node_password')
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
 }

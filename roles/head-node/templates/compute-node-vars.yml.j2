@@ -1,3 +1,6 @@
+{% if compute_node.password is defined and compute_node.password != omit %}
+password_compute_node: '{{ compute_node.password }}'
+{% endif %}
 {% if compute_node.fabric.include.names is defined and compute_node.fabric.include.names != omit %}
 fabric_include_names: '{{ compute_node.fabric.include.names }}'
 {% endif %}

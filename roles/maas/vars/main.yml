@@ -12,10 +12,11 @@ virtualbox:
 
 maas:
     admin_email: "{{ admin_email | default('admin@cord.lab') }}"
+    admin_password: "{{ password_maas_admin | default(lookup('password', 'passwords/maas_admin.txt')) }}"
     user: "{{ maas_user | default('cord') }}"
-    user_password: "{{ maas_password | default('cord') }}"
+    user_password: "{{ password_maas_user | default(lookup('password', 'passwords/maas_user.txt')) }}"
     user_email: "{{ maas_email | default('cord@cord.lab') }}"
-    user_sshkey: "{{ lookup('file', 'files/cord_id_rsa.pub') }}"
+    user_sshkey: "{{ lookup('file', '/etc/maas/.ssh/cord_rsa.pub') }}"
 
     # CHANGE:
     #   'domain' specifies the domain name configured in to MAAS
