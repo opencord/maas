@@ -182,11 +182,11 @@
   tags:
     - maas_restart
 
-- name: Ensure latest bootstrap image
-  become: yes
-  docker_image:
-    name: localhost:5000/cord-maas-bootstrap:{{ docker.tag }}
-    pull: yes
+#- name: Ensure latest bootstrap image
+#  become: yes
+#  docker_image:
+#    name: localhost:5000/cord-maas-bootstrap:{{ docker.tag }}
+#    pull: yes
 
 - name: Configure MAAS
   become: yes
