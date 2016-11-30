@@ -15,6 +15,10 @@
     - "{{ compute_node.addresses.management }}"
     - "{{ compute_node.addresses.external }}"
 
+- name: Get local user HOME directory
+  local_action: command ls -d ~
+  register: local_home
+
 - name: Applications
   become: yes
   apt: name={{ item }} state=present force=yes
@@ -78,16 +82,25 @@
     path=/home/{{ ansible_user }}/.ssh/id_rsa
   register: private_key
 
-- name: Ensure SSH Key
+- name: Ensure SSH Key Pair
   become: no
   copy:
-    src=files/{{ item }}
-    dest={{ ansible_env['PWD'] }}/.ssh/{{ item }}
-    owner={{ ansible_user }}
-    mode=0600
+    src: "{{local_home.stdout}}/.ssh/{{item.src}}"
+    dest: "{{ansible_env['PWD']}}/.ssh/{{item.dest}}"
+    owner: "{{ansible_user}}"
+    mode: 0600
   with_items:
-    - id_rsa
-    - id_rsa.pub
+    - { "src": "cord_rsa", "dest": "id_rsa" }
+    - { "src": "cord_rsa.pub", "dest": "id_rsa.pub" }
+
+- name: Ensure SSH config
+  become: no
+  copy:
+    src: "files/{{item}}"
+    dest: "{{ansible_env['PWD']}}/.ssh/{{item}}"
+    owner: "{{ansible_user}}"
+    mode: 0600
+  with_items:
     - config
 
 - name: Ensure CORD SUDO

@@ -15,7 +15,7 @@ maas:
     user: "{{ maas_user | default('cord') }}"
     user_password: "{{ maas_password | default('cord') }}"
     user_email: "{{ maas_email | default('cord@cord.lab') }}"
-    user_sshkey: "{{ lookup('file', 'files/cord_id_rsa.pub') }}"
+    user_sshkey: "{{ lookup('file', '~/.ssh/cord_rsa.pub') }}"
 
     # CHANGE:
     #   'domain' specifies the domain name configured in to MAAS
