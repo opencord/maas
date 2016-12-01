@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a014df3_ac9ff802",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-12-01T00:34:01Z",
+      "side": 1,
+      "message": "I feel it is more secure. you don\u0027t want others in your group using your key without your permission do you?",
+      "parentUuid": "1a014df3_ccf36472",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 53
+      },
+      "revId": "fdab3944adb84cef308d0c2138a84a9ad2e45f00",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a014df3_ecee208b",
         "filename": "roles/prep/tasks/main.yml",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "1a014df3_8ca43c58",
+        "filename": "roles/prep/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-12-01T00:34:01Z",
+      "side": 1,
+      "message": "the comment doesn\u0027t really matter. as this key is used all over cord i left it as cord.",
+      "parentUuid": "1a014df3_ecee208b",
+      "range": {
+        "startLine": 12,
+        "startChar": 117,
+        "endLine": 12,
+        "endChar": 121
+      },
+      "revId": "fdab3944adb84cef308d0c2138a84a9ad2e45f00",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a014df3_0ce26c9f",
         "filename": "roles/prep/tasks/main.yml",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2016-11-30T23:48:24Z",
       "side": 1,
       "message": "I think only private key need to be 0600. Otherwise, the public key is not \"public\" anymore.",
+      "range": {
+        "startLine": 18,
+        "startChar": 6,
+        "endLine": 18,
+        "endChar": 18
+      },
+      "revId": "fdab3944adb84cef308d0c2138a84a9ad2e45f00",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a014df3_6c89f0c9",
+        "filename": "roles/prep/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2016-12-01T00:34:01Z",
+      "side": 1,
+      "message": "i like the pub key as 0600, don\u0027t want other people to read it without my permission. if someone needs it I can give it to them.",
+      "parentUuid": "1a014df3_0ce26c9f",
       "range": {
         "startLine": 18,
         "startChar": 6,
