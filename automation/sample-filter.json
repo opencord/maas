@@ -1,11 +1,11 @@
-{  
-   "hosts":{  
-      "include":[  
+{
+   "hosts":{
+      "include":[
          ".*"
       ]
    },
-   "zones":{  
-      "include":[  
+   "zones":{
+      "include":[
          "default",
          "petaluma-lab"
       ]

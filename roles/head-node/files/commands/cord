@@ -16,7 +16,7 @@ usage() {
     for CMD in $ALL_FILES; do
         test -x "$CMD" && COMMANDS="$COMMANDS $CMD"
     done
-       
+
     # Process comands for usage information
     # Output all commands and their help information to file
     # so it can be sorted. The format will be:

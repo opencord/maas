@@ -50,7 +50,7 @@ case $COMMAND in
         fi
         ;;
     check)
-        RUNNING=$($SSH_OPT docker inspect --format="'{{ .State.Running }}'" harvester) 
+        RUNNING=$($SSH_OPT docker inspect --format="'{{ .State.Running }}'" harvester)
 	if [ $? -ne 0 ]; then
 	    >&2 echo "Unable to execute docker or locate harvester container, if not running on the head node please specify the server address"
 	    exit 1
@@ -112,4 +112,4 @@ case $COMMAND in
         exit 1
         ;;
 esac
-  
+

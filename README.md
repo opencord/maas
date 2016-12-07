@@ -69,7 +69,7 @@ best practices for a CORD POD. This role is meant to be applied to a head node i
    - A 2 port 10G card is installed on the head node
    - Head Node has _Internet_ connectivity via the 10G interface named `eth3`
 
-   _Additionally configuration variables, including network IP addressing information can be found in 
+   _Additionally configuration variables, including network IP addressing information can be found in
    the file `vars/main.yml`._
 
 ### Configuration

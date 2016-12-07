@@ -2,4 +2,4 @@
 
 CFG=${1:-"config-tibit.json"}
 
-curl -v -XDELETE -H Content-Type: application/json http://karaf:karaf@onos-fabric:8181/onos/v1/network/configuration 
+curl -v -XDELETE -H Content-Type: application/json http://karaf:karaf@onos-fabric:8181/onos/v1/network/configuration

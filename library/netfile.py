@@ -211,7 +211,7 @@ for key, value in arguments.iteritems():
 if name == "":
     result = {
         "changed": False,
-	"failed": True,
+        "failed": True,
         "msg": "Name is a mansitory parameter",
     }
     print json.dumps(result)

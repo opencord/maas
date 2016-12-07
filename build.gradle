@@ -113,7 +113,7 @@ def getBranchName = { ->
     }
     return branchStdOut.toString().trim()
 }
- 
+
 task buildSwitchqImage(type: Exec) {
     commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-maas-switchq', './switchq'
 }
@@ -126,22 +126,6 @@ task tagSwitchqImage(type: Exec) {
 task publishSwitchqImage(type: Exec) {
     dependsOn tagSwitchqImage
     commandLine "docker", 'push', "$targetReg/cord-maas-switchq:$targetTag"
-}
-
-// Bootstrap Image
-
-task buildBootstrapImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-maas-bootstrap', './bootstrap'
-}
-
-task tagBootstrapImage(type: Exec) {
-   dependsOn buildBootstrapImage
-   commandLine "docker", 'tag', 'cord-maas-bootstrap', "$targetReg/cord-maas-bootstrap:$targetTag"
-}
-
-task publishBootstrapImage(type: Exec) {
-    dependsOn tagBootstrapImage
-    commandLine "docker", 'push', "$targetReg/cord-maas-bootstrap:$targetTag"
 }
 
 // IP Allocator Image
@@ -242,7 +226,6 @@ task fetch(type: Exec) {
 // To be used to generate all needed binaries that need to be present on the target
 // as docker images in the local docker runner.
 task buildImages {
-    dependsOn buildBootstrapImage
     dependsOn buildHarvesterImage
     dependsOn buildAutomationImage
     dependsOn buildAllocationImage
@@ -252,7 +235,6 @@ task buildImages {
 }
 
 task tagImages {
-    dependsOn tagBootstrapImage
     dependsOn tagHarvesterImage
     dependsOn tagAutomationImage
     dependsOn tagAllocationImage
@@ -264,7 +246,6 @@ task tagImages {
 task publish {
     //FIXME: This works because the upstream project primes the nodes before running this.
     comps.each { name, spec -> if (spec.type == 'image') { dependsOn "publish" + name } }
-    dependsOn publishBootstrapImage
     dependsOn publishHarvesterImage
     dependsOn publishAutomationImage
     dependsOn publishAllocationImage
@@ -360,8 +341,8 @@ task prime (type: Exec)  {
     extraVars = extraVars.p("$targetReg", "deploy_docker_registry")
         .p("$targetTag", "deploy_docker_tag")
 
-    // the password set on the compute node is skipped because this is being run against the 
-    // head node and we don't want to change the head node password as this node was manualy 
+    // the password set on the compute node is skipped because this is being run against the
+    // head node and we don't want to change the head node password as this node was manualy
     // set up.
     def skipTags = [].p(config.seedServer.skipTags).p('set_compute_node_password')
 

@@ -6,7 +6,7 @@ This service generates network configuration (`network-cfg.json`) for CORD POD
 - Install Go (only for local debugging)
 - Make sure ONOS is reachable either locally or via SSH tunnel (either way is fine)
 - Make sure devices, hosts are connected and showing up in ONOS
-- Config-gen server listens on port 1337, so make sure it's available, if not change the ENV VAR `CONFIGGEN_ConfigServerPort` to the port you wish config-gen to use 
+- Config-gen server listens on port 1337, so make sure it's available, if not change the ENV VAR `CONFIGGEN_ConfigServerPort` to the port you wish config-gen to use
 
 
 ### To run locally from source (without a container) for debugging:
