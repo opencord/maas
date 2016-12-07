@@ -63,7 +63,7 @@ case $COMMAND in
             for i in $(curl -sSL http://$REG/v2/_catalog | jq '.repositories | .[]' | sed -e 's/"//g'); do
                 /bin/echo -n "$COMMA{\"registry\":\"${REG}/$i\",\"tags\":["
                 C2=
-                for t in $(curl -sSL http://$REG/v2/redis/tags/list | jq '.tags | .[]' | sed -e 's/"//g'); do
+                for t in $(curl -sSL http://$REG/v2/$i/tags/list | jq '.tags | .[]' | sed -e 's/"//g'); do
                     echo -n "${C2}\"$t\""
                     C2=","
                 done
@@ -75,7 +75,7 @@ case $COMMAND in
             OUT=$(mktemp)
             echo "REPOSITORY,TAG" > $OUT
             for i in $(curl -sSL http://$REG/v2/_catalog | jq '.repositories | .[]' | sed -e 's/"//g'); do
-                for t in $(curl -sSL http://$REG/v2/redis/tags/list | jq '.tags | .[]' | sed -e 's/"//g'); do
+                for t in $(curl -sSL http://$REG/v2/$i/tags/list | jq '.tags + [] | .[]' | sed -e 's/"//g'); do
                     /bin/echo -e "${REG}/$i,$t" >> $OUT
                 done
             done

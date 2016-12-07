@@ -3,8 +3,6 @@
   unarchive:
     src=files/i40e-1.4.25.tar.gz
     dest=/home/{{ ansible_user }}
-    owner={{ ansible_user }}
-    group={{ ansible_user }}
 
 - name: Build i40e Driver
   command: make
