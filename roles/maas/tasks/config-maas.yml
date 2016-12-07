@@ -1,0 +1,74 @@
+---
+- name: Ensure PIP
+  become: yes
+  apt:
+    name: python-pip
+    state: present
+
+- name: Ensure Prerequisites
+  become: yes
+  pip:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - maasclient==0.3
+    - requests_oauthlib
+    - ipaddress
+
+- name: Ensure SSH Key
+  maas_sshkey:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    sshkey: '{{maas.user_sshkey}}'
+    state: present
+
+- name: Ensure Administrative Zone
+  maas_zone:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    name: administrative
+    state: present
+
+- name: Ensure Cluster
+  maas_cluster:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    name: 'Cluster master'
+    status: enabled
+    domain: '{{maas.domain}}'
+
+- name: Ensure Management Interface
+  maas_cluster_interface:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    cluster_name: 'Cluster master'
+    name: '{{interfaces.management}}'
+    interface: '{{interfaces.management}}'
+    management: dhcpdns
+    ip: "{{networks.management | ipaddr(1) | ipaddr('address')}}"
+    subnet_mask: "{{networks.management | ipaddr('netmask')}}"
+    broadcast_ip: "{{networks.management | ipaddr('broadcast')}}"
+    ip_range_low: '{{ranges.management.low}}'
+    ip_range_high: '{{ranges.management.high}}'
+    state: present
+
+- name: Ensure Subnet Configuration
+  maas_subnet:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    name: '{{networks.management}}'
+    gateway_ip: "{{networks.management | ipaddr(1) | ipaddr('address')}}"
+    dns_servers: "{{networks.management | ipaddr(1) | ipaddr('address')}}"
+
+- name: Ensure Upstream DNS Server
+  maas:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    upstream_dns: '{{maas.upstream_dns}}'
+    state: present
+
+- name: Ensure Boot Resources
+  maas_boot_resource:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    state: import
