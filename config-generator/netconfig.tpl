@@ -14,7 +14,7 @@
     },
     "hosts": {
         {{ range $index, $element := .Hosts }}{{ if $index }},
-        {{ end }}"{{ .Mac }}": {
+        {{ end }}"{{ .Mac }}/-1": {
             "ips": ["{{ range $ip := .IpAddresses }}{{ $ip }}{{ end }}"],
             "location": "{{ .Location.ElementID }}/{{ .Location.Port }}"
         }{{ end }}
