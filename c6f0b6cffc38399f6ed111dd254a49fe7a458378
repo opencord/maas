@@ -22,6 +22,30 @@
       "revId": "c6f0b6cffc38399f6ed111dd254a49fe7a458378",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa0f191f_cf191d24",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2017-01-04T19:26:30Z",
+      "side": 0,
+      "message": "Correct. The new image will persist everything.\nThis hasn\u0027t been tested and that\u0027s why it is still an WIP. I will do it ASAP.",
+      "parentUuid": "fa0f191f_0f203548",
+      "range": {
+        "startLine": 58,
+        "startChar": 2,
+        "endLine": 65,
+        "endChar": 20
+      },
+      "revId": "c6f0b6cffc38399f6ed111dd254a49fe7a458378",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
