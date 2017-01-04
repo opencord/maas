@@ -1,5 +1,5 @@
-accton_as5712_54x: 'https://www.dropbox.com/s/tgpsmblubr6r0xc/onie-installer-x86_64-accton_as6712_32x-r0'
-accton_as6712_32x: 'https://www.dropbox.com/s/tgpsmblubr6r0xc/onie-installer-x86_64-accton_as6712_32x-r0'
+accton_as5712_54x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
+accton_as6712_32x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
 
 virtualbox:
     # CHANGE:
