@@ -1,9 +1,9 @@
 ---
 - name: Openflow Agent Debian Archive
   get_url:
-    url: http://github.com/ciena/ZeroTouchProvisioning/raw/master/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb
+    url: https://github.com/onfsdn/atrium-docs/raw/master/16A/ONOS/builds/ofdpa-3.0-ea0_3.0.0.0%2Baccton1.0-1_amd64.deb
     validate_certs: false
-    dest: /mnt/flash2/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb
+    dest: /mnt/onl/data/ofdpa-3.0-ea0_3.0.0.0+accton1.0-1_amd64.deb
 
 - name: Verify Service Exists
   stat:
@@ -30,18 +30,10 @@
   failed_when: false
 
 - name: Openflow Agent
-  apt: deb="/mnt/flash2/ofdpa-i.12.1.1_12.1.1%2Baccton1.7-1_amd64.deb" force=true
+  apt: deb="/mnt/onl/data/ofdpa-3.0-ea0_3.0.0.0+accton1.0-1_amd64.deb" force=true
   when: not lsb_stat.stat.exists or dist.stdout == "0"
 
 - name: OpenFlow Agent Started
   service: name=ofdpa state=started
   when: not lsb_stat.stat.exists or dist.stdout == "0"
 
-- name: Mark Persist Openflow Agent
-  command: persist /etc/accton/ofdpa.conf
-  changed_when: true
-
-- name: Persist Openflow Agent
-  command: savepersist
-  failed_when: false
-  changed_when: true
