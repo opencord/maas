@@ -20,9 +20,10 @@
   changed_when: false
   when: ofdpa_exists.stdout != "0"
 
-- name: Version I.12.1.1+1.1 Openflow Agent
+# Note: This is the version number of OFDPA 3.0 EA0
+- name: Version 2.0.4.0 Openflow Agent
   include: ofdpa.yml
-  when: ofdpa_exists.stdout == "0" or ofdpa_version.stdout.find('version I.12.1.1+1.1') == -1
+  when: ofdpa_exists.stdout == "0" or ofdpa_version.stdout.find('version 2.0.4.0') == -1
 
 - name: Utilities Scripts
   template:
@@ -38,15 +39,6 @@
     - reset
   register: utils
 
-- name: Mark Utilities Persistent
-  command: persist {{ item }}
-  with_items:
-    - purge
-    - killit
-    - connect
-    - reset
-  when: utils.changed
-
 - name: Authorize SSH Key
   become: yes
   authorized_key:
@@ -55,11 +47,3 @@
     state=present
   register: sshkey
 
-- name: Mark SSH Key Persistent
-  command: persist /root/.ssh/authorized_keys
-  when: sshkey.changed
-
-- name: Persist
-  command: savepersist
-  when: utils.changed or sshkey.changed
-  failed_when: false
