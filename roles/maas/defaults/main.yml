@@ -1,3 +1,5 @@
+---
+
 accton_as5712_54x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
 accton_as6712_32x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
 
@@ -12,9 +14,9 @@ virtualbox:
 
 maas:
     admin_email: "{{ admin_email | default('admin@cord.lab') }}"
-    admin_password: "{{ password_maas_admin | default(lookup('password', 'passwords/maas_admin.txt')) }}"
+    admin_password: "{{ password_maas_admin | default(lookup('password', 'passwords/maas_admin.txt chars=ascii_letters,digits')) }}"
     user: "{{ maas_user | default('cord') }}"
-    user_password: "{{ password_maas_user | default(lookup('password', 'passwords/maas_user.txt')) }}"
+    user_password: "{{ password_maas_user | default(lookup('password', 'passwords/maas_user.txt chars=ascii_letters,digits')) }}"
     user_email: "{{ maas_email | default('cord@cord.lab') }}"
     user_sshkey: "{{ lookup('file', '/etc/maas/.ssh/cord_rsa.pub') }}"
 
