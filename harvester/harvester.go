@@ -19,7 +19,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"text/template"
 	"time"
@@ -27,32 +29,36 @@ import (
 
 // application application configuration and internal state
 type application struct {
-	Port           int           `default:"4246" desc:"port on which the service will listen for requests"`
-	Listen         string        `default:"0.0.0.0" desc:"IP on which the service will listen for requests"`
-	LogLevel       string        `default:"warning" envconfig:"LOG_LEVEL" desc:"log output level"`
-	LogFormat      string        `default:"text" envconfig:"LOG_FORMAT" desc:"format of log messages"`
-	DHCPLeaseFile  string        `default:"/harvester/dhcpd.leases" envconfig:"DHCP_LEASE_FILE" desc:"lease file to parse for lease information"`
-	OutputFile     string        `envconfig:"OUTPUT_FILE" desc:"name of file to output discovered lease in bind9 format"`
-	OutputFormat   string        `default:"{{.ClientHostname}}\tIN A {{.IPAddress}}\t; {{.HardwareAddress}}" envconfig:"OUTPUT_FORMAT" desc:"specifies the single entry format when outputing to a file"`
-	VerifyLeases   bool          `default:"true" envconfig:"VERIFY_LEASES" desc:"verifies leases with a ping"`
-	VerifyTimeout  time.Duration `default:"1s" envconfig:"VERIFY_TIMEOUT" desc:"max timeout (RTT) to wait for verification pings"`
-	VerifyWithUDP  bool          `default:"false" envconfig:"VERIFY_WITH_UDP" desc:"use UDP instead of raw sockets for ping verification"`
-	QueryPeriod    time.Duration `default:"30s" envconfig:"QUERY_PERIOD" desc:"period at which the DHCP lease file is processed"`
-	QuietPeriod    time.Duration `default:"2s" envconfing:"QUIET_PERIOD" desc:"period to wait between accepting parse requests"`
-	RequestTimeout time.Duration `default:"10s" envconfig:"REQUEST_TIMEOUT" desc:"period to wait for processing when requesting a DHCP lease database parsing"`
-	RNDCUpdate     bool          `default:"false" envconfig:"RNDC_UPDATE" desc:"determines if the harvester reloads the DNS servers after harvest"`
-	RNDCAddress    string        `default:"127.0.0.1" envconfig:"RNDC_ADDRESS" desc:"IP address of the DNS server to contact via RNDC"`
-	RNDCPort       int           `default:"954" envconfig:"RNDC_PORT" desc:"port of the DNS server to contact via RNDC"`
-	RNDCKeyFile    string        `default:"/key/rndc.conf.maas" envconfig:"RNDC_KEY_FILE" desc:"key file, with default, to contact DNS server"`
-	RNDCZone       string        `default:"cord.lab" envconfig:"RNDC_ZONE" desc:"zone to reload"`
+	Port               int           `default:"4246" desc:"port on which the service will listen for requests"`
+	Listen             string        `default:"0.0.0.0" desc:"IP on which the service will listen for requests"`
+	LogLevel           string        `default:"warning" envconfig:"LOG_LEVEL" desc:"log output level"`
+	LogFormat          string        `default:"text" envconfig:"LOG_FORMAT" desc:"format of log messages"`
+	DHCPLeaseFile      string        `default:"/harvester/dhcpd.leases" envconfig:"DHCP_LEASE_FILE" desc:"lease file to parse for lease information"`
+	OutputFile         string        `envconfig:"OUTPUT_FILE" desc:"name of file to output discovered lease in bind9 format"`
+	OutputFormat       string        `default:"{{.ClientHostname}}\tIN A {{.IPAddress}}\t; {{.HardwareAddress}}" envconfig:"OUTPUT_FORMAT" desc:"specifies the single entry format when outputing to a file"`
+	VerifyLeases       bool          `default:"true" envconfig:"VERIFY_LEASES" desc:"verifies leases with a ping"`
+	VerifyTimeout      time.Duration `default:"1s" envconfig:"VERIFY_TIMEOUT" desc:"max timeout (RTT) to wait for verification pings"`
+	VerifyWithUDP      bool          `default:"false" envconfig:"VERIFY_WITH_UDP" desc:"use UDP instead of raw sockets for ping verification"`
+	QueryPeriod        time.Duration `default:"30s" envconfig:"QUERY_PERIOD" desc:"period at which the DHCP lease file is processed"`
+	QuietPeriod        time.Duration `default:"2s" envconfing:"QUIET_PERIOD" desc:"period to wait between accepting parse requests"`
+	RequestTimeout     time.Duration `default:"10s" envconfig:"REQUEST_TIMEOUT" desc:"period to wait for processing when requesting a DHCP lease database parsing"`
+	RNDCUpdate         bool          `default:"false" envconfig:"RNDC_UPDATE" desc:"determines if the harvester reloads the DNS servers after harvest"`
+	RNDCAddress        string        `default:"127.0.0.1" envconfig:"RNDC_ADDRESS" desc:"IP address of the DNS server to contact via RNDC"`
+	RNDCPort           int           `default:"954" envconfig:"RNDC_PORT" desc:"port of the DNS server to contact via RNDC"`
+	RNDCKeyFile        string        `default:"/key/rndc.conf.maas" envconfig:"RNDC_KEY_FILE" desc:"key file, with default, to contact DNS server"`
+	RNDCZone           string        `default:"cord.lab" envconfig:"RNDC_ZONE" desc:"zone to reload"`
+	BadClientNames     []string      `default:"localhost" envconfig:"BAD_CLIENT_NAMES" desc:"list of invalid hostnames for clients"`
+	ClientNameTemplate string        `default:"UKN-{{with $x:=.HardwareAddress|print}}{{regex $x \":\" \"\"}}{{end}}" envconfig:"CLIENT_NAME_TEMPLATE" desc:"template for generated host name"`
 
-	log            *logrus.Logger     `ignored:"true"`
-	interchange    sync.RWMutex       `ignored:"true"`
-	leases         map[string]*Lease  `ignored:"true"`
-	byHardware     map[string]*Lease  `ignored:"true"`
-	byHostname     map[string]*Lease  `ignored:"true"`
-	outputTemplate *template.Template `ignored:"true"`
-	requests       chan *chan uint    `ignored:"true"`
+	log                *logrus.Logger     `ignored:"true"`
+	interchange        sync.RWMutex       `ignored:"true"`
+	leases             map[string]*Lease  `ignored:"true"`
+	byHardware         map[string]*Lease  `ignored:"true"`
+	byHostname         map[string]*Lease  `ignored:"true"`
+	outputTemplate     *template.Template `ignored:"true"`
+	requests           chan *chan uint    `ignored:"true"`
+	clientNameTemplate *template.Template `ignored:"true"`
+	badClientNames     map[string]bool    `ignored:"true"`
 }
 
 func main() {
@@ -89,30 +95,48 @@ func main() {
 
 	// output the configuration
 	app.log.Infof(`Configuration:
-           LISTEN:          %s
-           PORT:            %d
-           LOG_LEVEL:       %s
-           LOG_FORMAT:      %s
-           DHCP_LEASE_FILE: %s
-           OUTPUT_FILE:     %s
-           OUTPUT_FORMAT:   %s
-           VERIFY_LEASES:   %t
-           VERIFY_TIMEOUT:  %s
-           VERIFY_WITH_UDP: %t
-           QUERY_PERIOD:    %s
-           QUIET_PERIOD:    %s
-           REQUEST_TIMEOUT: %s
-           RNDC_UPDATE:     %t
-           RNDC_ADDRESS:    %s
-           RNDC_PORT:       %d
-           RNDC_KEY_FILE:   %s
-           RNDC_ZONE:       %s`,
+           LISTEN:               %s
+           PORT:                 %d
+           LOG_LEVEL:            %s
+           LOG_FORMAT:           %s
+           DHCP_LEASE_FILE:      %s
+           OUTPUT_FILE:          %s
+           OUTPUT_FORMAT:        %s
+           VERIFY_LEASES:        %t
+           VERIFY_TIMEOUT:       %s
+           VERIFY_WITH_UDP:      %t
+           QUERY_PERIOD:         %s
+           QUIET_PERIOD:         %s
+           REQUEST_TIMEOUT:      %s
+           RNDC_UPDATE:          %t
+           RNDC_ADDRESS:         %s
+           RNDC_PORT:            %d
+           RNDC_KEY_FILE:        %s
+           RNDC_ZONE:            %s
+	   BAD_CLIENT_NAMES:     %s
+	   CLIENT_NAME_TEMPLATE: %s`,
 		app.Listen, app.Port,
 		app.LogLevel, app.LogFormat,
 		app.DHCPLeaseFile, app.OutputFile, strconv.Quote(app.OutputFormat),
 		app.VerifyLeases, app.VerifyTimeout, app.VerifyWithUDP,
 		app.QueryPeriod, app.QuietPeriod, app.RequestTimeout,
-		app.RNDCUpdate, app.RNDCAddress, app.RNDCPort, app.RNDCKeyFile, app.RNDCZone)
+		app.RNDCUpdate, app.RNDCAddress, app.RNDCPort, app.RNDCKeyFile, app.RNDCZone,
+		strings.Join(app.BadClientNames[:], ","), app.ClientNameTemplate)
+
+	app.clientNameTemplate, err = template.New("harvester").Funcs(template.FuncMap{
+		"regex": func(target, match, replace string) string {
+			re := regexp.MustCompile(match)
+			return re.ReplaceAllString(target, replace)
+		},
+	}).Parse(app.ClientNameTemplate)
+	if err != nil {
+		app.log.Fatalf("Unable to parse client host name template %s", err)
+	}
+
+	app.badClientNames = make(map[string]bool)
+	for _, bad := range app.BadClientNames {
+		app.badClientNames[bad] = true
+	}
 
 	// establish REST end points
 	router := mux.NewRouter()

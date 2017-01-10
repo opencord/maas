@@ -15,6 +15,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"net"
 	"os"
@@ -39,8 +40,25 @@ const (
 	bindFileFormat = "{{.ClientHostname}}\tIN A {{.IPAddress}}\t; {{.HardwareAddress}}"
 )
 
+// generateClientHostname generates a client name based on hardware address
+func (app *application) generateClientHostname(lease *Lease) string {
+	var buf bytes.Buffer
+
+	app.log.Debugf("Generating client-hostname for MAC '%s'", lease.HardwareAddress.String())
+
+	err := app.clientNameTemplate.Execute(&buf, lease)
+	if err != nil {
+		app.log.Errorf("Unable to generate client host name for lease with HW address '%s' : %s",
+			lease.HardwareAddress.String(), err)
+		return strings.ToUpper("UNK-" +
+			strings.Replace(lease.HardwareAddress.String(), ":", "", -1))
+	}
+
+	return buf.String()
+}
+
 // parseLease parses a single lease from the lease file
-func parseLease(scanner *bufio.Scanner, lease *Lease) error {
+func (app *application) parseLease(scanner *bufio.Scanner, lease *Lease) error {
 	var err error
 	for scanner.Scan() {
 		fields := strings.Fields(scanner.Text())
@@ -49,12 +67,16 @@ func parseLease(scanner *bufio.Scanner, lease *Lease) error {
 			case "}":
 				// If no client-hostname was specified, generate one
 				if len(lease.ClientHostname) == 0 {
-					lease.ClientHostname = strings.ToUpper("UNK-" +
-						strings.Replace(lease.HardwareAddress.String(), ":", "", -1))
+					lease.ClientHostname = app.generateClientHostname(lease)
 				}
 				return nil
 			case "client-hostname":
 				lease.ClientHostname = strings.Trim(fields[1], "\";")
+
+				// Validate client-hostname
+				if _, ok := app.badClientNames[lease.ClientHostname]; ok {
+					lease.ClientHostname = app.generateClientHostname(lease)
+				}
 			case "hardware":
 				lease.HardwareAddress, err = net.ParseMAC(strings.Trim(fields[2], ";"))
 				if err != nil {
@@ -84,7 +106,7 @@ func parseLease(scanner *bufio.Scanner, lease *Lease) error {
 }
 
 // parseLeaseFile parses the entire lease file
-func parseLeaseFile(filename string, filterFunc leaseFilterFunc) (map[string]*Lease, error) {
+func (app *application) parseLeaseFile(filename string, filterFunc leaseFilterFunc) (map[string]*Lease, error) {
 	leases := make(map[string]*Lease)
 
 	file, err := os.Open(filename)
@@ -100,7 +122,7 @@ func parseLeaseFile(filename string, filterFunc leaseFilterFunc) (map[string]*Le
 		if len(fields) > 0 && fields[0] == "lease" {
 			lease := Lease{}
 			lease.IPAddress = net.ParseIP(fields[1])
-			parseLease(scanner, &lease)
+			app.parseLease(scanner, &lease)
 			if filterFunc(&lease) {
 				leases[lease.IPAddress.String()] = &lease
 			}
@@ -136,7 +158,7 @@ func (app *application) syncRequestHandler(requests chan *chan uint) {
 
 		// process the lease database
 		app.log.Infof("Synchronizing DHCP lease database")
-		leases, err := parseLeaseFile(app.DHCPLeaseFile,
+		leases, err := app.parseLeaseFile(app.DHCPLeaseFile,
 			func(lease *Lease) bool {
 				return lease.BindingState != Free &&
 					lease.Ends.After(now) &&
