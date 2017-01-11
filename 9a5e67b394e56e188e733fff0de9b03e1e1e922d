@@ -22,6 +22,30 @@
       "revId": "9a5e67b394e56e188e733fff0de9b03e1e1e922d",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa0f191f_44728fe6",
+        "filename": "build.gradle",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-01-11T14:17:51Z",
+      "side": 1,
+      "message": "Don\u0027t follow? If there is a modification you will see \"branchname[modified]\".",
+      "parentUuid": "fa0f191f_8468a7f6",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 127,
+        "endChar": 14
+      },
+      "revId": "9a5e67b394e56e188e733fff0de9b03e1e1e922d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
