@@ -46,6 +46,30 @@
       "revId": "9a5e67b394e56e188e733fff0de9b03e1e1e922d",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa0f191f_5709232b",
+        "filename": "build.gradle",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-01-11T19:32:24Z",
+      "side": 1,
+      "message": "I spent some time with the various repo commands - when I run the `repo status .` on a non-master branch (checked out using the -b option to the CiaB script), it still returns 0 and thus wouldn\u0027t show as modified.\n\nI\u0027m not sure on the way to do this given that checkouts with repo are in a detached head state.",
+      "parentUuid": "fa0f191f_44728fe6",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 127,
+        "endChar": 14
+      },
+      "revId": "9a5e67b394e56e188e733fff0de9b03e1e1e922d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
