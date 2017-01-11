@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa0f191f_8468a7f6",
+        "filename": "build.gradle",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-01-11T06:54:38Z",
+      "side": 1,
+      "message": "Would it be helpful to use the branch name instead of \u0027modified\u0027?",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 127,
+        "endChar": 14
+      },
+      "revId": "9a5e67b394e56e188e733fff0de9b03e1e1e922d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
