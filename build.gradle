@@ -105,13 +105,26 @@ def getCommitHash = { ->
     return hashStdOut.toString().trim()
 }
 
-def getBranchName = { ->
-    def branchStdOut = new ByteArrayOutputStream()
+def getBranchModified = { ->
+    def stdout = new ByteArrayOutputStream()
     exec {
-        commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
-        standardOutput = branchStdOut
+        commandLine "bash", "-c", "repo status . | tail -n +2"
+        standardOutput = stdout
     }
-    return branchStdOut.toString().trim()
+    return stdout.toString().trim()
+}
+
+def getBranchName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine "bash", "-c", "repo info -l -o | grep 'Manifest branch:' | awk '{print \$NF}'"
+        standardOutput = stdout
+    }
+    def val = stdout.toString().trim()
+    if ( getBranchModified != "0" ) {
+        val += '[modified]'
+    }
+    return val
 }
  
 task buildSwitchqImage(type: Exec) {
