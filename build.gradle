@@ -105,13 +105,34 @@ def getCommitHash = { ->
     return hashStdOut.toString().trim()
 }
 
-def getBranchName = { ->
-    def branchStdOut = new ByteArrayOutputStream()
+def isModified = { ->
+    def statusOut = new ByteArrayOutputStream()
+    def branchesOut = new ByteArrayOutputStream()
     exec {
-        commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
-        standardOutput = branchStdOut
+        commandLine "bash", "-c", "repo --color=never --no-pager status . | tail -n +2 | wc -l"
+        standardOutput = statusOut
     }
-    return branchStdOut.toString().trim()
+    exec {
+        commandLine "bash", "-c", "repo --color=never --no-pager branches | wc -l"
+        standardOutput = branchesOut
+    }
+    def statusVal = statusOut.toString().trim()
+    def branchesVal = branchesOut.toString().trim()
+
+    return statusVal != "0" || branchesVal != "0"
+}
+
+def getBranchName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine "bash", "-c", "repo --color=never --no-pager info -l -o | grep 'Manifest branch:' | awk '{print \$NF}'"
+        standardOutput = stdout
+    }
+    def val = stdout.toString().trim()
+    if ( isModified() != "0" ) {
+        val += '[modified]'
+    }
+    return val
 }
 
 task buildSwitchqImage(type: Exec) {
