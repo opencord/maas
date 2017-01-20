@@ -311,8 +311,8 @@ task prime (type: Exec)  {
     executable = "ansible-playbook"
     args = ["-i", config.seedServer.ip + ',']
 
-    if ( config.seedServer.user != null && config.seedServer.user != "" ) {
-        args = args << "--user=$config.seedServer.user"
+    if ( config.seedServer.ansible_user != null && config.seedServer.ansible_user != "" ) {
+        args = args << "--user=$config.seedServer.ansible_user"
     }
 
     if ( config.debug ) {
@@ -322,8 +322,8 @@ task prime (type: Exec)  {
     def extraVars = []
     if (config.seedServer) {
         extraVars = extraVars.p(config.seedServer.extraVars)
-            .p(config.seedServer.password, "ansible_ssh_pass")
-            .p(config.seedServer.sudoPassword, "ansible_sudo_pass")
+            .p(config.seedServer.ansible_ssh_pass, "ansible_ssh_pass")
+            .p(config.seedServer.ansible_become_pass, "ansible_become_pass")
             .p(config.seedServer.fabric_ip, "fabric_ip")
             .p(config.seedServer.fabric_range_low, "fabric_range_low")
             .p(config.seedServer.fabric_range_high, "fabric_range_high")
@@ -374,10 +374,9 @@ task deployBase(type: Exec)  {
     executable = "ansible-playbook"
     args = ["-i", config.seedServer.ip + ',']
 
-    if ( config.seedServer.user != null && config.seedServer.user != "" ) {
-        args = args << "--user=$config.seedServer.user"
+    if ( config.seedServer.ansible_user != null && config.seedServer.ansible_user != "" ) {
+        args = args << "--user=$config.seedServer.ansible_user"
     }
-
 
     if ( config.debug ) {
         args = args << "-vvvv"
@@ -386,8 +385,8 @@ task deployBase(type: Exec)  {
     def extraVars = []
     if (config.seedServer) {
         extraVars = extraVars.p(config.seedServer.extraVars)
-            .p(config.seedServer.password, "ansible_ssh_pass")
-            .p(config.seedServer.sudoPassword, "ansible_sudo_pass")
+            .p(config.seedServer.ansible_ssh_pass, "ansible_ssh_pass")
+            .p(config.seedServer.ansible_become_pass, "ansible_become_pass")
             .p(config.seedServer.fabric_ip, "fabric_ip")
             .p(config.seedServer.fabric_range_low, "fabric_range_low")
             .p(config.seedServer.fabric_range_high, "fabric_range_high")
