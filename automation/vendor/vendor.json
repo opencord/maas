@@ -1,0 +1,127 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "dGXnnR7ZhsrZNnEqFimk6q7YCqs=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "61e43dc76f7ee59a82bdf3d71033dc12bea4c77d",
+			"revisionTime": "2017-01-13T01:19:11Z"
+		},
+		{
+			"checksumSHA1": "b4Bd+o7lqSpiJr8eYHrfn6Y5iPE=",
+			"path": "github.com/juju/ansiterm",
+			"revision": "35c59b9e0fe275705a71bf5d58ee293f27efbbc4",
+			"revisionTime": "2016-11-07T20:46:39Z"
+		},
+		{
+			"checksumSHA1": "mqeBN4W37/KmjWBQT4xqIQGjGYE=",
+			"path": "github.com/juju/ansiterm/tabwriter",
+			"revision": "35c59b9e0fe275705a71bf5d58ee293f27efbbc4",
+			"revisionTime": "2016-11-07T20:46:39Z"
+		},
+		{
+			"checksumSHA1": "KIX/3RadQkfl4ZxCmOQ01vAGLEI=",
+			"path": "github.com/juju/errors",
+			"revision": "6f54ff6318409d31ff16261533ce2c8381a4fd5d",
+			"revisionTime": "2016-08-09T03:08:48Z"
+		},
+		{
+			"checksumSHA1": "kFWNEYI94c34qJ3twdktZxjLQPE=",
+			"path": "github.com/juju/gomaasapi",
+			"revision": "f0300c96aa5e0deb3cc599ca8a8949097b955e60",
+			"revisionTime": "2016-11-02T12:07:14Z"
+		},
+		{
+			"checksumSHA1": "WttBhWbKX60YUiSiyF+mQKpfdVo=",
+			"path": "github.com/juju/loggo",
+			"revision": "3b7ece48644d35850f4ced4c2cbc2cf8413f58e0",
+			"revisionTime": "2016-08-18T02:57:24Z"
+		},
+		{
+			"checksumSHA1": "WsQOT3cgol8O3aenURnzUokuIAA=",
+			"path": "github.com/juju/schema",
+			"revision": "e4e05803c9a103fdfa880476044100ac17e54830",
+			"revisionTime": "2016-09-16T14:28:50Z"
+		},
+		{
+			"checksumSHA1": "uBuPqeE5+azM1/N7YtTU2IUXuTc=",
+			"path": "github.com/juju/utils",
+			"revision": "e5eb4d99a51c3ded8e4e8bdfe527260ceeec997d",
+			"revisionTime": "2017-01-16T11:32:47Z"
+		},
+		{
+			"checksumSHA1": "CEj9efal05UefJa0E6s1Uskv5XU=",
+			"path": "github.com/juju/utils/clock",
+			"revision": "e5eb4d99a51c3ded8e4e8bdfe527260ceeec997d",
+			"revisionTime": "2017-01-16T11:32:47Z"
+		},
+		{
+			"checksumSHA1": "i9VUhzmNRF4jDTwpDuAgoAru+k0=",
+			"path": "github.com/juju/utils/set",
+			"revision": "e5eb4d99a51c3ded8e4e8bdfe527260ceeec997d",
+			"revisionTime": "2017-01-16T11:32:47Z"
+		},
+		{
+			"checksumSHA1": "DqG7AvEBxxWLRzQPgLM69dUpkL0=",
+			"path": "github.com/juju/version",
+			"revision": "1f41e27e54f21acccf9b2dddae063a782a8a7ceb",
+			"revisionTime": "2016-10-31T05:19:06Z"
+		},
+		{
+			"checksumSHA1": "pNria08/hqW7nnWb0erRBMdJU3M=",
+			"path": "github.com/kelseyhightower/envconfig",
+			"revision": "4069f29f08928c54bcb1fdf632b31b1bb54b4fdb",
+			"revisionTime": "2017-01-13T19:16:37Z"
+		},
+		{
+			"checksumSHA1": "0nXta8PKYGYicKWeydn0A7ELKcs=",
+			"path": "github.com/lunixbochs/vtclean",
+			"revision": "4fbf7632a2c6d3fbdb9931439bdbbeded02cbe36",
+			"revisionTime": "2016-01-25T03:51:06Z"
+		},
+		{
+			"checksumSHA1": "I4njd26dG5hxFT2nawuByM4pxzY=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "d228849504861217f796da67fae4f6e347643f15",
+			"revisionTime": "2016-11-03T16:00:40Z"
+		},
+		{
+			"checksumSHA1": "xZuhljnmBysJPta/lMyYmJdujCg=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "30a891c33c7cde7b02a981314b4228ec99380cca",
+			"revisionTime": "2016-11-23T14:36:37Z"
+		},
+		{
+			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
+			"path": "golang.org/x/crypto/pbkdf2",
+			"revision": "b8a2a83acfe6e6770b75de42d5ff4c67596675c0",
+			"revisionTime": "2017-01-13T19:21:00Z"
+		},
+		{
+			"checksumSHA1": "TuN733jTVL7T0QVzNx6Tn6BAgrg=",
+			"path": "gopkg.in/juju/names.v2",
+			"revision": "0847c26d322a121e52614f969fb82eae2820c715",
+			"revisionTime": "2016-11-02T13:43:03Z"
+		},
+		{
+			"checksumSHA1": "YsB2DChSV9HxdzHaKATllAUKWSI=",
+			"path": "gopkg.in/mgo.v2/bson",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "XQsrqoNT1U0KzLxOFcAZVvqhLfk=",
+			"path": "gopkg.in/mgo.v2/internal/json",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "12GqsW8PiRPnezDDy0v4brZrndM=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "a5b47d31c556af34a302ce5d659e6fea44d90de0",
+			"revisionTime": "2016-09-28T15:37:09Z"
+		}
+	],
+	"rootPath": "gerrit.opencord.org/maas/automation"
+}

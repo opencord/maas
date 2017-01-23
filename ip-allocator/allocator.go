@@ -14,21 +14,25 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"net/http"
+	"os"
 )
 
+const appName = "ALLOCATE"
+
 type Config struct {
-	Port      int    `default:"4242"`
-	Listen    string `default:"0.0.0.0"`
-	Network   string `default:"10.0.0.0/24"`
-	RangeLow  string `default:"10.0.0.2" envconfig:"RANGE_LOW"`
-	RangeHigh string `default:"10.0.0.253" envconfig:"RANGE_HIGH"`
-	LogLevel  string `default:"warning" envconfig:"LOG_LEVEL"`
-	LogFormat string `default:"text" envconfig:"LOG_FORMAT"`
+	Port      int    `default:"4242" desc:"port on which to listen for requests"`
+	Listen    string `default:"0.0.0.0" desc:"IP on which to listen for requests"`
+	Network   string `default:"10.0.0.0/24" desc:"subnet to allocate via requests"`
+	RangeLow  string `default:"10.0.0.2" envconfig:"RANGE_LOW" desc:"low value in range to allocate"`
+	RangeHigh string `default:"10.0.0.253" envconfig:"RANGE_HIGH" desc:"high value in range to allocate"`
+	LogLevel  string `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
+	LogFormat string `default:"text" envconfig:"LOG_FORMAT" desc:"log output format, text or json"`
 }
 
 type Context struct {
@@ -36,12 +40,23 @@ type Context struct {
 }
 
 var log = logrus.New()
+var appFlags = flag.NewFlagSet("", flag.ContinueOnError)
 
 func main() {
 	context := &Context{}
 
 	config := Config{}
-	err := envconfig.Process("ALLOCATE", &config)
+	appFlags.Usage = func() {
+		envconfig.Usage(appName, &config)
+	}
+	if err := appFlags.Parse(os.Args[1:]); err != nil {
+		if err != flag.ErrHelp {
+			os.Exit(1)
+		} else {
+			return
+		}
+	}
+	err := envconfig.Process(appName, &config)
 	if err != nil {
 		log.Fatalf("Unable to parse configuration options : %s", err)
 	}

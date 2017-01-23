@@ -1,4 +1,4 @@
-## Copyright 2016 Open Networking Laboratory
+## Copyright 2017 Open Networking Laboratory
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -11,22 +11,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM golang:1.6-alpine
+FROM golang:1.7-alpine
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk --update add openssh-client git
-
-RUN mkdir -p /switchq
-COPY vendors.json /switchq/vendors.json
-
-RUN go get github.com/tools/godep
-ADD . /go/src/gerrit.opencord.com/maas/switchq
-
-WORKDIR /go/src/gerrit.opencord.com/maas/switchq
-RUN /go/bin/godep restore || true
-
+RUN mkdir /switchq /service
 WORKDIR /go
-RUN go install gerrit.opencord.com/maas/switchq
+ADD . /go/src/gerrit.opencord.com/maas/switchq
+COPY vendors.json /switchq/vendors.json
+RUN go build -o /service/entry-point gerrit.opencord.com/maas/switchq
 
 LABEL org.label-schema.name="switchq" \
       org.label-schema.description="Provides fabric switch discovery and provisioning" \
@@ -34,4 +26,5 @@ LABEL org.label-schema.name="switchq" \
       org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/go/bin/switchq"]
+WORKDIR /service
+ENTRYPOINT ["/service/entry-point"]

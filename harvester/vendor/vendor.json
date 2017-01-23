@@ -1,0 +1,67 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "dGXnnR7ZhsrZNnEqFimk6q7YCqs=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "61e43dc76f7ee59a82bdf3d71033dc12bea4c77d",
+			"revisionTime": "2017-01-13T01:19:11Z"
+		},
+		{
+			"checksumSHA1": "F5dR3/i70EhSIMZfeIV+H8/PtvM=",
+			"path": "github.com/gorilla/mux",
+			"revision": "392c28fe23e1c45ddba891b0320b3b5df220beea",
+			"revisionTime": "2017-01-18T13:43:44Z"
+		},
+		{
+			"checksumSHA1": "pNria08/hqW7nnWb0erRBMdJU3M=",
+			"path": "github.com/kelseyhightower/envconfig",
+			"revision": "4069f29f08928c54bcb1fdf632b31b1bb54b4fdb",
+			"revisionTime": "2017-01-13T19:16:37Z"
+		},
+		{
+			"checksumSHA1": "DpsruMRlfaXitPiELMUatEOMh1k=",
+			"path": "github.com/tatsushid/go-fastping",
+			"revision": "d7bb493dee3e090e2ffb6914adddf17c1e7c026c",
+			"revisionTime": "2016-01-08T17:53:29Z"
+		},
+		{
+			"checksumSHA1": "9Pcc1IiRqPxEcxU2KMpkrcEGb3k=",
+			"path": "golang.org/x/net/bpf",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revisionTime": "2017-01-14T04:22:49Z"
+		},
+		{
+			"checksumSHA1": "fsavl2xrqJNp2rnCPrmj7wVbyqo=",
+			"path": "golang.org/x/net/icmp",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revisionTime": "2017-01-14T04:22:49Z"
+		},
+		{
+			"checksumSHA1": "ph4zMZHCWvSjVOZwoxbks+nG0/M=",
+			"path": "golang.org/x/net/internal/iana",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revisionTime": "2017-01-14T04:22:49Z"
+		},
+		{
+			"checksumSHA1": "LVY0kRV5iwxDS3XQaBWxdzPemyc=",
+			"path": "golang.org/x/net/internal/netreflect",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revisionTime": "2017-01-14T04:22:49Z"
+		},
+		{
+			"checksumSHA1": "825oQJv9jmZu0T9YSXnDHtmeNUY=",
+			"path": "golang.org/x/net/ipv4",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revisionTime": "2017-01-14T04:22:49Z"
+		},
+		{
+			"checksumSHA1": "O58psCWTm25Kf+VCFLoamNACZ8Q=",
+			"path": "golang.org/x/net/ipv6",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revisionTime": "2017-01-14T04:22:49Z"
+		}
+	],
+	"rootPath": "gerrit.opencord.com/maas/harvester"
+}

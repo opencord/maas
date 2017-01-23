@@ -16,6 +16,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -23,28 +24,31 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"sync"
 	"time"
 )
 
+const appName = "SWITCHQ"
+
 type Config struct {
-	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"VENDORS_URL"`
-	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"ADDRESS_URL"`
-	PollInterval    string `default:"1m" envconfig:"POLL_INTERVAL"`
-	ProvisionTTL    string `default:"1h" envconfig:"PROVISION_TTL"`
-	ProvisionURL    string `default:"" envconfig:"PROVISION_URL"`
-	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL"`
-	DefaultRole     string `default:"fabric-switch" envconfig:"DEFAULT_ROLE"`
-	Script          string `default:"do-ansible"`
-	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL"`
-	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
-	Listen          string `default:""`
-	Port            int    `default:"4244"`
-	MaasURL         string `default:"http://localhost/MAAS" envconfig:"MAAS_URL"`
-	MaasKey         string `default:"" envconfig:"MAAS_API_KEY"`
-	ShowApiKey      bool   `default:"false" envconfig:"MAAS_SHOW_API_KEY"`
-	ApiKeyFile      string `default:"/secrets/maas_api_key" envconfig:"MAAS_API_KEY_FILE"`
+	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"VENDORS_URL" desc:"URL that specifies supported vendor OUI information"`
+	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"ADDRESS_URL" desc:"URL of service or file from which to query IP information"`
+	PollInterval    string `default:"1m" envconfig:"POLL_INTERVAL" desc:"how often IP information should be queried and processed"`
+	ProvisionTTL    string `default:"1h" envconfig:"PROVISION_TTL" desc:"duraction to wait for a provisioning request before considering it failed"`
+	ProvisionURL    string `default:"" envconfig:"PROVISION_URL" desc:"URL of provisioning service"`
+	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL" desc:"URL of service to query for switch role"`
+	DefaultRole     string `default:"fabric-switch" envconfig:"DEFAULT_ROLE" desc:"default switch role"`
+	Script          string `default:"do-ansible" desc:"script to run for provisioniner"`
+	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
+	LogFormat       string `default:"text" envconfig:"LOG_FORMAT" desc:"output format for logging, text or json"`
+	Listen          string `default:"" desc:"IP on which to listen for requests"`
+	Port            int    `default:"4244" desc:"port on which to listen for requests"`
+	MaasURL         string `default:"http://localhost/MAAS" envconfig:"MAAS_URL" desc:"connection string for MAAS"`
+	MaasKey         string `default:"" envconfig:"MAAS_API_KEY" desc:"API key for MAAS"`
+	ShowApiKey      bool   `default:"false" envconfig:"MAAS_SHOW_API_KEY" desc:"display API key in log"`
+	ApiKeyFile      string `default:"/secrets/maas_api_key" envconfig:"MAAS_API_KEY_FILE" desc:"file from which to read API key"`
 
 	vendors       Vendors
 	addressSource AddressSource
@@ -280,12 +284,24 @@ func (c *AppContext) processLoop() {
 }
 
 var log = logrus.New()
+var appFlags = flag.NewFlagSet("", flag.ContinueOnError)
 
 func main() {
 
 	var err error
 	context := &AppContext{}
-	err = envconfig.Process("SWITCHQ", &context.config)
+
+	appFlags.Usage = func() {
+		envconfig.Usage(appName, &(context.config))
+	}
+	if err := appFlags.Parse(os.Args[1:]); err != nil {
+		if err != flag.ErrHelp {
+			os.Exit(1)
+		} else {
+			return
+		}
+	}
+	err = envconfig.Process(appName, &context.config)
 	if err != nil {
 		log.Fatalf("Unable to parse configuration options : %s", err)
 	}

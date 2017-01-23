@@ -11,27 +11,17 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM golang:alpine
-
+FROM golang:1.7-alpine
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk --update add git
+RUN mkdir /service
 
-# install godep
 WORKDIR /go
-RUN go get github.com/tools/godep
 ADD . /go/src/gerrit.opencord.org/maas/config-generator
-
-# restore dependancies
-WORKDIR /go/src/gerrit.opencord.org/maas/config-generator
-RUN /go/bin/godep restore || true
-
-# generate the binary
-WORKDIR /go/
-RUN go install gerrit.opencord.org/maas/config-generator
+RUN go build -o /service/entry-point  gerrit.opencord.org/maas/config-generator
 
 # copy templates to the image
-COPY netconfig.tpl /go/
+COPY netconfig.tpl /service/netconfig.tpl
 
 EXPOSE 1337
 
@@ -41,4 +31,5 @@ LABEL org.label-schema.name="generator" \
       org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/go/bin/config-generator"]
+WORKDIR /service
+ENTRYPOINT ["/service/entry-point"]

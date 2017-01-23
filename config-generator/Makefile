@@ -1,35 +1,38 @@
+IMAGE_NAME=config-generator
+BINARY=entry-point
+BUILD_TAG=build
+PACKAGE_TAG=candidate
 
-default: image
+.PHONY: help
+help:
+	@echo "build     - create the binary"
+	@echo "package   - package the binary into a docker container"
+	@echo "clean     - remove tempory files and build artifacts"
+	@echo "help      - this message"
 
-ansible:
-	ansible-playbook ./setup.yml -v -vvvv -u gunjan -i ./host.yml --ask-pass
+BUILD_DATE=$(shell date -u +%Y-%m-%dT%TZ)
+VCS_REF=$(shell git log --pretty=format:%H -n 1)
+VCS_REF_DATE=$(shell git log --pretty=format:%cd --date=format:%FT%T%z -n 1)
+BRANCHES=$(shell repo --color=never --no-pager branches 2>/dev/null | wc -l)
+STATUS=$(shell repo --color=never --no-pager status . | tail -n +2 | wc -l)
+MODIFIED=$(shell test $(BRANCHES) -eq 0 && test $(STATUS) -eq 0 || echo "[modified]")
+BRANCH=$(shell repo --color=never --no-pager info -l -o | grep 'Manifest branch:' | awk '{print $$NF}')
+VERSION=$(BRANCH)$(MODIFIED)
 
-get:
-	goimports -w .
-	go get -t -d -v ./...
-
-src:
-	docker run --rm -it -v "$GOPATH":/gopath -v "$(pwd)":/app -e "GOPATH=/gopath" -w /app golang:1.6.1 sh -c 'CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags="-s" -o app'
-
-fmt:
-	gofmt -w .
-	#TODO: go lint, go vet
-test:
-	go test -v -race ./...
-	go test -cover -v ./...
-
-image:
-	docker build -t config-gen .
-
-run:
-	docker run --rm -p 1337:1337 -it config-gen
-
+.PHONY: build
 build:
-	GOOS=linux GOARCH=amd64 go build -o app
+	docker build -t $(IMAGE_NAME):$(BUILD_TAG) .
 
-depsave:
-	godep save
+.PHONY: package
+package:
+	$(eval BUILD_ID := $(shell docker create $(IMAGE_NAME):$(BUILD_TAG)))
+	$(eval BINDIR := $(shell mktemp -d))
+	docker cp $(BUILD_ID):/service/$(BINARY) $(BINDIR)/$(BINARY)
+	cp Dockerfile.release netconfig.tpl $(BINDIR)
+	docker build -f $(BINDIR)/Dockerfile.release -t $(IMAGE_NAME):$(PACKAGE_TAG) --label org.label-schema.build-date=$(BUILD_DATE) --label org.label-schema.vcs-ref=$(VCS_REF) --label org.label-schema.vcs-ref-date=$(VCS_REF_DATE) --label org.label-schema.version=$(VERSION) $(BINDIR)
+	docker rm -f $(BUILD_ID)
+	rm -r $(BINDIR)
 
-depupdate:
-	go get -t -v ./...
-	godep update
+.PHONY: clean
+clean:
+	@echo ""

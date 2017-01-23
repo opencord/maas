@@ -136,12 +136,13 @@ def getBranchName = { ->
 }
 
 task buildSwitchqImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-maas-switchq', './switchq'
+    workingDir 'switchq'
+    commandLine 'make', 'build', 'package'
 }
 
 task tagSwitchqImage(type: Exec) {
    dependsOn buildSwitchqImage
-   commandLine "docker", 'tag', 'cord-maas-switchq', "$targetReg/cord-maas-switchq:$targetTag"
+   commandLine "docker", 'tag', 'cord-maas-switchq:candidate', "$targetReg/cord-maas-switchq:$targetTag"
 }
 
 task publishSwitchqImage(type: Exec) {
@@ -152,12 +153,13 @@ task publishSwitchqImage(type: Exec) {
 // IP Allocator Image
 
 task buildAllocationImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-ip-allocator', './ip-allocator'
+    workingDir 'ip-allocator'
+    commandLine 'make', 'build', 'package'
 }
 
 task tagAllocationImage(type: Exec) {
    dependsOn buildAllocationImage
-   commandLine "docker", 'tag', 'cord-ip-allocator', "$targetReg/cord-ip-allocator:$targetTag"
+   commandLine "docker", 'tag', 'cord-ip-allocator:candidate', "$targetReg/cord-ip-allocator:$targetTag"
 }
 
 task publishAllocationImage(type: Exec) {
@@ -168,12 +170,13 @@ task publishAllocationImage(type: Exec) {
 // Provisioner Image
 
 task buildProvisionerImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'cord-provisioner', './provisioner'
+    workingDir 'provisioner'
+    commandLine 'make', 'build', 'package'
 }
 
 task tagProvisionerImage(type: Exec) {
    dependsOn buildProvisionerImage
-   commandLine "docker", 'tag', 'cord-provisioner', "$targetReg/cord-provisioner:$targetTag"
+   commandLine "docker", 'tag', 'cord-provisioner:candidate', "$targetReg/cord-provisioner:$targetTag"
 }
 
 task publishProvisionerImage(type: Exec) {
@@ -184,12 +187,13 @@ task publishProvisionerImage(type: Exec) {
 // Config Generator Image
 
 task buildConfigGeneratorImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', 'config-generator', './config-generator'
+    workingDir 'config-generator'
+    commandLine 'make', 'build', 'package'
 }
 
 task tagConfigGeneratorImage(type: Exec) {
    dependsOn buildConfigGeneratorImage
-   commandLine "docker", 'tag', 'config-generator', "$targetReg/config-generator:$targetTag"
+   commandLine "docker", 'tag', 'config-generator:candidate', "$targetReg/config-generator:$targetTag"
 }
 
 task publishConfigGeneratorImage(type: Exec) {
@@ -200,12 +204,13 @@ task publishConfigGeneratorImage(type: Exec) {
 // Automation Image
 
 task buildAutomationImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', "cord-maas-automation", "-f", "./automation/Dockerfile", "./automation"
+    workingDir 'automation'
+    commandLine 'make', 'build', 'package'
 }
 
 task tagAutomationImage(type: Exec) {
     dependsOn buildAutomationImage
-    commandLine "docker", 'tag', 'cord-maas-automation', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "docker", 'tag', 'cord-maas-automation:candidate', "$targetReg/cord-maas-automation:$targetTag"
 }
 
 task publishAutomationImage(type: Exec) {
@@ -216,12 +221,13 @@ task publishAutomationImage(type: Exec) {
 // DHCP Harvester Images
 
 task buildHarvesterImage(type: Exec) {
-    commandLine "docker", 'build', '--label', 'org.label-schema.build-date=' + getBuildTimestamp(), '--label', 'org.label-schema.vcs-ref=' + getCommitHash(), '--label', 'org.label-schema.vcs-ref-date=' + getCommitDate(), '--label', 'org.label-schema.version=' + getBranchName(), '-t', "cord-dhcp-harvester", "./harvester"
+    workingDir 'harvester'
+    commandLine 'make', 'build', 'package'
 }
 
 task tagHarvesterImage(type: Exec) {
     dependsOn buildHarvesterImage
-    commandLine "docker", 'tag', 'cord-dhcp-harvester', "$targetReg/cord-dhcp-harvester:$targetTag"
+    commandLine "docker", 'tag', 'cord-dhcp-harvester:candidate', "$targetReg/cord-dhcp-harvester:$targetTag"
 }
 
 task publishHarvesterImage(type: Exec) {
@@ -344,7 +350,7 @@ task prime (type: Exec)  {
             .p(config.seedServer.virtualbox_support, "virtualbox_support")
             .p(config.seedServer.power_helper_user, "power_helper_user")
             .p(config.seedServer.power_helper_host, "power_helper_host")
-            .p(config.seedServer.port, "ansible_ssh_port")
+            .p(config.seedServer.ansible_ssh_port, "ansible_ssh_port")
     }
 
     if (config.passwords) {
@@ -405,7 +411,7 @@ task deployBase(type: Exec)  {
             .p(config.seedServer.virtualbox_support, "virtualbox_support")
             .p(config.seedServer.power_helper_user, "power_helper_user")
             .p(config.seedServer.power_helper_host, "power_helper_host")
-            .p(config.seedServer.port, "ansible_ssh_port")
+            .p(config.seedServer.ansible_ssh_port, "ansible_ssh_port")
     }
 
     if (config.passwords) {

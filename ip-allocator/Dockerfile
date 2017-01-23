@@ -11,21 +11,12 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM golang:alpine
+FROM golang:1.7-alpine
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk --update add git
-
 WORKDIR /go
-RUN go get github.com/tools/godep
 ADD . /go/src/gerrit.opencord.org/maas/cord-ip-allocator
-
-WORKDIR /go/src/gerrit.opencord.org/maas/cord-ip-allocator
-RUN /go/bin/godep restore || true
-
-WORKDIR /go
-
-RUN go install gerrit.opencord.org/maas/cord-ip-allocator
+RUN go build -o /service/entry-point gerrit.opencord.org/maas/cord-ip-allocator
 
 LABEL org.label-schema.name="allocator" \
       org.label-schema.description="Provides IP address allocation for fabric interfaces" \
@@ -33,4 +24,5 @@ LABEL org.label-schema.name="allocator" \
       org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/go/bin/cord-ip-allocator"]
+WORKDIR /service
+ENTRYPOINT ["/service/entry-point"]
