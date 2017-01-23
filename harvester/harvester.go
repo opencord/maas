@@ -14,11 +14,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -26,6 +28,8 @@ import (
 	"text/template"
 	"time"
 )
+
+const appName = "HARVESTER"
 
 // application application configuration and internal state
 type application struct {
@@ -50,6 +54,7 @@ type application struct {
 	BadClientNames     []string      `default:"localhost" envconfig:"BAD_CLIENT_NAMES" desc:"list of invalid hostnames for clients"`
 	ClientNameTemplate string        `default:"UKN-{{with $x:=.HardwareAddress|print}}{{regex $x \":\" \"\"}}{{end}}" envconfig:"CLIENT_NAME_TEMPLATE" desc:"template for generated host name"`
 
+	appFlags           *flag.FlagSet      `ignored:"true"`
 	log                *logrus.Logger     `ignored:"true"`
 	interchange        sync.RWMutex       `ignored:"true"`
 	leases             map[string]*Lease  `ignored:"true"`
@@ -62,10 +67,23 @@ type application struct {
 }
 
 func main() {
+
 	// initialize application state
 	app := &application{
 		log:      logrus.New(),
+		appFlags: flag.NewFlagSet("", flag.ContinueOnError),
 		requests: make(chan *chan uint, 100),
+	}
+
+	app.appFlags.Usage = func() {
+		envconfig.Usage(appName, app)
+	}
+	if err := app.appFlags.Parse(os.Args[1:]); err != nil {
+		if err != flag.ErrHelp {
+			os.Exit(1)
+		} else {
+			return
+		}
 	}
 
 	// process and validate the application configuration

@@ -1,4 +1,4 @@
-## Copyright 2016 Open Networking Laboratory
+## Copyright 2017 Open Networking Laboratory
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -11,23 +11,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM golang:1.6-alpine
+FROM golang:1.7-alpine
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk --update add openssh-client git
-
+RUN mkdir /service
 WORKDIR /go
-RUN go get github.com/tools/godep
 ADD . /go/src/gerrit.opencord.org/maas/cord-maas-automation
-
-WORKDIR /go/src/gerrit.opencord.org/maas/cord-maas-automation
-RUN /go/bin/godep restore || true
-
-WORKDIR /go
-RUN go install gerrit.opencord.org/maas/cord-maas-automation
-
-RUN mkdir -p /root/.ssh
-COPY ssh-config /root/.ssh/config
+RUN go build -o /service/entry-point gerrit.opencord.org/maas/cord-maas-automation
 
 LABEL org.label-schema.name="automation" \
       org.label-schema.description="Provides automation of the compute node deployment and provisioning process" \
@@ -35,4 +25,5 @@ LABEL org.label-schema.name="automation" \
       org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/go/bin/cord-maas-automation"]
+WORKDIR /service
+ENTRYPOINT ["/service/entry-point"]

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 
 ID=$1
 HOSTNAME=$2

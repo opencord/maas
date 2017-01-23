@@ -11,19 +11,15 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-FROM golang:1.6-alpine
+FROM golang:1.7-alpine
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk --update add openssh-client git bind
+RUN apk --update add bind
 
-RUN go get github.com/tools/godep
-ADD . /go/src/gerrit.opencord.com/maas/harvester
-
-WORKDIR /go/src/gerrit.opencord.com/maas/harvester
-RUN /go/bin/godep restore || true
-
+RUN mkdir /service
 WORKDIR /go
-RUN go install gerrit.opencord.com/maas/harvester
+ADD . /go/src/gerrit.opencord.com/maas/harvester
+RUN go build -o /service/entry-point gerrit.opencord.com/maas/harvester
 
 LABEL org.label-schema.name="harvester" \
       org.label-schema.description="Provides DHCP havesting and insertion into DNS" \
@@ -31,4 +27,5 @@ LABEL org.label-schema.name="harvester" \
       org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/go/bin/harvester"]
+WORKDIR /service
+ENTRYPOINT ["/service/entry-point"]
