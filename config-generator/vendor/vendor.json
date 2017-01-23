@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "dGXnnR7ZhsrZNnEqFimk6q7YCqs=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "61e43dc76f7ee59a82bdf3d71033dc12bea4c77d",
+			"revisionTime": "2017-01-13T01:19:11Z"
+		},
+		{
+			"checksumSHA1": "F5dR3/i70EhSIMZfeIV+H8/PtvM=",
+			"path": "github.com/gorilla/mux",
+			"revision": "392c28fe23e1c45ddba891b0320b3b5df220beea",
+			"revisionTime": "2017-01-18T13:43:44Z"
+		},
+		{
+			"checksumSHA1": "pNria08/hqW7nnWb0erRBMdJU3M=",
+			"path": "github.com/kelseyhightower/envconfig",
+			"revision": "4069f29f08928c54bcb1fdf632b31b1bb54b4fdb",
+			"revisionTime": "2017-01-13T19:16:37Z"
+		}
+	],
+	"rootPath": "gerrit.opencord.org/maas/config-generator"
+}

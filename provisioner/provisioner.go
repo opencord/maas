@@ -14,23 +14,27 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 	"net/http"
+	"os"
 )
 
+const appName = "PROVISION"
+
 type Config struct {
-	Port            int    `default:"4243"`
-	Listen          string `default:"0.0.0.0"`
-	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL"`
-	DefaultRole     string `default:"compute-node" envconfig:"DEFAULT_ROLE"`
-	Script          string `default:"do-ansible"`
-	StorageURL      string `default:"memory:" envconfig:"STORAGE_URL"`
-	NumberOfWorkers int    `default:"5" envconfig:"NUMBER_OF_WORKERS"`
-	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL"`
-	LogFormat       string `default:"text" envconfig:"LOG_FORMAT"`
+	Port            int    `default:"4243" desc:"port on which to listen for requests"`
+	Listen          string `default:"0.0.0.0" desc:"IP on which to listen for requests"`
+	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL" desc:"connection string to query role for device"`
+	DefaultRole     string `default:"compute-node" envconfig:"DEFAULT_ROLE" desc:"default role for device"`
+	Script          string `default:"do-ansible" desc:"default script to execute to provision device"`
+	StorageURL      string `default:"memory:" envconfig:"STORAGE_URL" desc:"connection string to persistence implementation"`
+	NumberOfWorkers int    `default:"5" envconfig:"NUMBER_OF_WORKERS" desc:"number of concurrent provisioning workers"`
+	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
+	LogFormat       string `default:"text" envconfig:"LOG_FORMAT" desc:"log output format, text or json"`
 }
 
 type Context struct {
@@ -41,11 +45,22 @@ type Context struct {
 }
 
 var log = logrus.New()
+var appFlags = flag.NewFlagSet("", flag.ContinueOnError)
 
 func main() {
 	context := &Context{}
 
-	err := envconfig.Process("PROVISION", &(context.config))
+	appFlags.Usage = func() {
+		envconfig.Usage(appName, &(context.config))
+	}
+	if err := appFlags.Parse(os.Args[1:]); err != nil {
+		if err != flag.ErrHelp {
+			os.Exit(1)
+		} else {
+			return
+		}
+	}
+	err := envconfig.Process(appName, &(context.config))
 	if err != nil {
 		log.Fatalf("[ERRO] Unable to parse configuration options : %s", err)
 	}
