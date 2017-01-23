@@ -27,15 +27,17 @@ import (
 	maas "github.com/juju/gomaasapi"
 )
 
+const appName = "AUTOMATION"
+
 type Config struct {
-	PowerHelperUser   string        `default:"cord" envconfig:"POWER_HELPER_USER"`
-	PowerHelperHost   string        `default:"127.0.0.1" envconfig:"POWER_HELPER_HOST"`
-	PowerHelperScript string        `default:"" envconfig:"POWER_HELPER_SCRIPT"`
-	ProvisionUrl      string        `default:"" envconfig:"PROVISION_URL"`
-	ProvisionTtl      string        `default:"1h" envconfig:"PROVISION_TTL"`
-	LogLevel          string        `default:"warning" envconfig:"LOG_LEVEL"`
-	LogFormat         string        `default:"text" envconfig:"LOG_FORMAT"`
-	ApiKey            string        `envconfig:"MAAS_API_KEY" desc:"API key to access MAAS server"`
+	PowerHelperUser   string        `default:"cord" envconfig:"POWER_HELPER_USER" desc:"user when integrating with virtual box power mgmt"`
+	PowerHelperHost   string        `default:"127.0.0.1" envconfig:"POWER_HELPER_HOST" desc:"virtual box host"`
+	PowerHelperScript string        `default:"" envconfig:"POWER_HELPER_SCRIPT" desc:"script for virtual box power mgmt support"`
+	ProvisionUrl      string        `default:"" envconfig:"PROVISION_URL" desc:"connection string to connect to provisioner uservice"`
+	ProvisionTtl      string        `default:"1h" envconfig:"PROVISION_TTL" desc:"duration to wait for a provisioning request to complete, before considered a failure"`
+	LogLevel          string        `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
+	LogFormat         string        `default:"text" envconfig:"LOG_FORMAT" desc:"log output format, text or json"`
+	ApiKey            string        `envconfig:"MAAS_API_KEY" required:"true" desc:"API key to access MAAS server"`
 	ApiKeyFile        string        `default:"/secrets/maas_api_key" envconfig:"MAAS_API_KEY_FILE" desc:"file to hold the secret"`
 	ShowApiKey        bool          `default:"false" envconfig:"MAAS_SHOW_API_KEY" desc:"Show API in clear text in logs"`
 	MaasUrl           string        `default:"http://localhost/MAAS" envconfig:"MAAS_URL" desc:"URL to access MAAS server"`
@@ -89,12 +91,24 @@ func fetchNodes(client *maas.MAASObject) ([]MaasNode, error) {
 }
 
 var log = logrus.New()
+var appFlags = flag.NewFlagSet("", flag.ContinueOnError)
 
 func main() {
 
-	flag.Parse()
 	config := Config{}
-	err := envconfig.Process("AUTOMATION", &config)
+	appFlags.Usage = func() {
+		envconfig.Usage(appName, &config)
+	}
+	if err := appFlags.Parse(os.Args[1:]); err != nil {
+		if err != flag.ErrHelp {
+			os.Exit(1)
+		} else {
+			return
+		}
+	}
+
+	err := envconfig.Process(appName, &config)
+
 	if err != nil {
 		log.Fatalf("Unable to parse configuration options : %s", err)
 	}
