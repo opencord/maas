@@ -22,6 +22,30 @@
       "revId": "3c75747a5ad3a90290ec3b823e6c97acf67d0dac",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa0f191f_f1683c89",
+        "filename": "build.gradle",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-02-01T20:19:43Z",
+      "side": 1,
+      "message": "Will revise to use `headnode` instead of `prod` for credentials, and change the `config.seedServer` to `config.common` for all the other config options.",
+      "parentUuid": "fa0f191f_9158e0fb",
+      "range": {
+        "startLine": 56,
+        "startChar": 21,
+        "endLine": 56,
+        "endChar": 25
+      },
+      "revId": "3c75747a5ad3a90290ec3b823e6c97acf67d0dac",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
