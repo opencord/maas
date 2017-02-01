@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa0f191f_9158e0fb",
+        "filename": "build.gradle",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-02-01T19:33:55Z",
+      "side": 1,
+      "message": "have to be honest, i don\u0027t think prod is the correct choice here. It is not about prod, it is more about head node. I know this is a bit of a nit, but I think it is more descriptive and thus will help people understand a bit better.",
+      "range": {
+        "startLine": 56,
+        "startChar": 21,
+        "endLine": 56,
+        "endChar": 25
+      },
+      "revId": "3c75747a5ad3a90290ec3b823e6c97acf67d0dac",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
