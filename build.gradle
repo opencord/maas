@@ -53,8 +53,8 @@ ext {
         ? project.getProperty('targetReg')
         : config.docker && config.docker.registry
             ? config.docker.registry
-            : config.seedServer.ip
-                ? config.seedServer.ip + ":5000"
+            : config.headnode.ip
+                ? config.headnode.ip + ":5000"
                 : 'localhost:5000'
 
     // The tag used to tag the docker images push to the target registry
@@ -315,10 +315,10 @@ List.metaClass.p = { spec ->
 
 task prime (type: Exec)  {
     executable = "ansible-playbook"
-    args = ["-i", config.seedServer.ip + ',']
+    args = ["-i", config.headnode.ip + ',']
 
-    if ( config.seedServer.ansible_user != null && config.seedServer.ansible_user != "" ) {
-        args = args << "--user=$config.seedServer.ansible_user"
+    if ( config.headnode.ansible_user != null && config.headnode.ansible_user != "" ) {
+        args = args << "--user=$config.headnode.ansible_user"
     }
 
     if ( config.debug ) {
@@ -326,31 +326,31 @@ task prime (type: Exec)  {
     }
 
     def extraVars = []
-    if (config.seedServer) {
-        extraVars = extraVars.p(config.seedServer.extraVars)
-            .p(config.seedServer.ansible_ssh_pass, "ansible_ssh_pass")
-            .p(config.seedServer.ansible_become_pass, "ansible_become_pass")
-            .p(config.seedServer.fabric_ip, "fabric_ip")
-            .p(config.seedServer.fabric_range_low, "fabric_range_low")
-            .p(config.seedServer.fabric_range_high, "fabric_range_high")
-            .p(config.seedServer.management_ip, "management_ip")
-            .p(config.seedServer.management_range_low, "management_range_low")
-            .p(config.seedServer.management_range_high, "management_range_high")
-            .p(config.seedServer.management_gw, "management_gw")
-            .p(config.seedServer.management_bc, "management_bc")
-            .p(config.seedServer.management_network, "management_network")
-            .p(config.seedServer.management_iface, "management_iface")
-            .p(config.seedServer.external_ip, "external_ip")
-            .p(config.seedServer.external_gw, "external_gw")
-            .p(config.seedServer.external_bc, "external_bc")
-            .p(config.seedServer.external_network, "external_network")
-            .p(config.seedServer.external_iface, "external_iface")
-            .p(config.seedServer.fabric_iface, "fabric_iface")
-            .p(config.seedServer.domain, "domain")
-            .p(config.seedServer.virtualbox_support, "virtualbox_support")
-            .p(config.seedServer.power_helper_user, "power_helper_user")
-            .p(config.seedServer.power_helper_host, "power_helper_host")
-            .p(config.seedServer.ansible_ssh_port, "ansible_ssh_port")
+    if (config.common) {
+        extraVars = extraVars.p(config.common.extraVars)
+            .p(config.headnode.ansible_ssh_pass, "ansible_ssh_pass")
+            .p(config.headnode.ansible_become_pass, "ansible_become_pass")
+            .p(config.headnode.ansible_ssh_port, "ansible_ssh_port")
+            .p(config.common.fabric_ip, "fabric_ip")
+            .p(config.common.fabric_range_low, "fabric_range_low")
+            .p(config.common.fabric_range_high, "fabric_range_high")
+            .p(config.common.management_ip, "management_ip")
+            .p(config.common.management_range_low, "management_range_low")
+            .p(config.common.management_range_high, "management_range_high")
+            .p(config.common.management_gw, "management_gw")
+            .p(config.common.management_bc, "management_bc")
+            .p(config.common.management_network, "management_network")
+            .p(config.common.management_iface, "management_iface")
+            .p(config.common.external_ip, "external_ip")
+            .p(config.common.external_gw, "external_gw")
+            .p(config.common.external_bc, "external_bc")
+            .p(config.common.external_network, "external_network")
+            .p(config.common.external_iface, "external_iface")
+            .p(config.common.fabric_iface, "fabric_iface")
+            .p(config.common.domain, "domain")
+            .p(config.common.virtualbox_support, "virtualbox_support")
+            .p(config.common.power_helper_user, "power_helper_user")
+            .p(config.common.power_helper_host, "power_helper_host")
     }
 
     if (config.passwords) {
@@ -371,17 +371,17 @@ task prime (type: Exec)  {
     // the password set on the compute node is skipped because this is being run against the
     // head node and we don't want to change the head node password as this node was manualy
     // set up.
-    def skipTags = [].p(config.seedServer.skipTags).p('set_compute_node_password')
+    def skipTags = [].p(config.common.skipTags).p('set_compute_node_password')
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "prime-node.yml"
 }
 
 task deployBase(type: Exec)  {
     executable = "ansible-playbook"
-    args = ["-i", config.seedServer.ip + ',']
+    args = ["-i", config.headnode.ip + ',']
 
-    if ( config.seedServer.ansible_user != null && config.seedServer.ansible_user != "" ) {
-        args = args << "--user=$config.seedServer.ansible_user"
+    if ( config.headnode.ansible_user != null && config.headnode.ansible_user != "" ) {
+        args = args << "--user=$config.headnode.ansible_user"
     }
 
     if ( config.debug ) {
@@ -389,29 +389,29 @@ task deployBase(type: Exec)  {
     }
 
     def extraVars = []
-    if (config.seedServer) {
-        extraVars = extraVars.p(config.seedServer.extraVars)
-            .p(config.seedServer.ansible_ssh_pass, "ansible_ssh_pass")
-            .p(config.seedServer.ansible_become_pass, "ansible_become_pass")
-            .p(config.seedServer.fabric_ip, "fabric_ip")
-            .p(config.seedServer.fabric_range_low, "fabric_range_low")
-            .p(config.seedServer.fabric_range_high, "fabric_range_high")
-            .p(config.seedServer.management_ip, "management_ip")
-            .p(config.seedServer.management_range_low, "management_range_low")
-            .p(config.seedServer.management_range_high, "management_range_high")
-            .p(config.seedServer.management_gw, "management_gw")
-            .p(config.seedServer.management_network, "management_network")
-            .p(config.seedServer.management_iface, "management_iface")
-            .p(config.seedServer.external_ip, "external_ip")
-            .p(config.seedServer.external_gw, "external_gw")
-            .p(config.seedServer.external_network, "external_network")
-            .p(config.seedServer.external_iface, "external_iface")
-            .p(config.seedServer.fabric_iface, "fabric_iface")
-            .p(config.seedServer.domain, "domain")
-            .p(config.seedServer.virtualbox_support, "virtualbox_support")
-            .p(config.seedServer.power_helper_user, "power_helper_user")
-            .p(config.seedServer.power_helper_host, "power_helper_host")
-            .p(config.seedServer.ansible_ssh_port, "ansible_ssh_port")
+    if (config.common) {
+        extraVars = extraVars.p(config.common.extraVars)
+            .p(config.headnode.ansible_ssh_pass, "ansible_ssh_pass")
+            .p(config.headnode.ansible_become_pass, "ansible_become_pass")
+            .p(config.headnode.ansible_ssh_port, "ansible_ssh_port")
+            .p(config.common.fabric_ip, "fabric_ip")
+            .p(config.common.fabric_range_low, "fabric_range_low")
+            .p(config.common.fabric_range_high, "fabric_range_high")
+            .p(config.common.management_ip, "management_ip")
+            .p(config.common.management_range_low, "management_range_low")
+            .p(config.common.management_range_high, "management_range_high")
+            .p(config.common.management_gw, "management_gw")
+            .p(config.common.management_network, "management_network")
+            .p(config.common.management_iface, "management_iface")
+            .p(config.common.external_ip, "external_ip")
+            .p(config.common.external_gw, "external_gw")
+            .p(config.common.external_network, "external_network")
+            .p(config.common.external_iface, "external_iface")
+            .p(config.common.fabric_iface, "fabric_iface")
+            .p(config.common.domain, "domain")
+            .p(config.common.virtualbox_support, "virtualbox_support")
+            .p(config.common.power_helper_user, "power_helper_user")
+            .p(config.common.power_helper_host, "power_helper_host")
     }
 
     if (config.passwords) {
@@ -432,7 +432,7 @@ task deployBase(type: Exec)  {
     // the password set on the compute node is skipped because this is being run against the
     // head node and we don't want to change the head node password as this node was manualy
     // set up.
-    def skipTags = [].p(config.seedServer.skipTags).p('set_compute_node_password')
+    def skipTags = [].p(config.common.skipTags).p('set_compute_node_password')
 
     args = args.p(skipTags.asParam("skip-tags", ",")).p(extraVars.asParam("extra-vars", " ")) << "head-node.yml"
 }
