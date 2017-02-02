@@ -59,6 +59,7 @@ cat <<EOT >> $OUT
 $HOSTNAME IN A $LHOST
 xos CNAME $HOSTNAME
 xos-core CNAME $HOSTNAME
+xos-chameleon CNAME $HOSTNAME
 xos-spa-gui CNAME $HOSTNAME
 xos-rest-gw CNAME $HOSTNAME
 onos-cord CNAME $HOSTNAME
