@@ -34,7 +34,7 @@
   become: yes
   pip: name={{ item.name }} version={{ item.version }} state=present
   with_items:
-    - { name: "docker-py", version: "1.9" }
+    - { name: "docker-py", version: "1.10.6" }
 
 - name: Stop Containers
   become: yes
