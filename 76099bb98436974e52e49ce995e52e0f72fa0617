@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa0f191f_9d091198",
+        "filename": "ansible/roles/docker-compose/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-02-11T00:29:15Z",
+      "side": 1,
+      "message": "Should validate that the download is correct with: `checksum: \"sha256:3166bb74bc648e68c3154bc704fddf6bccf59f03a0c90fc48aefac034535e4ae\"`\n\n(also in the other changeset)",
+      "range": {
+        "startLine": 2,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 9
+      },
+      "revId": "76099bb98436974e52e49ce995e52e0f72fa0617",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
