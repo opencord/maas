@@ -1,0 +1,3 @@
+---
+# file: group_vars/all
+ansible_ssh_common_args: "-o ConnectionAttempts=20"
