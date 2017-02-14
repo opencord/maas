@@ -22,7 +22,8 @@ if [ ! -z "$NODES" ]; then
 fi
 
 cat << EO_TAIL
-    ]
+    ],
+    "vars" : { "ansible_user": "ubuntu" }
   }
 }
 EO_TAIL
