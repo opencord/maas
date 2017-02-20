@@ -59,6 +59,15 @@
     state: present
     validate_certs: no
 
+- name: Custom /etc/init/maas-regiond.conf
+  become: yes
+  copy:
+    src: files/maas-regiond.conf
+    dest: /etc/init/maas-regiond.conf
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: MAAS
   become: yes
   apt:
