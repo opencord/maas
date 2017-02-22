@@ -67,6 +67,15 @@
     force: yes
     update_cache: yes
     allow_unauthenticated: yes
+  async: 1200
+  poll: 30
+  register: status
+  ignore_errors: yes
+
+- name: Finish semi-broken MAAS install
+  become: yes
+  shell: "pkill dpkg; pkill frontend; dpkg --configure -a"
+  when: status|failed
 
 - name: MAAS Configuration Directory
   become: yes
