@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da141535_bf33bff5",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-02-22T20:46:56Z",
+      "side": 1,
+      "message": "while I like this comment, probably should remove it to be more formal ;)",
+      "range": {
+        "startLine": 77,
+        "startChar": 44,
+        "endLine": 77,
+        "endChar": 58
+      },
+      "revId": "ab9cb8f16da87ab47d3580a7aa979b0132692a3d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
