@@ -67,6 +67,21 @@
     force: yes
     update_cache: yes
     allow_unauthenticated: yes
+  async: 1800
+  poll: 30
+  register: status
+  ignore_errors: yes
+
+- name: Prompt
+  pause:
+    prompt: "We think MAAS install has hung. You may want to abort the install, re-image the head node, and start again."
+    minutes: 15
+  when: status|failed
+
+- name: Questionable workaround for semi-broken MAAS install
+  become: yes
+  shell: "pkill dpkg; pkill frontend; dpkg --configure -a"
+  when: status|failed
 
 - name: MAAS Configuration Directory
   become: yes
