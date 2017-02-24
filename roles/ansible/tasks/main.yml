@@ -2,6 +2,10 @@
   become: yes
   apt_repository:
     repo: "{{ ansible_apt_repo | default('ppa:ansible/ansible') }}"
+  register: result
+  until: result | success
+  retries: 3
+  delay: 10
 
 - name: Ensure Ansible
   become: yes
