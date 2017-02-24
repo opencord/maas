@@ -58,6 +58,10 @@
     update_cache: yes
     state: present
     validate_certs: no
+  register: result
+  until: result | success
+  retries: 3
+  delay: 10
 
 - name: MAAS
   become: yes
