@@ -95,9 +95,9 @@
     - compute_node.management.ignore.names is not defined or compute_node.management.ignore.names == omit
   changed_when: false
 
-- name: Explicity Ingnore Specified Interfaces From Management Bond
+- name: Explicity Ignore Specified Interfaces From Management Bond
   set_fact:
-    exclude_names_combined: "{{ compute_node.management.ignore.names }}"
+    ignore_names_combined: "{{ compute_node.management.ignore.names }}"
   when:
     - not compute_node.interfaces.external
     - compute_node.management.ignore.names is defined and compute_node.management.ignore.names != omit
