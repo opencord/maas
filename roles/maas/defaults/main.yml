@@ -64,3 +64,6 @@ ranges:
 
 docker:
     tag: "{{ deploy_docker_tag | default('candidate') }}"
+
+# temporary, for ciab builds
+cord_loghost: "10.100.198.222"
