@@ -1,5 +1,15 @@
-- hosts: all
-  serial: 1
+---
+# install MaaS on head node
+
+- name: run setup to gather facts
+  hosts: all, localhost
+  tasks:
+    - name: run setup
+      setup:
+
+- name: Install MaaS and supporting files on head node
+  hosts: head
   roles:
     - head-node
     - registry
+

@@ -1,28 +1,33 @@
-- name: Apt Information
+---
+
+- name: Prereqs and SSL support for apt for SSL
   become: yes
-  apt: name={{ item }} state=present force=yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
   with_items:
-    - apt-transport-https=1.0*
-    - ca-certificates=20160104*
+    - apt-transport-https
+    - ca-certificates
+    - python-pip
 
 - name: Docker Apt Key
   become: yes
   apt_key:
-    data="{{ lookup('file', 'docker_apt_key.gpg') }}"
+    data: "{{ lookup('file', 'docker_apt_key.gpg') }}"
 
 - name: Docker repository
   become: yes
   apt_repository:
-    repo: "{{ docker_apt_repo | default('deb https://apt.dockerproject.org/repo ubuntu-trusty main') }}"
-    update_cache: yes
-    state: present
+    repo: "{{ docker_apt_repo }}"
 
-- name: Docker Engine
+- name: Install docker engine
   become: yes
   apt:
     name: docker-engine=1.12*
-    state: present
     force: yes
+    update_cache: yes
+    cache_valid_time: 3600
 
 - name: Docker Exposed via TCP
   become: yes
@@ -40,19 +45,19 @@
     state=restarted
   when: docker_config.changed
 
-- name: Enable Docker for User
+# docker fails without docker-py, docker-compose >1.9 fails with docker-py installed
+- name: Install docker-compose and docker-py
+  become: yes
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - docker-py
+    - docker-compose==1.9
+
+- name: Make current user part of the Docker group
   become: yes
   user:
-    name={{ ansible_user }}
-    group=docker
-    append=yes
+    name: "{{ ansible_user_id }}"
+    groups: "docker"
+    append: yes
 
-- name: Docker Compose
-  become: yes
-  get_url:
-    url: https://github.com/docker/compose/releases/download/1.7.1/docker-compose-Linux-x86_64
-    checksum: "sha256:3166bb74bc648e68c3154bc704fddf6bccf59f03a0c90fc48aefac034535e4ae"
-    dest: /usr/local/bin/docker-compose
-    owner: root
-    group: root
-    mode: "0755"
