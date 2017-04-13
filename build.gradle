@@ -315,7 +315,7 @@ List.metaClass.p = { spec ->
 
 task prime (type: Exec)  {
     executable = "ansible-playbook"
-    args = ["-i", config.headnode.ip + ',']
+    args = ["-i", '../genconfig/cord-inv']
 
     if ( config.headnode.ansible_user != null && config.headnode.ansible_user != "" ) {
         args = args << "--user=$config.headnode.ansible_user"
@@ -378,7 +378,7 @@ task prime (type: Exec)  {
 
 task deployBase(type: Exec)  {
     executable = "ansible-playbook"
-    args = ["-i", config.headnode.ip + ',']
+    args = ["-i", '../genconfig/cord-inv']
 
     if ( config.headnode.ansible_user != null && config.headnode.ansible_user != "" ) {
         args = args << "--user=$config.headnode.ansible_user"
