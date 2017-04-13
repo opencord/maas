@@ -11,5 +11,4 @@ galaxy_info:
         - trusty
   galaxy_tags:
     - cord
-dependencies:
-  - { role : docker }
+dependencies: []
