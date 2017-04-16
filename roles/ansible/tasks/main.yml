@@ -1,4 +1,5 @@
 - name: "Install apt dependencies"
+  become: yes
   apt:
     name: "{{ item }}"
     state: present
