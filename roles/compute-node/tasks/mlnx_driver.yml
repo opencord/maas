@@ -1,0 +1,80 @@
+---
+- name:  Mellanox Constants
+  set_fact:
+    MLNX_PACK_VER: "mlnx-en-4.0-2.0.0.1-ubuntu14.04-x86_64"
+    MLNX_URL_PATH: "MLNX_EN-4.0-2.0.0.1"
+    MD5_MLNX: "b1581e2445c7832ec096b367e78303aa"
+
+- name: Install Prerequesites
+  become: yes
+  apt: name={{ item }} state=installed
+  with_items:
+    - debhelper
+    - autotools-dev
+    - dkms
+    - zlib1g-dev
+    - make
+    - python-libxml2
+    - m4
+    - automake
+    - autoconf
+    - libltdl-dev
+    - chrpath
+    - swig
+    - quilt
+    - graphviz
+    - dpatch
+    - gcc
+
+- name: Check Mellanox install package
+  become: yes
+  stat:
+    path: "{{ playbook_dir }}/roles/compute-node/files/{{MLNX_PACK_VER}}.tgz"
+  register: mlnx_package_exists
+
+- name: Download mlnx driver package
+  become: yes
+  local_action: >
+    get_url url="http://www.mellanox.com/downloads/ofed/{{MLNX_URL_PATH}}/{{MLNX_PACK_VER}}.tgz"
+    dest="{{ playbook_dir }}/roles/compute-node/files"
+    checksum="md5:{{MD5_MLNX}}"
+  when: mlnx_package_exists.stat.exists == False
+
+- name: Unarchive mlnx driver package
+  unarchive:
+    copy=yes
+    src="{{ playbook_dir }}/roles/compute-node/files/{{MLNX_PACK_VER}}.tgz"
+    dest=/tmp
+
+- name: Install mlnx driver
+  become: yes
+  command: /tmp/{{MLNX_PACK_VER}}/install --force
+  changed_when: true
+
+- name: Load mlnx Driver
+  command: /etc/init.d/mlnx-en.d restart
+  changed_when: true
+
+- name: Remove Build Directory
+  become: yes
+  file:
+    path=/tmp/{{MLNX_PACK_VER}}
+    state=absent
+
+- name: Remove Build files
+  become: yes
+  file:
+    path=/tmp/{{MLNX_PACK_VER}}.tgz
+    state=absent
+
+- name: Remove Mellanox Service files
+  become: yes
+  file:
+    path=/etc/init/mlnx-en.conf
+    state=absent
+
+- name: Remove Mellanox Init Script
+  become: yes
+  file:
+    path=/etc/init.d/mlnx-en.d
+    state=absent

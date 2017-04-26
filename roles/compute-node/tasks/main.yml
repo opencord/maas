@@ -157,9 +157,9 @@
     - post-fabric-config
     - pull-latest-docker-images
 
-- name: Verify Mellanox 40Gb NIC
-  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c ConnectX-3 || true
-  register: mlx_nic_present
+- name: Verify Mellanox NICs
+  shell: /usr/bin/lspci | grep "Ethernet controller" | grep -c Mellanox || true
+  register: mlnx_nic_present
   changed_when: False
 
 - name: Verify Intel 40Gb NIC
@@ -176,18 +176,18 @@
   tags:
     - interface_config
 
-- name: Verify mlx4 Driver
-  command: modinfo --field=version mlx4_core
-  register: mlx4_version
-  when: mlx_nic_present.stdout != "0"
+- name: Verify Mellanox Driver
+  command: modinfo --field=version mlx5_core
+  register: mlnx5_version
+  when: mlnx_nic_present.stdout != "0"
   changed_when: False
   failed_when: False
   tags:
     - interface_config
 
-- name: Update mlx4 Driver
-  include: mlx4_driver.yml
-  when: mlx_nic_present.stdout != "0" and mlx4_version.stdout != '3.1-1.0.4'
+- name: Update Mellanox Driver
+  include: mlnx_driver.yml
+  when: mlnx_nic_present.stdout != "0" and mlnx5_version.stdout != '4.0-2.0.0'
   tags:
     - interface_config
 
