@@ -119,7 +119,7 @@
     - { "src": "cord_rsa.pub", "dest": "id_rsa.pub" }
 
 - name: Ensure SSH config
-  become: no
+  become: yes
   copy:
     src: "files/{{item}}"
     dest: "{{ansible_env['PWD']}}/.ssh/{{item}}"
