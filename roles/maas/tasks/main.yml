@@ -214,6 +214,7 @@
   with_items:
     - { src: 'dhcpd.blacklist', dest: '/etc/dhcp' }
     - { src: 'dhcpd.reservations', dest: '/etc/dhcp' }
+    - { src: 'dhcpd.reservations.sample', dest: '/etc/dhcp' }
     - { src: 'dhcp_harvest.inc', dest: '/etc/bind/maas' }
     - { src: 'named.conf.options.inside.maas', dest: '/etc/bind/maas' }
     - { src: 'dhcpd.conf.template', dest: '/etc/maas/templates/dhcp' }

@@ -1,0 +1,79 @@
+############################################################################
+## RESERVATIONS
+############################################################################
+
+# RACK1 - Rack with two fabric switches
+host fabric01 {
+    hardware ethernet cc:37:ab:17:7b:c0;
+    fixed-address  10.0.128.100;
+}
+host fabric02 {
+    hardware ethernet 70:72:cf:f5:60:9e;
+    fixed-address 10.0.128.101;
+}
+host cord-r1-s2 {
+    hardware ethernet 2c:60:0c:e3:c4:2d;
+    fixed-address 10.0.128.113;
+}
+host cord-r1-s2-ipmi {
+    hardware ethernet 2c:60:0c:e3:c4:2f;
+    fixed-address 10.0.128.107;
+}
+host cord-r1-s3 {
+    hardware ethernet 2c:60:0c:cb:00:ef;
+    fixed-address 10.0.128.115;
+}
+host cord-r1-s3-ipmi {
+    hardware ethernet 2c:60:0c:cb:00:f1;
+    fixed-address 10.0.128.108;
+}
+host cord-r1-s4 {
+    hardware ethernet 2c:60:0c:cb:00:3b;
+    fixed-address 10.0.128.116;
+}
+host cord-r1-s4-ipmi {
+    hardware ethernet 2c:60:0c:cb:00:3d;
+    fixed-address 10.0.128.110;
+}
+
+# RACK 2 - Rack with full fabric (2 leaf / 2 spine)
+host spine01 {
+    hardware ethernet cc:37:ab:6e:e3:40;
+    fixed-address 192.168.42.238;
+}
+host spine02 {
+    hardware ethernet cc:37:ab:6b:0d:a6;
+    fixed-address 192.168.42.223;
+}
+host leaf01 {
+    hardware ethernet cc:37:ab:6e:e3:c2;
+    fixed-address 192.168.42.221;
+}
+host leaf02 {
+    hardware ethernet cc:37:ab:6e:e4:c6;
+    fixed-address 192.168.42.222;
+}
+host cord-r2-s2 {
+    hardware ethernet 00:25:90:fa:5f:78;
+    fixed-address 10.0.128.113;
+}
+host cord-r2-s2-ipmi {
+    hardware ethernet 00:25:90:ff:a7:97;
+    fixed-address 10.0.128.118;
+}
+host cord-r2-s3 {
+    hardware ethernet 00:25:90:fa:5f:52;
+    fixed-address 10.0.128.115;
+}
+host cord-r2-s3-ipmi {
+    hardware ethernet 00:25:90:ff:a7:3e;
+    fixed-address 10.0.128.121;
+}
+host cord-r2-s4 {
+    hardware ethernet 00:25:90:fa:5f:4e;
+    fixed-address 10.0.128.124;
+}
+host cord-r2-s4-ipmi {
+    hardware ethernet 00:25:90:ff:a7:3c;
+    fixed-address 10.0.128.116;
+}
