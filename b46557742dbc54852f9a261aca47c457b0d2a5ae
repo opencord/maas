@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba092121_93fea46a",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-05-04T18:02:53Z",
+      "side": 1,
+      "message": "i wonder if we should put a comment in the file as opposed to a blank file that explains the purpose and points at the sample or something? Or at least explains the format for the file.",
+      "range": {
+        "startLine": 206,
+        "startChar": 2,
+        "endLine": 213,
+        "endChar": 13
+      },
+      "revId": "b46557742dbc54852f9a261aca47c457b0d2a5ae",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
