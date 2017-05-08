@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba092121_1948752c",
+        "filename": "roles/compute-node/tasks/mlnx_driver.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-05-08T21:00:39Z",
+      "side": 1,
+      "message": "Can we specify specific version of these packages so we have a consistent, predictable, reproducible, etc deployment? I am aware the original didn\u0027t but it would be a good change.",
+      "range": {
+        "startLine": 10,
+        "startChar": 23,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "f613b8047a9bb33bbe25f66a732a7332fb40e3c7",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
