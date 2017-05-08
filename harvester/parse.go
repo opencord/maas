@@ -136,6 +136,70 @@ func (app *application) parseLeaseFile(filename string, filterFunc leaseFilterFu
 	return leases, nil
 }
 
+// parseReservation parses a single reservation entry
+func (app *application) parseReservation(scanner *bufio.Scanner, lease *Lease) error {
+	var err error
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) > 0 {
+			switch fields[0] {
+			case "}":
+				// If not IP or MAC specified then return error
+				if len(lease.HardwareAddress) == 0 {
+					return fmt.Errorf("Reservation requires hardware address")
+				}
+				if len(lease.IPAddress) == 0 {
+					return fmt.Errorf("Reservation requires IP address")
+				}
+				return nil
+			case "hardware":
+				lease.HardwareAddress, err = net.ParseMAC(strings.Trim(fields[2], ";"))
+				if err != nil {
+					return err
+				}
+			case "fixed-address":
+				lease.IPAddress = net.ParseIP(strings.Trim(fields[1], ";"))
+				if lease.IPAddress == nil {
+					return fmt.Errorf("Invalid IP Address")
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// parseReservationFile parses the reservation file to include reservation IPs in IP information
+func (app *application) parseReservationFile(filename string, leases map[string]*Lease) (map[string]*Lease, error) {
+	// If no filename was specified, nothing to parse
+	if len(filename) == 0 {
+		return leases, nil
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) > 0 && fields[0] == "host" {
+			lease := Lease{}
+			lease.ClientHostname = fields[1]
+			app.parseReservation(scanner, &lease)
+			leases[lease.IPAddress.String()] = &lease
+		}
+	}
+
+	if err = scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return leases, nil
+}
+
 // syncRequestHandler accepts requests to parse the lease file and either processes or ignores because of quiet period
 func (app *application) syncRequestHandler(requests chan *chan uint) {
 
@@ -168,69 +232,81 @@ func (app *application) syncRequestHandler(requests chan *chan uint) {
 			app.log.Errorf("Unable to parse DHCP lease file at '%s' : %s",
 				app.DHCPLeaseFile, err)
 		} else {
-			// if configured to verify leases with a ping do so
-			if app.VerifyLeases {
-				app.log.Infof("Verifing %d discovered leases", len(leases))
-				_, err := app.verifyLeases(leases)
-				if err != nil {
-					app.log.Errorf("unexpected error while verifing leases : %s", err)
-					app.log.Infof("Discovered %d active, not verified because of error, DHCP leases",
-						len(leases))
-				} else {
-					app.log.Infof("Discovered %d active and verified DHCP leases", len(leases))
-				}
+			leaseCount := len(leases)
+			app.log.Infof("Read %d leases from lease file", leaseCount)
+			// Process the reservation file, if specified
+			app.log.Info("Synchronizing DHCP reservation file")
+			leases, err = app.parseReservationFile(app.DHCPReservationFile, leases)
+			if err != nil {
+				app.log.Errorf("Unable to parse reservation file '%s' : '%s'",
+					app.DHCPReservationFile, err)
 			} else {
-				app.log.Infof("Discovered %d active, not not verified, DHCP leases", len(leases))
-			}
-
-			// if configured to output the lease information to a file, do so
-			if len(app.OutputFile) > 0 {
-				app.log.Infof("Writing lease information to file '%s'", app.OutputFile)
-				out, err := os.Create(app.OutputFile)
-				if err != nil {
-					app.log.Errorf(
-						"unexpected error while attempting to open file `%s' for output : %s",
-						app.OutputFile, err)
-				} else {
-					table := tabwriter.NewWriter(out, 1, 0, 4, ' ', 0)
-					for _, lease := range leases {
-						if err := app.outputTemplate.Execute(table, lease); err != nil {
-							app.log.Errorf(
-								"unexpected error while writing leases to file '%s' : %s",
-								app.OutputFile, err)
-							break
-						}
-						fmt.Fprintln(table)
+				app.log.Infof("Read %d reservations from reservation file",
+					len(leases)-leaseCount)
+				// if configured to verify leases with a ping do so
+				if app.VerifyLeases {
+					app.log.Infof("Verifing %d discovered leases", len(leases))
+					_, err := app.verifyLeases(leases)
+					if err != nil {
+						app.log.Errorf("unexpected error while verifing leases : %s", err)
+						app.log.Infof("Discovered %d active, not verified because of error, DHCP leases",
+							len(leases))
+					} else {
+						app.log.Infof("Discovered %d active and verified DHCP leases", len(leases))
 					}
-					table.Flush()
-				}
-				out.Close()
-			}
-
-			// if configured to reload the DNS server, then use the RNDC command to do so
-			if app.RNDCUpdate {
-				cmd := exec.Command("rndc", "-s", app.RNDCAddress, "-p", strconv.Itoa(app.RNDCPort),
-					"-c", app.RNDCKeyFile, "reload", app.RNDCZone)
-				err := cmd.Run()
-				if err != nil {
-					app.log.Errorf("Unexplected error while attempting to reload zone '%s' on DNS server '%s:%d' : %s", app.RNDCZone, app.RNDCAddress, app.RNDCPort, err)
 				} else {
-					app.log.Infof("Successfully reloaded DNS zone '%s' on server '%s:%d' via RNDC command",
-						app.RNDCZone, app.RNDCAddress, app.RNDCPort)
+					app.log.Infof("Discovered %d active, not not verified, DHCP leases", len(leases))
 				}
-			}
 
-			// process the results of the parse to internal data structures
-			app.interchange.Lock()
-			app.leases = leases
-			app.byHostname = make(map[string]*Lease)
-			app.byHardware = make(map[string]*Lease)
-			for _, lease := range leases {
-				app.byHostname[lease.ClientHostname] = lease
-				app.byHardware[lease.HardwareAddress.String()] = lease
+				// if configured to output the lease information to a file, do so
+				if len(app.OutputFile) > 0 {
+					app.log.Infof("Writing lease information to file '%s'", app.OutputFile)
+					out, err := os.Create(app.OutputFile)
+					if err != nil {
+						app.log.Errorf(
+							"unexpected error while attempting to open file `%s' for output : %s",
+							app.OutputFile, err)
+					} else {
+						table := tabwriter.NewWriter(out, 1, 0, 4, ' ', 0)
+						for _, lease := range leases {
+							if err := app.outputTemplate.Execute(table, lease); err != nil {
+								app.log.Errorf(
+									"unexpected error while writing leases to file '%s' : %s",
+									app.OutputFile, err)
+								break
+							}
+							fmt.Fprintln(table)
+						}
+						table.Flush()
+					}
+					out.Close()
+				}
+
+				// if configured to reload the DNS server, then use the RNDC command to do so
+				if app.RNDCUpdate {
+					cmd := exec.Command("rndc", "-s", app.RNDCAddress, "-p", strconv.Itoa(app.RNDCPort),
+						"-c", app.RNDCKeyFile, "reload", app.RNDCZone)
+					err := cmd.Run()
+					if err != nil {
+						app.log.Errorf("Unexplected error while attempting to reload zone '%s' on DNS server '%s:%d' : %s", app.RNDCZone, app.RNDCAddress, app.RNDCPort, err)
+					} else {
+						app.log.Infof("Successfully reloaded DNS zone '%s' on server '%s:%d' via RNDC command",
+							app.RNDCZone, app.RNDCAddress, app.RNDCPort)
+					}
+				}
+
+				// process the results of the parse to internal data structures
+				app.interchange.Lock()
+				app.leases = leases
+				app.byHostname = make(map[string]*Lease)
+				app.byHardware = make(map[string]*Lease)
+				for _, lease := range leases {
+					app.byHostname[lease.ClientHostname] = lease
+					app.byHardware[lease.HardwareAddress.String()] = lease
+				}
+				leases = nil
+				app.interchange.Unlock()
 			}
-			leases = nil
-			app.interchange.Unlock()
 		}
 		if last == nil {
 			last = &time.Time{}

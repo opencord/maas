@@ -132,6 +132,7 @@ services:
           - "lab.solution=cord"
           - "lab.component=harvester"
       volumes:
+          - "/etc/dhcp:/reservations"
           - "/var/lib/maas/dhcp:/harvester"
           - "/etc/bind/maas:/bind"
           - "/etc/bind/maas:/key"
