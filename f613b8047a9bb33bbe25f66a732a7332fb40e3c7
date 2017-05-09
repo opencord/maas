@@ -22,6 +22,29 @@
       "revId": "f613b8047a9bb33bbe25f66a732a7332fb40e3c7",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba092121_19cbd573",
+        "filename": "roles/compute-node/tasks/mlnx_driver.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000167
+      },
+      "writtenOn": "2017-05-09T11:27:38Z",
+      "side": 1,
+      "message": "Do you refer to something like this?\n\n    - debhelper\u003d9.20131227ubuntu1\n    - autotools-dev\u003d20130810.1\n    - dkms\u003d2.2.0.3-1.1ubuntu5.14.04.9\n    - zlib1g-dev\u003d1:1.2.8.dfsg-1ubuntu1\n    - make\u003d3.81-8.2ubuntu3\n    - python-libxml2\u003d2.9.1+dfsg1-3ubuntu4.9\n    - m4\u003d1.4.17-2ubuntu1\n    - automake\u003d1:1.14.1-2ubuntu1\n    - m4\u003d1.4.17-2ubuntu1\n    - autoconf\u003d2.69-6\n    - libltdl-dev\u003d2.4.2-1.7ubuntu1\n    - chrpath\u003d0.14-3ubuntu1\n    - swig\u003d2.0.11-1ubuntu2\n    - quilt\u003d0.61-1\n    - graphviz\u003d2.36.0-0ubuntu3.2\n    - dpatch\u003d2.0.35\n    - gcc\u003d4:4.8.2-1ubuntu6",
+      "range": {
+        "startLine": 11,
+        "startChar": 2,
+        "endLine": 27,
+        "endChar": 9
+      },
+      "revId": "f613b8047a9bb33bbe25f66a732a7332fb40e3c7",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
