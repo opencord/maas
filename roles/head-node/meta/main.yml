@@ -13,3 +13,4 @@ galaxy_info:
     - cord
 dependencies:
   - { role : maas }
+  - { role : ansible }
