@@ -45,6 +45,30 @@
       "revId": "f613b8047a9bb33bbe25f66a732a7332fb40e3c7",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba092121_b9a189ab",
+        "filename": "roles/compute-node/tasks/mlnx_driver.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-05-09T13:12:08Z",
+      "side": 1,
+      "message": "y",
+      "parentUuid": "ba092121_19cbd573",
+      "range": {
+        "startLine": 11,
+        "startChar": 2,
+        "endLine": 27,
+        "endChar": 9
+      },
+      "revId": "f613b8047a9bb33bbe25f66a732a7332fb40e3c7",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
