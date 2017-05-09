@@ -46,6 +46,30 @@
       "revId": "799d493a8611efd5ab9dd3578a620874dea480c1",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba092121_3977b9d6",
+        "filename": "roles/head-node/meta/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-05-09T22:54:56Z",
+      "side": 1,
+      "message": "There are tasks run inside Docker containers (mainly TOSCA recipes) and those have to be run on the same node as the docker daemon (as we didn\u0027t have remote access to that, which requires SSL setup, when it was implemented), thus why it\u0027s running on the head node.",
+      "parentUuid": "ba092121_39b0d98a",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 22
+      },
+      "revId": "799d493a8611efd5ab9dd3578a620874dea480c1",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
