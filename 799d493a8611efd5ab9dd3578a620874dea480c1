@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba092121_f9e4a1ad",
+        "filename": "roles/head-node/meta/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-05-09T21:52:52Z",
+      "side": 1,
+      "message": "why is ansible on the head node?",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 22
+      },
+      "revId": "799d493a8611efd5ab9dd3578a620874dea480c1",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
