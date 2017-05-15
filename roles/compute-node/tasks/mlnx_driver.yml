@@ -9,22 +9,22 @@
   become: yes
   apt: name={{ item }} state=installed
   with_items:
-    - debhelper
-    - autotools-dev
-    - dkms
-    - zlib1g-dev
-    - make
-    - python-libxml2
-    - m4
-    - automake
-    - autoconf
-    - libltdl-dev
-    - chrpath
-    - swig
-    - quilt
-    - graphviz
-    - dpatch
-    - gcc
+    - debhelper=9.20131227ubuntu1
+    - autotools-dev=20130810.1
+    - dkms=2.2.0.3-1.1ubuntu5.14.04.9
+    - zlib1g-dev=1:1.2.8.dfsg-1ubuntu1
+    - make=3.81-8.2ubuntu3
+    - python-libxml2=2.9.1+dfsg1-3ubuntu4.9
+    - m4=1.4.17-2ubuntu1
+    - automake=1:1.14.1-2ubuntu1
+    - autoconf=2.69-6
+    - libltdl-dev=2.4.2-1.7ubuntu1
+    - chrpath=0.14-3ubuntu1
+    - swig=2.0.11-1ubuntu2
+    - quilt=0.61-1
+    - graphviz=2.36.0-0ubuntu3.2
+    - dpatch=2.0.35
+    - gcc=4:4.8.2-1ubuntu6
 
 - name: Check Mellanox install package
   become: yes
