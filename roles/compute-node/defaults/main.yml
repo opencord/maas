@@ -7,7 +7,7 @@ compute_node:
     fabric:
         include:
             names: "{{ fabric_include_names | default(omit) }}"
-            module_types: "{{ fabric_include_module_types | default('i40e, mlx4_en') }}"
+            module_types: "{{ fabric_include_module_types | default('i40e, mlx4_en, mlx5_core') }}"
             bus_types: "{{ fabric_include_bus_types | default(omit) }}"
         exclude:
             names: "{{ fabric_exclude_names | default(omit) }}"
