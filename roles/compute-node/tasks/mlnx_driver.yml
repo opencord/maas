@@ -52,6 +52,7 @@
   changed_when: true
 
 - name: Load mlnx Driver
+  become: yes
   command: /etc/init.d/mlnx-en.d restart
   changed_when: true
 
