@@ -9,6 +9,5 @@
 - name: Configure compute hosts to use DNS server
   hosts: all
   remote_user: ubuntu
-  become: yes
   roles:
     - role: compute-node
