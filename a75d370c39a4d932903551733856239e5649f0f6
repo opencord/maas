@@ -22,6 +22,30 @@
       "revId": "a75d370c39a4d932903551733856239e5649f0f6",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba092121_675ea747",
+        "filename": "provisioner/ansible.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-05-19T22:13:18Z",
+      "side": 1,
+      "message": "quote from walking dead ;)",
+      "parentUuid": "ba092121_a76ddf06",
+      "range": {
+        "startLine": 3,
+        "startChar": 1,
+        "endLine": 3,
+        "endChar": 28
+      },
+      "revId": "a75d370c39a4d932903551733856239e5649f0f6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
