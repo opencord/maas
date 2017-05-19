@@ -28,7 +28,7 @@ package:
 	$(eval BUILD_ID := $(shell docker create $(IMAGE_NAME):$(BUILD_TAG)))
 	$(eval BINDIR := $(shell mktemp -d))
 	docker cp $(BUILD_ID):/service/$(BINARY) $(BINDIR)/$(BINARY)
-	cp Dockerfile.release ssh-config $(BINDIR)
+	cp Dockerfile.release ssh-config ansible.cfg $(BINDIR)
 	docker build -f $(BINDIR)/Dockerfile.release -t $(IMAGE_NAME):$(PACKAGE_TAG) --label org.label-schema.build-date=$(BUILD_DATE) --label org.label-schema.vcs-ref=$(VCS_REF) --label org.label-schema.vcs-ref-date=$(VCS_REF_DATE) --label org.label-schema.version=$(VERSION) $(BINDIR)
 	docker rm -f $(BUILD_ID)
 	rm -r $(BINDIR)
