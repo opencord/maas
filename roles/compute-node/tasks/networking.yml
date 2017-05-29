@@ -383,6 +383,11 @@
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
+- name: Add dns
+  lineinfile:
+    name: /etc/network/interfaces
+    line: 'dns-nameservers 8.8.8.8'
+
 - name: Reboot Required
   command: /sbin/reboot
   async: 0
