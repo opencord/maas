@@ -22,6 +22,30 @@
       "revId": "4dbd06d74c3d45d4861e0be8ee4254476175c61d",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0e1d27_bdf067ca",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1000030
+      },
+      "writtenOn": "2017-05-30T18:02:10Z",
+      "side": 1,
+      "message": "In some scenario, after roles/compute-node setting new network interfaces config and reboot. The next role is roles/maas. There will have the problem when we doing Install Prerequisites with APT because there is no DNS server so that it can\u0027t resolve apt source. So I add DNS server setting here.",
+      "parentUuid": "9a0e1d27_3dca17a2",
+      "range": {
+        "startLine": 386,
+        "startChar": 0,
+        "endLine": 389,
+        "endChar": 35
+      },
+      "revId": "4dbd06d74c3d45d4861e0be8ee4254476175c61d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
