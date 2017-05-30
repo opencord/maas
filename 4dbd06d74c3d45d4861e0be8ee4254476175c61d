@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a0e1d27_3dca17a2",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2017-05-30T13:46:45Z",
+      "side": 1,
+      "message": "Can you elaborate on why you think this is necessary?",
+      "range": {
+        "startLine": 386,
+        "startChar": 0,
+        "endLine": 389,
+        "endChar": 35
+      },
+      "revId": "4dbd06d74c3d45d4861e0be8ee4254476175c61d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
