@@ -62,6 +62,7 @@ services:
       - "/etc/maas/ansible:/etc/maas/ansible"
       - "/usr/local/share/ca-certificates:/usr/local/share/ca-certificates"
       - "/opt/cord:/opt/cord"
+      - "/opt/credentials:/opt/credentials"
       - "/etc/maas/.ssh:/etc/maas/.ssh"
     restart: unless-stopped
 
