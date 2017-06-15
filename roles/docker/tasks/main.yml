@@ -29,24 +29,8 @@
     update_cache: yes
     cache_valid_time: 3600
 
-- name: Docker Exposed via TCP
-  become: yes
-  lineinfile:
-    dest=/etc/default/docker
-    state=present
-    insertafter='#DOCKER_OPTS'
-    line='DOCKER_OPTS="-H unix:///var/run/docker.sock"'
-  register: docker_config
-
-- name: Docker Restart
-  become: yes
-  service:
-    name=docker
-    state=restarted
-  when: docker_config.changed
-
 # docker fails without docker-py, docker-compose >1.9 fails with docker-py installed
-- name: Install docker-compose and docker-py
+- name: Install docker-compose
   become: yes
   pip:
     name: "{{ item }}"
