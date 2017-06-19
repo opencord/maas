@@ -12,3 +12,7 @@
   roles:
     - registry
 
+- name: install SSH key
+  hosts: head
+  roles:
+    - { role: head-node, tags: [establish_ssh_keys] }
