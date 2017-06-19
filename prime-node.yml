@@ -12,3 +12,7 @@
   roles:
     - registry
 
+- name: install local SSH key on head node
+  hosts: head
+  roles:
+    - ssh-key
