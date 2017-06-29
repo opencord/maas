@@ -32,9 +32,10 @@
 
 - name: Install Python Prerequisites
   become: yes
-  pip: name={{ item.name }} version={{ item.version }} state=present
+  pip: 
+    name: "{{ item }}"
   with_items:
-    - { name: "docker-py", version: "1.10.6" }
+    - "docker"
 
 - name: Stop Containers
   become: yes
