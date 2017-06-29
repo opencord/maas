@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a202591_7b2657bc",
+        "filename": "roles/compute-node/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-06-29T18:53:54Z",
+      "side": 1,
+      "message": "no version?",
+      "range": {
+        "startLine": 84,
+        "startChar": 10,
+        "endLine": 84,
+        "endChar": 16
+      },
+      "revId": "bf42e62cec8218fe430cd5ee2016cad9d3b147d4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a202591_5b2b9b82",
+        "filename": "roles/docker/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-06-29T18:53:54Z",
+      "side": 1,
+      "message": "docker is moving toward docker-ce as opposed to docker-engine, i wonder if we need to change as well. also don\u0027t we want to specify a version?",
+      "range": {
+        "startLine": 27,
+        "startChar": 17,
+        "endLine": 27,
+        "endChar": 23
+      },
+      "revId": "bf42e62cec8218fe430cd5ee2016cad9d3b147d4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a202591_3b20df9a",
+        "filename": "roles/docker/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-06-29T18:53:54Z",
+      "side": 1,
+      "message": "version numbers?",
+      "revId": "bf42e62cec8218fe430cd5ee2016cad9d3b147d4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a202591_1b2523ab",
+        "filename": "scripts/bootstrap_ansible.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-06-29T18:53:54Z",
+      "side": 1,
+      "message": "version number?",
+      "revId": "bf42e62cec8218fe430cd5ee2016cad9d3b147d4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
