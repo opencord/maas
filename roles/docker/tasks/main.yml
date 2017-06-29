@@ -21,11 +21,10 @@
   apt_repository:
     repo: "{{ docker_apt_repo }}"
 
-- name: Install docker engine
+- name: Install docker-ce
   become: yes
   apt:
-    name: docker-engine=1.12*
-    force: yes
+    name: "docker-ce=17.06.*"
     update_cache: yes
     cache_valid_time: 3600
 
@@ -51,8 +50,8 @@
   pip:
     name: "{{ item }}"
   with_items:
-    - docker-py
-    - docker-compose==1.9
+    - "docker==2.4.2"
+    - "docker-compose==1.14.0"
 
 - name: Make current user part of the Docker group
   become: yes

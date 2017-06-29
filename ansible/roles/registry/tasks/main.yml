@@ -14,20 +14,22 @@
   tags: [registry]
 
 - name: Registry container is running
-  docker:
+  docker_container:
     name: registry
     image: registry:2.4.0
-    ports: 5000:5000
+    ports:
+      - "5000:5000"
     volumes:
       - /vagrant/registry:/var/lib/registry/docker/registry
       - /data/registry/conf:/conf
   tags: [registry]
 
 - name: Mirror container is running
-  docker:
+  docker_container:
     name: registry-mirror
     image: registry:2.4.0
-    ports: 5001:5000
+    ports:
+      - "5001:5000"
     volumes:
       - /vagrant/registry-mirror:/var/lib/registry/docker/registry
       - /data/registry-mirror/conf:/conf

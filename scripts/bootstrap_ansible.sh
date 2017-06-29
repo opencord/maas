@@ -18,11 +18,9 @@
 set -e
 
 echo "Installing Ansible..."
-# apt-get install -y software-properties-common ca-certificates
-# apt-add-repository ppa:ansible/ansible
-# apt-get update
-# apt-get install -y ansible
-apt-get -y install python-dev libffi-dev python-pip libssl-dev sshpass
-pip install ansible==2.2.2.0
+apt-get install -y software-properties-common ca-certificates
+apt-add-repository ppa:ansible/ansible
+apt-get update
+apt-get install -y ansible=2.3*
 mkdir -p /etc/ansible
 cp /maasdev/ansible/ansible.cfg /etc/ansible/ansible.cfg

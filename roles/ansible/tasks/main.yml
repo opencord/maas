@@ -1,3 +1,5 @@
+---
+
 - name: "Install apt dependencies"
   become: yes
   apt:
@@ -10,21 +12,17 @@
     - libssl-dev
     - sshpass
 
-- name: "Install Ansible via pip"
-  pip: name=ansible version=2.2.2.0
+- name: Ansible APT Repository
   become: yes
+  apt_repository:
+    repo: "{{ ansible_apt_repo | default('ppa:ansible/ansible') }}"
+  register: result
+  until: result | success
+  retries: 3
+  delay: 10
 
-# - name: Ansible Repository
-#   become: yes
-#   apt_repository:
-#     repo: "{{ ansible_apt_repo | default('ppa:ansible/ansible') }}"
-#   register: result
-#   until: result | success
-#   retries: 3
-#   delay: 10
-
-# - name: Ensure Ansible
-#   become: yes
-#   apt:
-#     name=ansible=2.2.*
-#     state=present
+- name: Install Ansible using APT
+  become: yes
+  apt:
+    name: ansible=2.3*
+    state: present
