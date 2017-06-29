@@ -8,6 +8,9 @@ if [ $# -gt 0 ]; then
 fi
 CHANGED='false'
 
+# later versions of docker don't set this
+iptables -P FORWARD ACCEPT
+
 iptables --table nat --check POSTROUTING --out-interface {{ interfaces.external }} -j MASQUERADE &>> /dev/null
 if [ $? -ne 0 ]; then
     iptables --table nat --append POSTROUTING --out-interface {{ interfaces.external }} -j MASQUERADE
