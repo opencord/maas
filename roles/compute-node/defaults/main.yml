@@ -1,6 +1,7 @@
 ---
 
-pub_ssh_key: "{{ lookup('file', '/etc/maas/.ssh/cord_rsa.pub') }}"
+pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
+pub_ssh_key: "{{ lookup('file', pub_ssh_key_file_location+'/cord_rsa.pub') }}"
 
 compute_node:
     password: "{{password_compute_node | default(lookup('password', 'passwords/compute_node.txt chars=ascii_letters,digits'))}}"

@@ -43,12 +43,12 @@
     state: absent
   with_items:
     - { name: "storage", image: "docker-registry:5000/consul:{{ docker.tag }}" }
-    - { name: "allocator", image: "docker-registry:5000/cord-ip-allocator:{{ docker.tag }}" }
-    - { name: "provisioner", image: "docker-registry:5000/cord-provisioner:{{ docker.tag }}" }
+    - { name: "allocator", image: "docker-registry:5000/cord-maas-allocator:{{ docker.tag }}" }
+    - { name: "provisioner", image: "docker-registry:5000/cord-maas-provisioner:{{ docker.tag }}" }
     - { name: "switchq", image: "docker-registry:5000/cord-maas-switchq:{{ docker.tag }}" }
     - { name: "automation", image: "docker-registry:5000/cord-maas-automation:{{ docker.tag }}" }
-    - { name: "generator", image: "docker-registry:5000/config-generator:{{ docker.tag }}" }
-    - { name: "harvester", image: "docker-registry:5000/cord-dhcp-harvester:{{ docker.tag }}" }
+    - { name: "generator", image: "docker-registry:5000/cord-maas--generator:{{ docker.tag }}" }
+    - { name: "harvester", image: "docker-registry:5000/cord-maas-harvester:{{ docker.tag }}" }
 
 - name: MAAS Repository
   become: yes
@@ -128,6 +128,11 @@
   shell: maas-region-admin apikey --username={{ maas.user }} 2>/dev/null | wc -l
   register: maas_user_exists
   changed_when: false
+
+- name: Debug
+  become: yes
+  debug:
+    msg: "USER: {{maas.user}} and {{maas.user_password}} and {{maas_user_exists.stdout}}"
 
 - name: MAAS User
   become: yes

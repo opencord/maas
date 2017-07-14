@@ -1,7 +1,7 @@
 #!/bin/bash
 
 KEEP_DOCKER=0
-DOCKER_ENGINE="docker-engine"
+DOCKER_ENGINE="docker-ce"
 DOCKER_REGISTRY="/docker-registry /docker-registry-mirror"
 CONTAINER_LIST=$(docker ps -qa)
 
@@ -17,15 +17,11 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-CONTAINER_LIST=$(docker ps --format '{{.ID}} {{.Names}}' | grep -v ' registry$' | grep -v ' registry-mirror$' | awk '{print $1}')
-
-docker kill $CONTAINER_LIST
-docker rm -f $CONTAINER_LIST
-if [ $KEEP_DOCKER -eq 0 ]; then
-    docker rmi -f $(docker images -aq)
-fi
-
-sudo apt-get remove --purge -y bind9 apache2 $DOCKER_ENGINE ansible $(dpkg --get-selections | grep maas | cut -f1)
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images -q)
+docker volume rm -f $(docker volume ls -q)
+docker network rm $(docker network ls -q)
+sudo apt-get remove --purge -y bind9 apache2 apt-cacher-ng $DOCKER_ENGINE ansible $(dpkg --get-selections | grep maas | cut -f1)
 
 sudo rm -rf \
     /etc/maas \
@@ -41,6 +37,7 @@ sudo rm -rf \
     /etc/apt/sources.list.d/ppa_maas_stable_trusty.list \
     /etc/apt/sources.list.d/ppa_ansible_ansible_trusty.list \
     /etc/network/if-pre-up.d/nat \
+    /etc/apt/apt.conf.d/03apt-cacher-ng \
     $DOCKER_REGISTRY
 
 sudo apt-get update -y

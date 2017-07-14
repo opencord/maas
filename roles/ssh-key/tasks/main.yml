@@ -19,3 +19,24 @@
     key: "{{lookup('file', '~/.ssh/id_rsa.pub')}}"
   tags:
     - establish_ssh_keys
+
+- name: Ensure key pair storage
+  become: yes
+  local_action: file path={{pub_ssh_key_file_location}} mode="0755" state=directory
+
+- name: Validate existing key pair
+  become: yes
+  local_action: stat path={{pub_ssh_key_file_location}}/cord_rsa
+  register: key_pair
+
+- name: Generate key pair
+  become: yes
+  local_action: command ssh-keygen -b 2048 -t rsa -N "" -C cord@cord.lab -f {{pub_ssh_key_file_location}}/cord_rsa
+  when: not key_pair.stat.exists
+
+- name: Ensure privacy of key pair
+  become: yes
+  local_action: file path="{{pub_ssh_key_file_location}}/{{item.name}}" mode="{{item.mode}}"
+  with_items:
+    - { "name": "cord_rsa", "mode": "0644" }
+    - { "name": "cord_rsa.pub", "mode": "0644" }

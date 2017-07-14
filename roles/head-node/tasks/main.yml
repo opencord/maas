@@ -131,7 +131,7 @@
 - name: Copy SSH Key Pair for POD
   become: yes
   copy:
-    src: /etc/maas/.ssh/{{item}}
+    src: "{{pub_ssh_key_file_location}}/{{item}}"
     dest: /etc/maas/.ssh/{{item}}
     owner: maas
     group: maas

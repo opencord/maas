@@ -1,4 +1,4 @@
-## Copyright 2017 Open Networking Laboratory
+## Copyright 2016 Open Networking Laboratory
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -11,15 +11,24 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+FROM golang:1.7-alpine as builder
+MAINTAINER Open Networking Laboratory <info@onlab.us>
+
+WORKDIR /go
+ADD . /go/src/gerrit.opencord.org/maas/cord-provisioner
+RUN go build -o /build/entry-point gerrit.opencord.org/maas/cord-provisioner
+
 FROM alpine:3.5
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
-RUN apk --update add bind
+# Base image information borrowed by official golang wheezy Dockerfile
+RUN apk --update add ansible openssh-client sshpass curl py2-netaddr rsync
+COPY ssh-config /root/.ssh/config
+COPY ansible.cfg /etc/ansible/ansible.cfg
+COPY --from=builder /build/entry-point /service/entry-point
 
-ADD entry-point /service/entry-point
-
-LABEL org.label-schema.name="harvester" \
-      org.label-schema.description="Provides DHCP harvesting and insertion into DNS" \
+LABEL org.label-schema.name="provisioner" \
+      org.label-schema.description="Provides provisioning of compute and switch nodes for CORD" \
       org.label-schema.vcs-url="https://gerrit.opencord.org/maas" \
       org.label-schema.vendor="Open Networking Laboratory" \
       org.label-schema.schema-version="1.0"
