@@ -1,0 +1,3 @@
+BUILD_DOCKER_TAG:=candidate
+DEPLOY_DOCKER_TAG:=candidate
+DOCKER_REGISTRY:=localhost:5000

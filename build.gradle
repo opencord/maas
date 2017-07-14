@@ -137,102 +137,102 @@ def getBranchName = { ->
 
 task buildSwitchqImage(type: Exec) {
     workingDir 'switchq'
-    commandLine 'make', 'build', 'package'
+    commandLine 'make', 'build'
 }
 
 task tagSwitchqImage(type: Exec) {
    dependsOn buildSwitchqImage
-   commandLine "docker", 'tag', 'cord-maas-switchq:candidate', "$targetReg/cord-maas-switchq:$targetTag"
+   commandLine "docker", 'tag', 'opencord/maas-switchq:candidate', "$targetReg/opencord/maas-switchq:$targetTag"
 }
 
 task publishSwitchqImage(type: Exec) {
     dependsOn tagSwitchqImage
-    commandLine "docker", 'push', "$targetReg/cord-maas-switchq:$targetTag"
+    commandLine "docker", 'push', "$targetReg/opencord/maas-switchq:$targetTag"
 }
 
 // IP Allocator Image
 
 task buildAllocationImage(type: Exec) {
     workingDir 'ip-allocator'
-    commandLine 'make', 'build', 'package'
+    commandLine 'make', 'build'
 }
 
 task tagAllocationImage(type: Exec) {
    dependsOn buildAllocationImage
-   commandLine "docker", 'tag', 'cord-ip-allocator:candidate', "$targetReg/cord-ip-allocator:$targetTag"
+   commandLine "docker", 'tag', 'opencord/maas-allocator:candidate', "$targetReg/opencord/maas-allocator:$targetTag"
 }
 
 task publishAllocationImage(type: Exec) {
     dependsOn tagAllocationImage
-    commandLine "docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
+    commandLine "docker", 'push', "$targetReg/opencord/maas-allocator:$targetTag"
 }
 
 // Provisioner Image
 
 task buildProvisionerImage(type: Exec) {
     workingDir 'provisioner'
-    commandLine 'make', 'build', 'package'
+    commandLine 'make', 'build'
 }
 
 task tagProvisionerImage(type: Exec) {
    dependsOn buildProvisionerImage
-   commandLine "docker", 'tag', 'cord-provisioner:candidate', "$targetReg/cord-provisioner:$targetTag"
+   commandLine "docker", 'tag', 'opencord/maas-provisioner:candidate', "$targetReg/opencord/maas-provisioner:$targetTag"
 }
 
 task publishProvisionerImage(type: Exec) {
     dependsOn tagProvisionerImage
-    commandLine "docker", 'push', "$targetReg/cord-provisioner:$targetTag"
+    commandLine "docker", 'push', "$targetReg/opencord/maas-provisioner:$targetTag"
 }
 
 // Config Generator Image
 
 task buildConfigGeneratorImage(type: Exec) {
     workingDir 'config-generator'
-    commandLine 'make', 'build', 'package'
+    commandLine 'make', 'build'
 }
 
 task tagConfigGeneratorImage(type: Exec) {
    dependsOn buildConfigGeneratorImage
-   commandLine "docker", 'tag', 'config-generator:candidate', "$targetReg/config-generator:$targetTag"
+   commandLine "docker", 'tag', 'opencord/maas-generator:candidate', "$targetReg/opencord/maas-generator:$targetTag"
 }
 
 task publishConfigGeneratorImage(type: Exec) {
     dependsOn tagConfigGeneratorImage
-    commandLine "docker", 'push', "$targetReg/config-generator:$targetTag"
+    commandLine "docker", 'push', "$targetReg/opencord/maas-generator:$targetTag"
 }
 
 // Automation Image
 
 task buildAutomationImage(type: Exec) {
     workingDir 'automation'
-    commandLine 'make', 'build', 'package'
+    commandLine 'make', 'build'
 }
 
 task tagAutomationImage(type: Exec) {
     dependsOn buildAutomationImage
-    commandLine "docker", 'tag', 'cord-maas-automation:candidate', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "docker", 'tag', 'opencord/maas-automation:candidate', "$targetReg/opencord/maas-automation:$targetTag"
 }
 
 task publishAutomationImage(type: Exec) {
     dependsOn tagAutomationImage
-    commandLine "docker", 'push', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine "docker", 'push', "$targetReg/opencord/maas-automation:$targetTag"
 }
 
 // DHCP Harvester Images
 
 task buildHarvesterImage(type: Exec) {
     workingDir 'harvester'
-    commandLine 'make', 'build', 'package'
+    commandLine 'make', 'build'
 }
 
 task tagHarvesterImage(type: Exec) {
     dependsOn buildHarvesterImage
-    commandLine "docker", 'tag', 'cord-dhcp-harvester:candidate', "$targetReg/cord-dhcp-harvester:$targetTag"
+    commandLine "docker", 'tag', 'opencord/maas-harvester:candidate', "$targetReg/opencord/maas-harvester:$targetTag"
 }
 
 task publishHarvesterImage(type: Exec) {
     dependsOn tagHarvesterImage
-    commandLine "docker", 'push', "$targetReg/cord-dhcp-harvester:$targetTag"
+    commandLine "docker", 'push', "$targetReg/opencord/maas-harvester:$targetTag"
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
