@@ -108,7 +108,7 @@
 - name: Ensure SSH Key Pair
   become: yes
   copy:
-    src: "/etc/maas/.ssh/{{item.src}}"
+    src: "{{pub_ssh_key_file_location}}/{{item.src}}"
     dest: "{{ansible_env['PWD']}}/.ssh/{{item.dest}}"
     owner: "{{ ansible_user_id }}"
     group: "docker"

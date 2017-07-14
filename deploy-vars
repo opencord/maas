@@ -1,0 +1,65 @@
+---
+# Password to assign to compute nodes for user `ubuntu`. Defaults to random value if not set
+password_compute_node: ubuntu
+
+#fabric_include_names
+fabric_include_module_types: i40e, mlx4_en
+#fabric_include_bus_types
+
+#fabric_exclude_names
+#fabric_exclude_module_types
+#fabric_exclude_bus_types
+
+#fabric_ignore_names
+#fabric_ignore_module_types
+#fabric_ignore_bus_types
+
+#management_include_names
+#management_include_module_types
+#management_include_bus_types
+#management_exclude_names
+#management_exclude_module_types
+#management_exclude_bus_types
+#management_ignore_names
+#management_ignore_module_types
+#management_ignore_bus_types
+
+fabric_iface: fabric
+management_iface: mgmtbr
+external_iface: eth2
+iface_file: /etc/network/interfaces
+
+fabric_ip: 10.2.1.1/24
+management_ip: 10.2.0.1/24
+external_ip: 192.168.10.3/24
+
+external_gw: 192.168.10.1
+#management_gw
+
+#external_bc
+#management_bc
+
+power_helper_user: cord
+power_helper_host: ''
+
+admin_email: admin@cord.lab
+password_maas_admin: admin
+maas_user: cord
+password_maas_user: cord
+maas_email: cord@cord.lab
+
+domain: cord.lab
+upstream_dns: 8.8.8.8 8.8.8.4
+
+management_network: 10.2.0.0/24
+bridge_network: 172.42.0.0/24
+bridge_name: mgmtbr
+
+fabric_range_low: 10.2.1.2
+fabric_range_high: 10.2.1.100
+management_range_low: 10.2.0.2
+management_range_high: 10.2.0.128
+
+deploy_docker_tag: candidate
+logging_host: 10.100.198.201
+

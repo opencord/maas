@@ -137,102 +137,72 @@ def getBranchName = { ->
 
 task buildSwitchqImage(type: Exec) {
     workingDir 'switchq'
-    commandLine 'make', 'build', 'package'
-}
-
-task tagSwitchqImage(type: Exec) {
-   dependsOn buildSwitchqImage
-   commandLine "docker", 'tag', 'cord-maas-switchq:candidate', "$targetReg/cord-maas-switchq:$targetTag"
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'build'
 }
 
 task publishSwitchqImage(type: Exec) {
-    dependsOn tagSwitchqImage
-    commandLine "docker", 'push', "$targetReg/cord-maas-switchq:$targetTag"
+    workingDir 'switchq'
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'publish'
 }
 
 // IP Allocator Image
 
 task buildAllocationImage(type: Exec) {
     workingDir 'ip-allocator'
-    commandLine 'make', 'build', 'package'
-}
-
-task tagAllocationImage(type: Exec) {
-   dependsOn buildAllocationImage
-   commandLine "docker", 'tag', 'cord-ip-allocator:candidate', "$targetReg/cord-ip-allocator:$targetTag"
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'build'
 }
 
 task publishAllocationImage(type: Exec) {
-    dependsOn tagAllocationImage
-    commandLine "docker", 'push', "$targetReg/cord-ip-allocator:$targetTag"
+    workingDir 'ip-allocator'
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'publish'
 }
 
 // Provisioner Image
 
 task buildProvisionerImage(type: Exec) {
     workingDir 'provisioner'
-    commandLine 'make', 'build', 'package'
-}
-
-task tagProvisionerImage(type: Exec) {
-   dependsOn buildProvisionerImage
-   commandLine "docker", 'tag', 'cord-provisioner:candidate', "$targetReg/cord-provisioner:$targetTag"
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'build'
 }
 
 task publishProvisionerImage(type: Exec) {
-    dependsOn tagProvisionerImage
-    commandLine "docker", 'push', "$targetReg/cord-provisioner:$targetTag"
+    workingDir 'provisioner'
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'publish'
 }
 
 // Config Generator Image
 
 task buildConfigGeneratorImage(type: Exec) {
     workingDir 'config-generator'
-    commandLine 'make', 'build', 'package'
-}
-
-task tagConfigGeneratorImage(type: Exec) {
-   dependsOn buildConfigGeneratorImage
-   commandLine "docker", 'tag', 'config-generator:candidate', "$targetReg/config-generator:$targetTag"
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'build'
 }
 
 task publishConfigGeneratorImage(type: Exec) {
-    dependsOn tagConfigGeneratorImage
-    commandLine "docker", 'push', "$targetReg/config-generator:$targetTag"
+    workingDir 'config-generator'
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'publish'
 }
 
 // Automation Image
 
 task buildAutomationImage(type: Exec) {
     workingDir 'automation'
-    commandLine 'make', 'build', 'package'
-}
-
-task tagAutomationImage(type: Exec) {
-    dependsOn buildAutomationImage
-    commandLine "docker", 'tag', 'cord-maas-automation:candidate', "$targetReg/cord-maas-automation:$targetTag"
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'build'
 }
 
 task publishAutomationImage(type: Exec) {
-    dependsOn tagAutomationImage
-    commandLine "docker", 'push', "$targetReg/cord-maas-automation:$targetTag"
+    workingDir 'automation'
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'publish'
 }
 
 // DHCP Harvester Images
 
 task buildHarvesterImage(type: Exec) {
     workingDir 'harvester'
-    commandLine 'make', 'build', 'package'
-}
-
-task tagHarvesterImage(type: Exec) {
-    dependsOn buildHarvesterImage
-    commandLine "docker", 'tag', 'cord-dhcp-harvester:candidate', "$targetReg/cord-dhcp-harvester:$targetTag"
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'build'
 }
 
 task publishHarvesterImage(type: Exec) {
-    dependsOn tagHarvesterImage
-    commandLine "docker", 'push', "$targetReg/cord-dhcp-harvester:$targetTag"
+    workingDir 'harvester'
+    commandLine 'make', "DOCKER_TAG=$targetTag", "DOCKER_REGISTRY=$targetReg", 'publish'
 }
 
 // ~~~~~~~~~~~~~~~~~~~ Global tasks ~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,15 +231,6 @@ task buildImages {
     dependsOn buildSwitchqImage
 }
 
-task tagImages {
-    dependsOn tagHarvesterImage
-    dependsOn tagAutomationImage
-    dependsOn tagAllocationImage
-    dependsOn tagProvisionerImage
-    dependsOn tagConfigGeneratorImage
-    dependsOn tagSwitchqImage
-}
-
 task publish {
     //FIXME: This works because the upstream project primes the nodes before running this.
     comps.each { name, spec -> if (spec.type == 'image') { dependsOn "publish" + name } }
@@ -280,7 +241,6 @@ task publish {
     dependsOn publishConfigGeneratorImage
     dependsOn publishSwitchqImage
 }
-
 
 // ~~~~~~~~~~~~~~~~~~~ Deployment / Test Tasks  ~~~~~~~~~~~~~~~~~~~~~~~
 
