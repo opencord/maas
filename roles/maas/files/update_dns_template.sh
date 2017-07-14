@@ -67,7 +67,6 @@ apt-cache CNAME $HOSTNAME
 mavenrepo CNAME $HOSTNAME
 xos-gui CNAME $HOSTNAME
 xos-ws CNAME $HOSTNAME
-xos-tosca CNAME $HOSTNAME
 consul CNAME $HOSTNAME
 juju-head-node CNAME $HOSTNAME
 \$INCLUDE "/etc/bind/maas/cnames.inc"
