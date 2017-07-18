@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1d315d_1a3abd36",
+        "filename": "roles/compute-node/files/remove-maas-components",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-07-18T18:43:48Z",
+      "side": 1,
+      "message": "Should MaaS (or any CORD component) remove things that it specifically doesn\u0027t install?",
+      "range": {
+        "startLine": 33,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 17
+      },
+      "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1d315d_da3b2537",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-07-18T18:43:48Z",
+      "side": 1,
+      "message": "This is being parameterized (including the /) in platform-install as `deploy_docker_registry`.\n\nMight be worth doing that, as a prep for using ssl/auth for the registry.",
+      "range": {
+        "startLine": 45,
+        "startChar": 32,
+        "endLine": 45,
+        "endChar": 54
+      },
+      "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
