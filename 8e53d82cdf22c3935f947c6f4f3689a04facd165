@@ -22,6 +22,30 @@
       "revId": "8e53d82cdf22c3935f947c6f4f3689a04facd165",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1d315d_7a12d1b5",
+        "filename": "roles/maas/files/update_dns_template.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-07-18T18:51:31Z",
+      "side": 0,
+      "message": "i didn\u0027t change this file, so i am not sure what happened here. will put this back to what is in master.",
+      "parentUuid": "3a1d315d_fa3ee128",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 25
+      },
+      "revId": "8e53d82cdf22c3935f947c6f4f3689a04facd165",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }

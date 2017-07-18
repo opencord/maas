@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3a1d315d_9a45adb5",
+        "filename": "roles/compute-node/files/remove-maas-components",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-07-18T18:51:31Z",
+      "side": 1,
+      "message": "yes, i was lazy ;)\n\ni will remove this to the remove-cos-components script.",
+      "parentUuid": "3a1d315d_1a3abd36",
+      "range": {
+        "startLine": 33,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 17
+      },
+      "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a1d315d_da3b2537",
         "filename": "roles/maas/tasks/main.yml",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-07-18T18:43:48Z",
       "side": 1,
       "message": "This is being parameterized (including the /) in platform-install as `deploy_docker_registry`.\n\nMight be worth doing that, as a prep for using ssl/auth for the registry.",
+      "range": {
+        "startLine": 45,
+        "startChar": 32,
+        "endLine": 45,
+        "endChar": 54
+      },
+      "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1d315d_5a1715a4",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-07-18T18:51:31Z",
+      "side": 1,
+      "message": "always ok with parameterization. so the idea being that the images may not be pulled by the pod local registry? \n\nwhere is this variable set? and i assume you mean a global replace of `docker-registry:5000/` with `{{ deploy_docker_registry }}`. There is already a `{{ docker.registry }}` var, why is this different?",
+      "parentUuid": "3a1d315d_da3b2537",
       "range": {
         "startLine": 45,
         "startChar": 32,
