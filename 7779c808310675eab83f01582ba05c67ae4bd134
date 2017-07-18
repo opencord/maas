@@ -117,6 +117,30 @@
       "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1d315d_9a1c8dc3",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-07-18T19:05:05Z",
+      "side": 1,
+      "message": "For the former, the name or port (especially if SSL is involved) might change.\n\nFor the latter, it gets set in the build.gradle file for the old build system. Looks like it\u0027s being set both ways there, so it can become inconsistent. This might be a larger problem than I had anticipated, so maybe we just leave it the way it is for now?",
+      "parentUuid": "3a1d315d_5a1715a4",
+      "range": {
+        "startLine": 45,
+        "startChar": 32,
+        "endLine": 45,
+        "endChar": 54
+      },
+      "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
