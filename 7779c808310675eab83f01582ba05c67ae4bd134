@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "3a1d315d_1a119dac",
+        "filename": "roles/compute-node/files/remove-maas-components",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-07-18T19:00:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a1d315d_9a45adb5",
+      "range": {
+        "startLine": 33,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 17
+      },
+      "revId": "7779c808310675eab83f01582ba05c67ae4bd134",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a1d315d_da3b2537",
         "filename": "roles/maas/tasks/main.yml",
         "patchSetId": 3
