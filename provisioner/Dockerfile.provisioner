@@ -24,6 +24,7 @@ MAINTAINER Open Networking Laboratory <info@onlab.us>
 # Base image information borrowed by official golang wheezy Dockerfile
 RUN apk --update add ansible openssh-client sshpass curl py2-netaddr rsync
 COPY ssh-config /root/.ssh/config
+RUN chmod 700 /root/.ssh && chmod 600 /root/.ssh/config
 COPY ansible.cfg /etc/ansible/ansible.cfg
 COPY --from=builder /build/entry-point /service/entry-point
 
