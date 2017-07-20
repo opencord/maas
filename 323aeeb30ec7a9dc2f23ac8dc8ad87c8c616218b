@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1a2d67_3626b669",
+        "filename": "roles/maas/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-07-20T15:36:22Z",
+      "side": 1,
+      "message": "there is a docker.registry entry in the configuration. how is this related to this parameter?  Or is it? Or should it be?\n\nWhat are the scenarios in the POD where the POD would not be using its internal docker repo?",
+      "range": {
+        "startLine": 67,
+        "startChar": 18,
+        "endLine": 67,
+        "endChar": 40
+      },
+      "revId": "323aeeb30ec7a9dc2f23ac8dc8ad87c8c616218b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
