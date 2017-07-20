@@ -42,13 +42,13 @@
     image: "{{ item.image }}"
     state: absent
   with_items:
-    - { name: "storage", image: "docker-registry:5000/consul:{{ docker.tag }}" }
-    - { name: "allocator", image: "docker-registry:5000/cord-maas-allocator:{{ docker.tag }}" }
-    - { name: "provisioner", image: "docker-registry:5000/cord-maas-provisioner:{{ docker.tag }}" }
-    - { name: "switchq", image: "docker-registry:5000/cord-maas-switchq:{{ docker.tag }}" }
-    - { name: "automation", image: "docker-registry:5000/cord-maas-automation:{{ docker.tag }}" }
-    - { name: "generator", image: "docker-registry:5000/cord-maas--generator:{{ docker.tag }}" }
-    - { name: "harvester", image: "docker-registry:5000/cord-maas-harvester:{{ docker.tag }}" }
+    - { name: "storage", image: "{{ docker.registry }}consul:{{ docker.tag }}" }
+    - { name: "allocator", image: "{{ docker.registry }}cord-maas-allocator:{{ docker.tag }}" }
+    - { name: "provisioner", image: "{{ docker.registry }}cord-maas-provisioner:{{ docker.tag }}" }
+    - { name: "switchq", image: "{{ docker.registry }}cord-maas-switchq:{{ docker.tag }}" }
+    - { name: "automation", image: "{{ docker.registry }}cord-maas-automation:{{ docker.tag }}" }
+    - { name: "generator", image: "{{ docker.registry }}cord-maas--generator:{{ docker.tag }}" }
+    - { name: "harvester", image: "{{ docker.registry }}cord-maas-harvester:{{ docker.tag }}" }
 
 - name: MAAS Repository
   become: yes
@@ -391,6 +391,7 @@
   with_items:
     - automation-compose.yml
   changed_when: true
+  when: docker.registry != ""
 
 - name: Start Automation
   become: yes

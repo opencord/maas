@@ -64,6 +64,7 @@ ranges:
         high: "{{ management_range_high | default(management_ip | default('10.6.0.0/24')) | ipaddr(-3) | ipaddr('address') }}"
 
 docker:
+    registry: "{{ deploy_docker_registry | default('docker-registry:5000/') }}"
     tag: "{{ deploy_docker_tag | default('candidate') }}"
 
 # temporary, for ciab builds
