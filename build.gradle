@@ -311,6 +311,7 @@ task prime (type: Exec)  {
             .p(config.common.virtualbox_support, "virtualbox_support")
             .p(config.common.power_helper_user, "power_helper_user")
             .p(config.common.power_helper_host, "power_helper_host")
+            .p(config.common.kernel_opts, "kernel_opts")
     }
 
     if (config.passwords) {
@@ -372,6 +373,7 @@ task deployBase(type: Exec)  {
             .p(config.common.virtualbox_support, "virtualbox_support")
             .p(config.common.power_helper_user, "power_helper_user")
             .p(config.common.power_helper_host, "power_helper_host")
+            .p(config.common.kernel_opts, "kernel_opts")
     }
 
     if (config.passwords) {
