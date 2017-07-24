@@ -67,6 +67,13 @@
     upstream_dns: '{{maas.upstream_dns}}'
     state: present
 
+- name: Set Kernel options for performance
+  maas:
+    key: '{{apikey.stdout}}'
+    maas: 'http://{{mgmt_ip_address.stdout}}/MAAS/api/1.0'
+    kernel_opts: '{{maas.kernel_opts}}'
+    state: present
+
 - name: Ensure Boot Resources
   maas_boot_resource:
     key: '{{apikey.stdout}}'

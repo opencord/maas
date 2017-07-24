@@ -25,6 +25,7 @@ maas:
     #   'domain' specifies the domain name configured in to MAAS
     domain: "{{ domain | default('cord.lab') }}"
     upstream_dns: "{{ upstream_dns | default('8.8.8.8 8.8.8.4') }}"
+    kernel_opts: "{{ kernel_opts | default('') }}"
 
 interfaces:
     # CHANGE:
