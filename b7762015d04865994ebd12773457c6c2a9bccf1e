@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1a2d67_1c175953",
+        "filename": "build.gradle",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2017-07-26T17:23:31Z",
+      "side": 1,
+      "message": "We probably don\u0027t need this.  We just need to allow setting of kernel_opts from the POD config file.",
+      "range": {
+        "startLine": 314,
+        "startChar": 0,
+        "endLine": 314,
+        "endChar": 56
+      },
+      "revId": "b7762015d04865994ebd12773457c6c2a9bccf1e",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1a2d67_fc0b7d29",
+        "filename": "build.gradle",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2017-07-26T17:23:31Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 377,
+        "startChar": 0,
+        "endLine": 377,
+        "endChar": 56
+      },
+      "revId": "b7762015d04865994ebd12773457c6c2a9bccf1e",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1a2d67_3c121563",
+        "filename": "roles/maas/tasks/config-maas.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2017-07-26T17:23:31Z",
+      "side": 1,
+      "message": "There might be other reasons to set the kernel_opts besides DPDK.  How about: \n\nwhen: maas.kernel_opts !\u003d \"\"",
+      "range": {
+        "startLine": 76,
+        "startChar": 2,
+        "endLine": 76,
+        "endChar": 36
+      },
+      "revId": "b7762015d04865994ebd12773457c6c2a9bccf1e",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
