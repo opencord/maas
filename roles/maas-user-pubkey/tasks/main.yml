@@ -1,0 +1,14 @@
+---
+# roles/maas-user-pubkey/tasks/main.yml
+
+- name: Create maas user
+  user:
+    name: maas
+    groups: "{{ maas_groups }}"
+    state: present
+
+- name: Authorize generated key for maas user
+  authorized_key:
+    user: maas
+    key: "{{ lookup('file', pub_ssh_key_file_location+'/cord_rsa.pub') }}"
+    state: present
