@@ -304,13 +304,9 @@
 
 - name: Ensure SSH keys for Ansible
   become: yes
-  command: cp {{ ansible_env['PWD'] }}/.ssh/id_rsa /etc/maas/ansible/id_rsa
-  changed_when: true
-
-- name: Ensure SSH Key Permissions
-  become: yes
-  file:
-    path: /etc/maas/ansible/id_rsa
+  copy:
+    src: "{{ pub_ssh_key_file_location }}/cord_rsa"
+    dest: "/etc/maas/ansible/id_rsa"
     owner: root
     group: root
     mode: "0400"

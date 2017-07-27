@@ -15,7 +15,7 @@
 
 - name: Ensure Key Authorized on Target Head Node
   authorized_key:
-    user: '{{ansible_ssh_user}}'
+    user: '{{ansible_user_id}}'
     key: "{{lookup('file', '~/.ssh/id_rsa.pub')}}"
   tags:
     - establish_ssh_keys

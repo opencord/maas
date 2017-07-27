@@ -1,0 +1,20 @@
+---
+# roles/maas-user-privkey/tasks/main.yml
+
+- name: Create maas .ssh dir
+  become: yes
+  file:
+    path: "{{ maas_homedir }}/.ssh"
+    state: directory
+    owner: maas
+    group: maas
+    mode: 0700
+
+- name: Copy generated private key to maas user
+  become: yes
+  copy:
+    src: "{{ pub_ssh_key_file_location }}/cord_rsa"
+    dest: "{{ maas_homedir }}/.ssh/id_rsa"
+    owner: maas
+    group: maas
+    mode: 0600
