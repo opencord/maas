@@ -1,0 +1,5 @@
+---
+# roles/maas-user-privkey/defaults/main.yml
+
+maas_homedir: "/var/lib/maas"
+pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
