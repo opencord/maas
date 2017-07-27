@@ -1,0 +1,5 @@
+---
+# roles/maas-user-pubkey/defaults/main.yml
+
+maas_key_path: "/tmp/head1/home/vagrant/.ssh/"
+maas_public_key: "cord_rsa.pub"
