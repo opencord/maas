@@ -1,0 +1,15 @@
+---
+# setup-ciab-pcu.yml
+# Used to set up remote power control for CORD-in-a-Box
+
+- name: Setup maas user in head node VM with private key
+  hosts: head
+  roles:
+  - maas-user-privkey
+
+# This runs on the local server
+- name: Setup maas user on CiaB server with authorized_keys
+  hosts: localhost
+  become: yes
+  roles:
+  - maas-user-pubkey
