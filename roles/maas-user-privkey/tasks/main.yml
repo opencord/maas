@@ -1,0 +1,28 @@
+---
+# roles/maas-user-privkey/tasks/main.yml
+
+- name: Fetch generated keypair
+  fetch:
+    src: "{{ ansible_env.PWD }}/.ssh/{{ item }}"
+    dest: /tmp
+  with_items:
+    - "{{ maas_private_key }}"
+    - "{{ maas_public_key }}"
+
+- name: Create maas .ssh dir
+  become: yes
+  file:
+    path: "{{ maas_homedir }}/.ssh"
+    state: directory
+    owner: maas
+    mode: 0700
+
+- name: Copy generated private key to maas user
+  become: yes
+  copy:
+    src: "{{ maas_key_path }}/{{ item }}"
+    dest: "{{ maas_homedir }}/.ssh/{{ item }}"
+    owner: maas
+    mode: 0700
+  with_items:
+    - "{{ maas_private_key }}"
