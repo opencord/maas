@@ -114,8 +114,8 @@
     group: "docker"
     mode: "0600"
   with_items:
-    - { "src": "cord_rsa", "dest": "id_rsa" }
-    - { "src": "cord_rsa.pub", "dest": "id_rsa.pub" }
+    - { "src": "cord_rsa", "dest": "cord_rsa" }
+    - { "src": "cord_rsa.pub", "dest": "cord_rsa.pub" }
 
 - name: Ensure SSH config
   become: yes
