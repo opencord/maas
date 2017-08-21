@@ -74,7 +74,7 @@ func (c *Config) configGenHandler(w http.ResponseWriter, r *http.Request) {
 	// If the request specified the number of hosts, validate we have that
 	// exact number
 	if options.HostCount > 0 && len(hosts.Hosts) != options.HostCount {
-		log.Errorf("Expecting %d host(s), found %d, no configuration generaged",
+		log.Errorf("Expecting %d host(s), found %d, no configuration generated",
 			options.HostCount, len(hosts.Hosts))
 		http.Error(w, "Expected host count mismatch",
 			http.StatusInternalServerError)
@@ -106,6 +106,13 @@ func (c *Config) configGenHandler(w http.ResponseWriter, r *http.Request) {
 				return ip + "254/24"
 			} else {
 				return "0.0.0.254/24"
+			}
+		},
+		"vlan": func(ips []string) string {
+			if (len(ips) > 0) {
+				return strings.Split(ips[0], ".")[2]
+			} else {
+				return "0"
 			}
 		},
 	}
