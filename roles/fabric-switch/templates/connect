@@ -18,7 +18,7 @@ while [ "$IP x" == " x" ]; do
 done
 
 if [ $BG -eq 1 ]; then
-  nohup brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller=$IP 2>&1 > connect.log &
+  nohup launcher ofagentapp -i {{ switch_id }} -t $IP 2>&1 > connect.log &
 else
-  brcm-indigo-ofdpa-ofagent --dpid={{ switch_id }} --controller=$IP
+  launcher ofagentapp -i {{ switch_id }} -t $IP
 fi
