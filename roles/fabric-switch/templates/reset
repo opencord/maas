@@ -1,6 +1,0 @@
-#!/bin/bash
-./killit
-./purge
-service ofdpa restart
-./purge
-

@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 ---
 - name: Generate DPID
   shell: ifconfig ma1 | grep HWaddr | awk '{ print "0x0000"$5 }' | sed s/://g
@@ -26,20 +25,20 @@
     controller_ip: "onos-fabric"
 
 - name: Verify Openflow Agent
-  shell: which ofdpa | wc -w
+  shell: which ofagentapp | wc -w
   register: ofdpa_exists
   changed_when: false
 
 - name: Openflow Agent Version
-  command: ofdpa --version
+  command: ofagentapp --version
   register: ofdpa_version
   changed_when: false
   when: ofdpa_exists.stdout != "0"
 
-# Note: This is the version number of OFDPA 3.0 EA0
+# Note: This is the version number of OFDPA 3.0 EA4
 - name: Version 2.0.4.0 Openflow Agent
   include: ofdpa.yml
-  when: ofdpa_exists.stdout == "0" or ofdpa_version.stdout.find('version 2.0.4.0') == -1
+  when: ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('version 2.0.4.0') == -1
 
 - name: Utilities Scripts
   template:
@@ -49,10 +48,8 @@
     group: root
     mode: "0755"
   with_items:
-    - purge
     - killit
     - connect
-    - reset
   register: utils
 
 - name: Authorize SSH Key

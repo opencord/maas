@@ -6,7 +6,7 @@ PROG=$(echo $(basename $0) | sed -e 's/^cord-/cord /g')
 usage() {
     echo "usage: $PROG <sub-command> [options]"
     echo "    list    display the provisioning status of all nodes"
-    echo "    show    display the provisiniong status of a single node"
+    echo "    show    display the provisioning status of a single node"
     echo "    delete  delete node(s) provisioning state"
     echo "    help    this message"
 }
