@@ -1,5 +1,5 @@
 #!/bin/bash
-#D provides access to the CORD POD swtich identification service
+#D provides access to the CORD POD switch identification service
 
 PROG=$(echo $(basename $0) | sed -e 's/^cord-/cord /g')
 

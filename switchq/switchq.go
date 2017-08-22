@@ -36,11 +36,11 @@ type Config struct {
 	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"VENDORS_URL" desc:"URL that specifies supported vendor OUI information"`
 	AddressURL      string `default:"file:///switchq/dhcp_harvest.inc" envconfig:"ADDRESS_URL" desc:"URL of service or file from which to query IP information"`
 	PollInterval    string `default:"1m" envconfig:"POLL_INTERVAL" desc:"how often IP information should be queried and processed"`
-	ProvisionTTL    string `default:"1h" envconfig:"PROVISION_TTL" desc:"duraction to wait for a provisioning request before considering it failed"`
+	ProvisionTTL    string `default:"1h" envconfig:"PROVISION_TTL" desc:"duration to wait for a provisioning request before considering it failed"`
 	ProvisionURL    string `default:"" envconfig:"PROVISION_URL" desc:"URL of provisioning service"`
 	RoleSelectorURL string `default:"" envconfig:"ROLE_SELECTOR_URL" desc:"URL of service to query for switch role"`
 	DefaultRole     string `default:"fabric-switch" envconfig:"DEFAULT_ROLE" desc:"default switch role"`
-	Script          string `default:"do-ansible" desc:"script to run for provisioniner"`
+	Script          string `default:"do-ansible" desc:"script to run for provisioner"`
 	LogLevel        string `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
 	LogFormat       string `default:"text" envconfig:"LOG_FORMAT" desc:"output format for logging, text or json"`
 	Listen          string `default:"" desc:"IP on which to listen for requests"`
