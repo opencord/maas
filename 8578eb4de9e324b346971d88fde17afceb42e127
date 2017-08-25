@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a2f8d8d_ce3da3bd",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-08-25T23:16:38Z",
+      "side": 1,
+      "message": "Can you add a checksum to this download?  Docs: http://docs.ansible.com/ansible/latest/get_url_module.html\n\nDo we need to ignore the cert check?",
+      "range": {
+        "startLine": 18,
+        "startChar": 2,
+        "endLine": 18,
+        "endChar": 9
+      },
+      "revId": "8578eb4de9e324b346971d88fde17afceb42e127",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
