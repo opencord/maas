@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a2f8d8d_ee673fe9",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-08-25T23:23:34Z",
+      "side": 1,
+      "message": "The MAC address for that interface is likely found at `ansible_ma1[\u0027macaddress\u0027]`,  and can be manipulated with the hwaddr filter: http://docs.ansible.com/ansible/latest/playbooks_filters_ipaddr.html",
+      "range": {
+        "startLine": 18,
+        "startChar": 8,
+        "endLine": 18,
+        "endChar": 77
+      },
+      "revId": "70d8fcb7f95b41a5c6b01a2036f661084df5f8dc",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
