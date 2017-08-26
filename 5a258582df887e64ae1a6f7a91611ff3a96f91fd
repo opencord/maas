@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a2f8d8d_cb3d95bd",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2017-08-26T00:16:26Z",
+      "side": 1,
+      "message": "Yeah maybe. For now I\u0027d rather keep it as it is in the interests of time.",
+      "parentUuid": "3a3291f1_6017daa4",
+      "range": {
+        "startLine": 51,
+        "startChar": 6,
+        "endLine": 51,
+        "endChar": 12
+      },
+      "revId": "5a258582df887e64ae1a6f7a91611ff3a96f91fd",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a3291f1_400cde94",
         "filename": "roles/fabric-switch/templates/killit",
         "patchSetId": 1
