@@ -22,6 +22,30 @@
       "revId": "8578eb4de9e324b346971d88fde17afceb42e127",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a2f8d8d_eedcdf76",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2017-08-26T00:16:26Z",
+      "side": 1,
+      "message": "I added the checksum verification. I don\u0027t know about the validate_certs issue, I didn\u0027t write this originally.",
+      "parentUuid": "1a2f8d8d_ce3da3bd",
+      "range": {
+        "startLine": 18,
+        "startChar": 2,
+        "endLine": 18,
+        "endChar": 9
+      },
+      "revId": "8578eb4de9e324b346971d88fde17afceb42e127",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
