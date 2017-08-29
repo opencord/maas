@@ -1,0 +1,13 @@
+diff --git a/src/provisioningserver/boot/uefi.py b/src/provisioningserver/boot/uefi.py
+index e770b0e..544a37c 100644
+--- a/src/provisioningserver/boot/uefi.py
++++ b/src/provisioningserver/boot/uefi.py
+@@ -143,7 +143,7 @@ class UEFIBootMethod(BootMethod):
+             # Extract the package with dpkg, and install the shim
+             call_and_check(["dpkg", "-x", shim_output, tmp])
+             install_bootloader(
+-                os.path.join(tmp, 'usr', 'lib', 'shim', 'shim.efi.signed'),
++                os.path.join(tmp, 'usr', 'lib', 'shim', 'shimx64.efi.signed'),
+                 os.path.join(destination, self.bootloader_path))
+ 
+             # Download the grub-efi-amd64-signed package.
