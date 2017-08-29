@@ -91,6 +91,21 @@
   register: status
   ignore_errors: yes
 
+# next two tasks are to repair https://jira.opencord.org/browse/CORD-1839. Remove when fixed upstream
+- name: patch maas file to change filename from shim.efi.signed to shimx64.efi.signed
+  become: yes
+  patch:
+    src: uefi.py.diff
+    dest: /usr/lib/python2.7/dist-packages/provisioningserver/boot/uefi.py
+
+- name: restart maas-regiond to reload uefi.py
+  become: yes
+  service:
+    name: maas-clusterd
+    state: restarted
+  tags:
+    - skip_ansible_lint # need to restart this now, not as a handler
+
 - name: WARNING - We think MAAS install has hung. You may want to abort the install, re-image the head node, and start again.
   pause:
     minutes: 15
