@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fa5d592f_2a5adf83",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-08-30T16:13:01Z",
+      "side": 1,
+      "message": "`ansible_ssh_port` is deprecated in Ansible 2.x, and shouldn\u0027t be used: http://docs.ansible.com/ansible/latest/intro_inventory.html\n\nShould all mentions of ansible_ssh_port should be replaced with ansible_port ?",
+      "parentUuid": "fa5d592f_ead047f9",
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa5d592f_0aecbbc6",
         "filename": "setup-ciab-pcu.yml",
         "patchSetId": 3
