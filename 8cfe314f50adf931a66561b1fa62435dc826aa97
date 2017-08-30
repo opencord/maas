@@ -129,6 +129,24 @@
       "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_0daa95d4",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-08-30T21:10:22Z",
+      "side": 1,
+      "message": "i do need to catch up on the latest build system updates, is there a write up somewhere? it seems to me we need a place to override the settings that can be overridden today via the deploy config, including network information, ansible information, etc. I am assuming that can all still be done.",
+      "parentUuid": "fa5d592f_ed406137",
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
