@@ -153,6 +153,30 @@
       "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_cafea338",
+        "filename": "setup-ciab-pcu.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2017-08-30T17:23:42Z",
+      "side": 1,
+      "message": "David:  I think MAAS automatically configures the IPMI interface on a physical server from the initial Linux image that gets PXE booted on the node.   The virtual compute nodes don\u0027t have built-in IPMI like the physical servers (AFAIK) so we are configuring ssh/libvirt rather than IPMI to allow MAAS to reboot the compute nodes.",
+      "parentUuid": "fa5d592f_ca222301",
+      "range": {
+        "startLine": 33,
+        "startChar": 6,
+        "endLine": 33,
+        "endChar": 25
+      },
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
