@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "fa5d592f_2d6e79ca",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-08-30T20:57:07Z",
+      "side": 1,
+      "message": "Possibly not - maybe `{{ ansible_port | default(\u002722\u0027) }}` ?",
+      "parentUuid": "fa5d592f_8d19e57b",
+      "range": {
+        "startLine": 414,
+        "startChar": 22,
+        "endLine": 414,
+        "endChar": 24
+      },
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa5d592f_4d2bed82",
         "filename": "roles/compute-node/tasks/networking.yml",
         "patchSetId": 4
