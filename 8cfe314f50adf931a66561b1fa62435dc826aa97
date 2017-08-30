@@ -70,6 +70,23 @@
       "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_4d2bed82",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-08-30T20:44:08Z",
+      "side": 1,
+      "message": "it should be configurable via the deployment configuration, but is that means we need to change it in the deployment config to the standard `ansible_port` that is fine. my concern was that if it is not set external (i.e. defaulted) will the ansible_port variable still container `22` or will if be blank?",
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
