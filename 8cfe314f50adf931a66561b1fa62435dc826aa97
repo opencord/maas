@@ -171,6 +171,24 @@
       "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_2d7c3972",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000297
+      },
+      "writtenOn": "2017-08-30T21:15:09Z",
+      "side": 1,
+      "message": "https://github.com/opencord/cord/blob/master/docs/build_internals.md\n\nNot a write up on the archirecture but its usage. I believe Zack or Andy are working on the writeup of the architecture",
+      "parentUuid": "fa5d592f_0daa95d4",
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
