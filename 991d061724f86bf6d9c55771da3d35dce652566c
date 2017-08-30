@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "fa5d592f_4a4f5393",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-08-30T19:30:22Z",
+      "side": 1,
+      "message": "Can we make those changes in this patch, or do we want to wait on this until later?",
+      "parentUuid": "fa5d592f_2ae89f7b",
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa5d592f_0aecbbc6",
         "filename": "setup-ciab-pcu.yml",
         "patchSetId": 3
