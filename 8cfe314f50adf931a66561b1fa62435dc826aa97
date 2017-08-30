@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "fa5d592f_2da55904",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000297
+      },
+      "writtenOn": "2017-08-30T21:10:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa5d592f_2d6e79ca",
+      "range": {
+        "startLine": 414,
+        "startChar": 22,
+        "endLine": 414,
+        "endChar": 24
+      },
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa5d592f_4d2bed82",
         "filename": "roles/compute-node/tasks/networking.yml",
         "patchSetId": 4
