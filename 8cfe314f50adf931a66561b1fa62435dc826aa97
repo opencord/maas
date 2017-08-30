@@ -87,6 +87,24 @@
       "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_ed406137",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000297
+      },
+      "writtenOn": "2017-08-30T20:51:52Z",
+      "side": 1,
+      "message": "Ok, as far as I know, there is no distinct deployment in the new build system. We have a `podconfig` that is used to override the `scenario` and `profile` configs. Andy and Zack, please feel free to correct me if I am wrong",
+      "parentUuid": "fa5d592f_4d2bed82",
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
