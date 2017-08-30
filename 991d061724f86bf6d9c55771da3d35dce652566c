@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "fa5d592f_8a542b22",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000297
+      },
+      "writtenOn": "2017-08-30T19:47:46Z",
+      "side": 1,
+      "message": "I would prefer to treat this as a separate Jira where I understand what the variable does and how it is used and then propagate the change. But if we clearly understand how this variable is used in the team, I am open to do a search and replace.",
+      "parentUuid": "fa5d592f_4a4f5393",
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa5d592f_0aecbbc6",
         "filename": "setup-ciab-pcu.yml",
         "patchSetId": 3
