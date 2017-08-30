@@ -29,3 +29,5 @@
   become: yes
   roles:
   - maas-user-pubkey
+  tags:
+    - skip_setup_ciab_pcu
