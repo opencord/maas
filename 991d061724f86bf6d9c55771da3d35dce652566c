@@ -111,6 +111,30 @@
       "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_ca222301",
+        "filename": "setup-ciab-pcu.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-08-30T14:57:50Z",
+      "side": 1,
+      "message": "Andy, I am aware and appreciative of your efforts to minimize differences between deployment types. \n\nI have to admit I am short on background around the context of this particular task in Ansible and I am wondering why a maas used needs to be established on the CiaB server any differently than on a physical POD or on a cloud deployment.\n\nPerhaps I need to be educated on the context.",
+      "parentUuid": "fa5d592f_aa480fcd",
+      "range": {
+        "startLine": 33,
+        "startChar": 6,
+        "endLine": 33,
+        "endChar": 25
+      },
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
