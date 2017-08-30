@@ -411,8 +411,8 @@
 
 - name: Ensure Port Defined
   set_fact:
-    ansible_ssh_port: 22
-  when: ansible_ssh_port is not defined
+    ansible_ssh_port: "{{ ansible_port | default('22') }}"
+  when: ansible_port is not defined
 
 - name: Wait For Restart
   local_action: wait_for port={{ ansible_ssh_port }} host={{ inventory_hostname }} search_regex=OpenSSH delay=120 timeout=600 connect_timeout=15
