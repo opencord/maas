@@ -87,6 +87,30 @@
       "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_aa480fcd",
+        "filename": "setup-ciab-pcu.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2017-08-30T14:44:18Z",
+      "side": 1,
+      "message": "David:   The purpose of CiaB is to provide a vanilla deployment of a CORD POD, without any unnecessary \"customization of the deployment\", but in a virtual environment.  As the main developer of CiaB, I have tried to be sensitive to your first concern.  Concretely, this playbook sets up the PCU in MAAS for controlling virtual machines.  I think that PCU setup is likely to be idiosyncratic based on the environment (CiaB, cloud, physical).\n\nWe want the system to be more modular, as you point out.   I think the new build system is a step in the right direction, however there is clearly more thinking that needs to happen in this area.",
+      "parentUuid": "fa5d592f_2a353f46",
+      "range": {
+        "startLine": 33,
+        "startChar": 6,
+        "endLine": 33,
+        "endChar": 25
+      },
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
