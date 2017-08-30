@@ -255,6 +255,30 @@
       "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_ea24c7c7",
+        "filename": "setup-ciab-pcu.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-08-30T20:05:13Z",
+      "side": 1,
+      "message": "The task is named \"Setup maas user on CiaB server with authorized_keys\", but we are skipping it on the CiaB build?",
+      "parentUuid": "fa5d592f_6aee978d",
+      "range": {
+        "startLine": 33,
+        "startChar": 6,
+        "endLine": 33,
+        "endChar": 25
+      },
+      "revId": "991d061724f86bf6d9c55771da3d35dce652566c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
