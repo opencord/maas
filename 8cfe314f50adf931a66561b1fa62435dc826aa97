@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa5d592f_4a1d1373",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-08-30T20:20:48Z",
+      "side": 1,
+      "message": "Could you change this to `{{ ansible_port }}` rather than hardcoding it to 22, when `ansible_port` could be different?",
+      "range": {
+        "startLine": 414,
+        "startChar": 22,
+        "endLine": 414,
+        "endChar": 24
+      },
+      "revId": "8cfe314f50adf931a66561b1fa62435dc826aa97",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
