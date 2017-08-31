@@ -16,6 +16,24 @@
       "revId": "96b0bead0096e31e9cacff4278c8d5c94cf53c01",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa5d592f_ad05c915",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 8
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000297
+      },
+      "writtenOn": "2017-08-31T18:42:04Z",
+      "side": 1,
+      "message": "At this stage, `ansible_port` is not defined. I tried defining it in the podconfig yesterday and ran into an issue where ansible was not able to SSH into the `corddev` build VM. So I removed it. There seems to be more to `ansible_port` than just a simple definition. I would like to deal with that separately as a Jira.\n\nAbout your original question of why the check is for `ansible_port` and not `ansible_ssh_port`, again this was because we ran into a bug where checking for `ansible_ssh_port` was making ansible error out (presumably because newer versions of Ansible do not recognize ansible_ssh_port anymore).",
+      "parentUuid": "fa5d592f_ad76e904",
+      "revId": "96b0bead0096e31e9cacff4278c8d5c94cf53c01",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
