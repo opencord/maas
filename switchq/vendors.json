@@ -1,22 +1,32 @@
 [
-    {
-	"prefix" : "CC:37:AB",
-	"vendor" : "Edgecore Networks Corportation",
-	"provision" : true
-    },
-    {
-        "prefix" : "70:72:CF",
-        "vendor" : "Edgecore Networks Corportation",
-        "provision" : true
-    },
-    {
-        "prefix" : "C4:39:3A",
-        "vendor" : "Edgecore Networks Corportation",
-        "provision" : true
-    },
-    {
-        "prefix" : "48:0F:CF",
-        "vendor" : "Hewlett Packard Enterprise",
-        "provision" : true
-    }
+  {
+    "prefix" : "CC:37:AB",
+    "vendor" : "Edgecore Networks Corporation",
+    "provision" : true
+  },
+  {
+    "prefix" : "70:72:CF",
+    "vendor" : "Edgecore Networks Corporation",
+    "provision" : true
+  },
+  {
+    "prefix" : "C4:39:3A",
+    "vendor" : "Edgecore Networks Corporation",
+    "provision" : true
+  },
+  {
+    "prefix" : "8C:EA:1B",
+    "vendor" : "Edgecore Networks Corporation",
+    "provision" : true
+  },
+  {
+    "prefix" : "A8:2B:B5",
+    "vendor" : "Edgecore Networks Corporation",
+    "provision" : true
+  },
+  {
+    "prefix" : "48:0F:CF",
+    "vendor" : "Hewlett Packard Enterprise",
+    "provision" : true
+  }
 ]
