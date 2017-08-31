@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa5d592f_ad76e904",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 8
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-08-31T15:03:36Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be when `sensible_ssh_port` is not defined, else we attempt to define `ansible_ssh_port` only when `ansible_port` is not defined and we attempt to define it with the undefined value of `ansible_port`, which means it will always be 22.\n\nIf we can verify that `ansible_port` is always defined then we can eliminate this `set_fact` and replace all instances of `ansible_ssh_port` with `ansible_port`.",
+      "revId": "96b0bead0096e31e9cacff4278c8d5c94cf53c01",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
