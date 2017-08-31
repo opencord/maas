@@ -1,4 +1,4 @@
-
+---
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
----
-
 accton_as5712_54x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
+accton_as5812_54x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
 accton_as6712_32x: 'https://www.dropbox.com/s/pl3cvr9olnaufw5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
+
 pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
 
 virtualbox:

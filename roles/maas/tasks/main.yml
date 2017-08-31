@@ -212,6 +212,7 @@
   with_items:
     - { url : "{{ accton_as6712_32x }}", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
     - { url : "{{ accton_as5712_54x }}", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
+    - { url : "{{ accton_as5812_54x }}", dest : "onie-installer-x86_64-accton_as5812_54x-r0" }
   tags:
     - switch_support
 
