@@ -410,7 +410,10 @@
     - reboot
 
 - name: Wait For Restart
-  local_action: wait_for port={{ ansible_port | default('22') }} host={{ inventory_hostname }} search_regex=OpenSSH delay=120 timeout=600 connect_timeout=15
+  wait_for_connection:
+    delay: 120
+    timeout: 600
+    connect_timeout: 15
   when: reboot_required
   tags:
     - interface_config
