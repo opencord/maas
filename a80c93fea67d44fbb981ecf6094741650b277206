@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa5d592f_bf760b05",
+        "filename": "roles/docker/tasks/main.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-09-07T21:45:56Z",
+      "side": 1,
+      "message": "Do notifications happen in line or at the end of the playbook?",
+      "revId": "a80c93fea67d44fbb981ecf6094741650b277206",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
