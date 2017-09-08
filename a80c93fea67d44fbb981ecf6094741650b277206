@@ -52,6 +52,24 @@
       "revId": "a80c93fea67d44fbb981ecf6094741650b277206",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da6255ed_e9f855c6",
+        "filename": "roles/docker/tasks/main.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-09-08T15:05:35Z",
+      "side": 1,
+      "message": "depends if at the end means at the end of this role or at the end of the whole playbook. if at the end of the whole playbook then there may be issues; i would have to do a deep check. if at the end of this role then likely no issues.",
+      "parentUuid": "fa5d592f_3f445b73",
+      "revId": "a80c93fea67d44fbb981ecf6094741650b277206",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
