@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da6255ed_ac8f0b75",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1000297
+      },
+      "writtenOn": "2017-09-11T22:28:52Z",
+      "side": 1,
+      "message": "Had a chat with Andy about not specifying the port explicitly. If Ansible defaults to 22, I am fine with this change. I will wait for one physical pod build to complete without problem to +1 this.",
+      "range": {
+        "startLine": 413,
+        "startChar": 2,
+        "endLine": 416,
+        "endChar": 23
+      },
+      "revId": "4f7fa4a7e8c499887edbf8be2c5ecf7b3124bd32",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
