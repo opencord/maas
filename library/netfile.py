@@ -241,7 +241,7 @@ all_methods = dir()
 
 # which attributes should be ignored and not be written as single
 # attributes values against and interface
-write_ignore = ["auto", "type", "config", "description"]
+write_ignore = ["auto", "type", "config", "description", "source"]
 
 # specifies the order in which attributes are written against an
 # interface. Any attribute note in this list is sorted by default
