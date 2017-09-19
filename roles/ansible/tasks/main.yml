@@ -1,3 +1,4 @@
+---
 
 # Copyright 2017-present Open Networking Foundation
 #
@@ -13,22 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
----
-
-- name: "Install apt dependencies"
+- name: "Install dependencies"
   become: yes
   apt:
     name: "{{ item }}"
     state: present
   with_items:
-    - python-dev
-    - libffi-dev
-    - python-pip
-    - libssl-dev
+    - python-netaddr
+    - python-pycurl
+    - software-properties-common
     - sshpass
 
-- name: Ansible APT Repository
+- name: Add ansible APT repository
   become: yes
   apt_repository:
     repo: "{{ ansible_apt_repo | default('ppa:ansible/ansible') }}"
@@ -37,8 +34,13 @@
   retries: 3
   delay: 10
 
-- name: Install Ansible using APT
+- name: Make sure Ansible is latest version
   become: yes
   apt:
-    name: ansible=2.3*
-    state: present
+    name: "ansible"
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - skip_ansible_lint # ansible-lint complains about latest, need this as distro provided 1.5.x version may be used if already installed.
+
