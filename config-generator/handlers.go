@@ -97,23 +97,29 @@ func (c *Config) configGenHandler(w http.ResponseWriter, r *http.Request) {
 			return a + b
 		},
 		"gateway": func(ips []string) string {
-			if len(ips) > 0 {
-				parts := strings.Split(ips[0], ".")
-				ip := ""
-				for _, v := range parts[:len(parts)-1] {
-					ip = ip + v + "."
+			// Find the first v4 address, as determined by
+			// not having a ':' in the IP
+			for _, ip := range ips {
+				if strings.Index(ip, ":") == -1 {
+					parts := strings.Split(ip, ".")
+					targetIp := ""
+					for _, v := range parts[:len(parts)-1] {
+						targetIp = targetIp + v + "."
+					}
+					return targetIp + "254/24"
 				}
-				return ip + "254/24"
-			} else {
-				return "0.0.0.254/24"
 			}
+			return "0.0.0.254/24"
 		},
 		"vlan": func(ips []string) string {
-			if (len(ips) > 0) {
-				return strings.Split(ips[0], ".")[2]
-			} else {
-				return "0"
+			// Find the first v4 address, as determined by
+			// not having a ':' in the IP
+			for _, ip := range ips {
+				if strings.Index(ip, ":") == -1 {
+					return strings.Split(ip, ".")[2]
+				}
 			}
+			return "0"
 		},
 	}
 
