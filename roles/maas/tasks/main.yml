@@ -23,14 +23,14 @@
 
 - name: Ensure Management Bridge Interface
   become: yes
-  command: ifconfig mgmtbr
-  register: have_mgmtbr
+  command: ifconfig mgmtbridge
+  register: have_mgmtbridge
   failed_when: false
   changed_when: false
 
 - name: Verify Management Bridge
-  fail: msg="The head node must have a network bridge named 'mgmtbr' to continue the deployment. Please see docuemataiton at 'http://github.com/opencord/cord'."
-  when: have_mgmtbr.rc != 0
+  fail: msg="The head node must have a network bridge named 'mgmtbridge' to continue the deployment. Please see documentation at 'http://github.com/opencord/cord'."
+  when: have_mgmtbridge.rc != 0
 
 - name: Install Prerequisites
   become: yes

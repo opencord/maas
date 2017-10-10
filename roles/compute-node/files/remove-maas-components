@@ -44,4 +44,4 @@ sudo apt-get update -y
 
 # remove NAT rules
 sudo iptables --table nat --delete POSTROUTING --out-interface eth3 -j MASQUERADE
-sudo iptables --delete FORWARD --in-interface mgmtbr -j ACCEPT
+sudo iptables --delete FORWARD --in-interface mgmtbridge -j ACCEPT
