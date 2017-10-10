@@ -264,7 +264,7 @@
     name: mgmtbr
     config: "dhcp"
     auto: true
-    bridge_ports: "mgmtbond veth2"
+    bridge_ports: "{{ management_primary_iface }} veth2"
     description: "Internal POD management bridge"
   register: net_changed
   when: compute_node.addresses.management == "dhcp"
@@ -283,29 +283,12 @@
     address: "{{ compute_node.addresses.management }}"
     gateway: "{{ compute_node.gateway.management }}"
     broadcast: "{{ compute_node.broadcast.management }}"
-    bridge_ports: "mgmtbond veth2"
+    bridge_ports: "{{ management_primary_iface }} veth2"
     description: "Internal POD management bridge"
   register: net_changed
   when: compute_node.addresses.management != "dhcp"
 
 - name: Verify Management Bridge STATIC Changed
-  set_fact:
-    reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
-
-- name: Ensure Management Bond
-  netfile:
-    src: "{{ compute_node.interfaces.file }}"
-    state: present
-    name: mgmtbond
-    config: "manual"
-    auto: true
-    bond-mode: active-backup
-    bond-miimon: 100
-    bond-slaves: none
-    description: "Internal POD management bond"
-  register: net_changed
-
-- name: Verify Management Bond DHCP Changed
   set_fact:
     reboot_required: "{{ reboot_required }} or {{ net_changed.changed }}"
 
@@ -322,8 +305,6 @@
     auto: true
     name: "{{ management_primary_iface }}"
     config: manual
-    bond-master: mgmtbond
-    bond-primary: "{{ management_primary_iface }}"
     description: "Primary management interface"
   register: net_changed
   when: management_iface_list|length > 0
@@ -339,7 +320,6 @@
     auto: true
     name: "{{ item }}"
     config: manual
-    bond-master: mgmtbond
     description: "Management interface"
   register: net_changed
   when: management_iface_list|length > 1 and item != management_primary_iface
