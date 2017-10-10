@@ -247,8 +247,8 @@
     pre-up:
       - /sbin/ip link add name veth3 type veth peer name veth2
       - /sbin/ip link set veth2 up
-      - /sbin/brctl addif mgmtbr veth2
-    pre-down: /sbin/brctl delif mgmtbr veth2
+      - /sbin/brctl addif mgmtbridge veth2
+    pre-down: /sbin/brctl delif mgmtbridge veth2
     post-down: /sbin/ip link del veth2
     description: "Veth interfaces for VTN app"
   register: net_changed
@@ -261,7 +261,7 @@
   netfile:
     src: "{{ compute_node.interfaces.file }}"
     state: present
-    name: mgmtbr
+    name: mgmtbridge
     config: "dhcp"
     auto: true
     bridge_ports: "mgmtbond veth2"
@@ -277,7 +277,7 @@
   netfile:
     src: "{{ compute_node.interfaces.file }}"
     state: present
-    name: mgmtbr
+    name: mgmtbridge
     config: static
     auto: true
     address: "{{ compute_node.addresses.management }}"
