@@ -25,7 +25,7 @@ fabric_include_module_types: i40e, mlx4_en
 #management_ignore_bus_types
 
 fabric_iface: fabric
-management_iface: mgmtbr
+management_iface: mgmtbridge
 external_iface: eth2
 iface_file: /etc/network/interfaces
 
@@ -53,7 +53,7 @@ upstream_dns: 8.8.8.8 8.8.8.4
 
 management_network: 10.2.0.0/24
 bridge_network: 172.42.0.0/24
-bridge_name: mgmtbr
+bridge_name: mgmtbridge
 
 fabric_range_low: 10.2.1.2
 fabric_range_high: 10.2.1.100

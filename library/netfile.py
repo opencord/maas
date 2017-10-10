@@ -260,7 +260,7 @@ write_sort_order = {
 
 write_iface_sort_order = {
     "fabric" : "y",
-    "mgmtbr" : "z"
+    "mgmtbridge" : "z"
 }
 
 # Read and parse the specified interface file

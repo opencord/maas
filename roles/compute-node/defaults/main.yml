@@ -50,7 +50,7 @@ compute_node:
 
     interfaces:
         fabric: "{{ fabric_iface | default('fabric') }}"
-        management: "{{ management_iface | default('mgmtbr') }}"
+        management: "{{ management_iface | default('mgmtbridge') }}"
         external: "{{ external_iface | default(None) }}"
         file: "{{ iface_file | default('/etc/network/interfaces') }}"
     addresses:

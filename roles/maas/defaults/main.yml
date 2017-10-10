@@ -63,7 +63,7 @@ interfaces:
     #   'management' specifies the interface on which the head node will
     #                service DHCP and PXE boot requests
     fabric: "{{ fabric_iface | default('fabric') }}"
-    management: "{{ management_iface | default('mgmtbr') }}"
+    management: "{{ management_iface | default('mgmtbridge') }}"
     external: "{{ external_iface | default('') }}"
 
 networks:
@@ -83,7 +83,7 @@ networks:
     # CHANGE:
     #   'bridge' name of the bride to create that is used when connecting
     #            the VMs created in support of XOS
-    bridge_name: "{{ bridge_name | default('mgmtbr') }}"
+    bridge_name: "{{ bridge_name | default('mgmtbridge') }}"
 
 ranges:
     fabric:
