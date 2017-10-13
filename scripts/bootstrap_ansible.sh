@@ -23,6 +23,7 @@ echo "Installing Ansible..."
 # apt-get update
 # apt-get install -y ansible
 apt-get -y install python-dev libffi-dev python-pip libssl-dev sshpass
+pip install cryptography==1.9
 pip install ansible==2.2.2.0
 mkdir -p /etc/ansible
 cp /maasdev/ansible/ansible.cfg /etc/ansible/ansible.cfg

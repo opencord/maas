@@ -10,6 +10,10 @@
     - libssl-dev
     - sshpass
 
+- name: Install Cryptography package via pip
+  pip: name=cryptography version=1.9
+  become: yes
+
 - name: "Install Ansible via pip"
   pip: name=ansible version=2.2.2.0
   become: yes
