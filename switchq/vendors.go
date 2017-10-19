@@ -64,7 +64,12 @@ func (v *VendorsData) Switchq(mac string) (bool, error) {
 	if len(mac) < 8 {
 		return false, nil
 	}
-	rec, ok := v.Vendors[strings.ToUpper(mac[0:8])]
+	if len(mac) == 17 {
+  	rec, ok := v.Vendors[strings.ToUpper(mac[0:17])]
+  }
+  if len(mac) == 8 {
+    rec, ok := v.Vendors[strings.ToUpper(mac[0:8])]
+  }
 	if !ok || !rec.Provision {
 		return false, nil
 	}
