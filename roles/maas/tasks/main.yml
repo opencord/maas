@@ -213,6 +213,8 @@
     - { url : "{{ accton_as6712_32x }}", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
     - { url : "{{ accton_as5712_54x }}", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
     - { url : "{{ accton_as5812_54x }}", dest : "onie-installer-x86_64-accton_as5812_54x-r0" }
+    # Leave it commented until the ONL image is available
+    # - { url : "{{ quanta_ly8 }}", dest : "onie-installer-x86_64-quanta_ly8_rangeley-r0" }
   tags:
     - switch_support
 
