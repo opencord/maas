@@ -12,7 +12,7 @@ endif
 
 BUILD_DATE=$(shell date -u +%Y-%m-%dT%TZ)
 VCS_REF=$(shell git log --pretty=format:%H -n 1)
-VCS_REF_DATE=$(shell git log --pretty=format:%cd --date=format:%FT%T%z -n 1)
+VCS_REF_DATE=$(shell date -d @$(shell git log --pretty=format:%ct -n 1) +%FT%T%z)
 BRANCHES=$(shell repo --color=never --no-pager branches 2>/dev/null | wc -l)
 STATUS=$(shell repo --color=never --no-pager status . | tail -n +2 | wc -l)
 MODIFIED=$(shell test $(BRANCHES) -eq 0 && test $(STATUS) -eq 0 || echo "[modified]")
