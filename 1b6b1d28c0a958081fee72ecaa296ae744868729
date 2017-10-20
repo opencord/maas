@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a5c5d37_e3d5f643",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-10-20T21:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a5c5d37_238d4e7c",
+      "range": {
+        "startLine": 57,
+        "startChar": 25,
+        "endLine": 57,
+        "endChar": 33
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a5c5d37_a3813e4c",
         "filename": "roles/fabric-switch/tasks/ofdpa.yml",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-10-20T20:35:55Z",
       "side": 1,
       "message": "The utilities should be shared between Accton and QCT switches. I\u0027d suggest remove this",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 14
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a5c5d37_c3caf2a0",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-10-20T21:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a5c5d37_a3813e4c",
       "range": {
         "startLine": 61,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9a5c5d37_a3cffeaf",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-10-20T21:13:02Z",
+      "side": 1,
+      "message": "I\u0027ll comment anyway this out until we don\u0027t have the software published",
+      "parentUuid": "9a5c5d37_83963a93",
+      "range": {
+        "startLine": 216,
+        "startChar": 18,
+        "endLine": 216,
+        "endChar": 28
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a5c5d37_639346a4",
         "filename": "switchq/vendors.go",
         "patchSetId": 3
@@ -82,6 +154,30 @@
       "writtenOn": "2017-10-20T20:35:55Z",
       "side": 1,
       "message": "Redundant space",
+      "range": {
+        "startLine": 74,
+        "startChar": 59,
+        "endLine": 74,
+        "endChar": 60
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a5c5d37_23bb0e10",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-10-20T21:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a5c5d37_639346a4",
       "range": {
         "startLine": 74,
         "startChar": 59,
