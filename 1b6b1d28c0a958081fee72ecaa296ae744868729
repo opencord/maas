@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a5c5d37_238d4e7c",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2017-10-20T20:35:55Z",
+      "side": 1,
+      "message": "I am not sure what this thing does. What I can see is that some parameter from previous section is missing here. Just make sure this was done intentionally",
+      "range": {
+        "startLine": 57,
+        "startChar": 25,
+        "endLine": 57,
+        "endChar": 33
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a5c5d37_a3813e4c",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2017-10-20T20:35:55Z",
+      "side": 1,
+      "message": "The utilities should be shared between Accton and QCT switches. I\u0027d suggest remove this",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 14
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a5c5d37_83963a93",
+        "filename": "roles/maas/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2017-10-20T20:35:55Z",
+      "side": 1,
+      "message": "The variable is defined as \"qct_ly8\"",
+      "range": {
+        "startLine": 216,
+        "startChar": 18,
+        "endLine": 216,
+        "endChar": 28
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a5c5d37_639346a4",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2017-10-20T20:35:55Z",
+      "side": 1,
+      "message": "Redundant space",
+      "range": {
+        "startLine": 74,
+        "startChar": 59,
+        "endLine": 74,
+        "endChar": 60
+      },
+      "revId": "1b6b1d28c0a958081fee72ecaa296ae744868729",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
