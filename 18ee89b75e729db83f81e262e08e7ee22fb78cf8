@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a5c5d37_03000a00",
+        "filename": "rules.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-10-20T18:01:29Z",
+      "side": 1,
+      "message": "this was failing in my simple tests. I cloned a repo and executed\n\n$ date -d $(git log --pretty\u003dformat:%ct -n 1) +%FT%T%z\ndate: invalid date ‘1508279491’",
+      "revId": "18ee89b75e729db83f81e262e08e7ee22fb78cf8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
