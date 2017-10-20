@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a5c5d37_6310e64e",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-10-20T18:08:46Z",
+      "side": 1,
+      "message": "func (v *VendorsData) Switchq(mac string) (bool, error) {\n\n\t// If there is a \"full\" mac then attempt to see if that can\n\t// be matched. If matched accept that result and look no\n\t// further\n\tif len(mac) \u003d\u003d 17 {\n\t\tif rec, ok :\u003d v.Vendors[strings.ToUpper(mac)]; ok {\n\t\t\treturn rec.Provision, nil\n\t\t}\n\t}\n\n\t// If we have at least a OUI, then look to see if that can be\n\t// be matched. If matched accept that result and look no \n\t// further.\n\tif len(mac) \u003e\u003d 8 {\n\t\tif rec, ok :\u003d v.Vendors[strings.ToUpper(mac[0:8])]; ok {\n\t\t\treturn rec.Provision, nil\n\t\t}\n\t}\n\n\t// No match found, so assume false.\n\treturn false, nil\n}",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 20
+      },
+      "revId": "64711cf783c26cc2ae6bc411f515f2215043b7dc",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
