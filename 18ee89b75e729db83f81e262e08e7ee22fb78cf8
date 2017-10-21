@@ -16,6 +16,24 @@
       "revId": "18ee89b75e729db83f81e262e08e7ee22fb78cf8",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a5c5d37_23d8ae1c",
+        "filename": "rules.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000335
+      },
+      "writtenOn": "2017-10-21T08:47:45Z",
+      "side": 1,
+      "message": "@ is missing in your copy, you should type as follow:\n$ date -d @$(git log --pretty\u003dformat:%ct -n 1) +%FT%T%z",
+      "parentUuid": "9a5c5d37_03000a00",
+      "revId": "18ee89b75e729db83f81e262e08e7ee22fb78cf8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
