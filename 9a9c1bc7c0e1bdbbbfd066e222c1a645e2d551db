@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a5c5d37_e9303558",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-10-24T20:24:41Z",
+      "side": 1,
+      "message": "Ansible already has this data in `ansible_interfaces` for a list of interfaces, then `ansible_\u003cinterface name\u003e.macaddress` and also using the `macaddr` j2 filter.",
+      "revId": "9a9c1bc7c0e1bdbbbfd066e222c1a645e2d551db",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
