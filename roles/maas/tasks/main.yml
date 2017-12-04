@@ -1,4 +1,4 @@
-
+---
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
----
 - name: Verify Network Bits on Network Specifications
   fail: msg="Network specification '{{ item }}' must include network bits"
   when: "item | match('^([0-9]{1,3}.){3}[0-9]{1,3}$')"
@@ -207,12 +205,33 @@
   changed_when: false
   failed_when: mgmt_ip_address.rc != 0 or mgmt_ip_address.stdout == ""
 
-- name: Switch Resource
-  include: download.yml
-  with_items:
-    - { url : "{{ accton_as6712_32x }}", dest : "onie-installer-x86_64-accton_as6712_32x-r0" }
-    - { url : "{{ accton_as5712_54x }}", dest : "onie-installer-x86_64-accton_as5712_54x-r0" }
-    - { url : "{{ accton_as5812_54x }}", dest : "onie-installer-x86_64-accton_as5812_54x-r0" }
+- name: Download Switch Boot Images
+  become: yes
+  get_url:
+    url: "{{ item.url }}"
+    checksum: "{{ item.checksum }}"
+    dest: "{{ switch_image_dir }}/{{ item.name }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items: "{{ switch_boot_images }}"
+  register: boot_image_download_result
+  until: boot_image_download_result|success
+  retries: 5
+  delay: 10
+  tags:
+    - switch_support
+
+- name: Link boot images to model files
+  become: yes
+  file:
+    state: link
+    src: "{{ switch_image_dir }}/{{ item.boot_image }}"
+    dest: "{{ switch_image_dir }}/{{ item.name }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items: "{{ switch_models }}"
   tags:
     - switch_support
 
