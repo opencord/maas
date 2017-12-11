@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbf523fe_89b80d24",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-11T23:11:57Z",
+      "side": 1,
+      "message": "how does this work if there is more than one interface?",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f53e338_da10c85b",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-11T23:11:57Z",
+      "side": 1,
+      "message": "if there is more than a single interface?",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1953ae77_8687b031",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-11T23:11:57Z",
+      "side": 1,
+      "message": "rather than !\u003d, should this be reversed on only specify the OUT of accton switches. using !\u003d means that this task could still fire for non-accton switches. There could be a rule that matches accton, one for QCT and then if nothing matches a tasks that issues an error.",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e0633079_968c23e3",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-11T23:11:57Z",
+      "side": 1,
+      "message": "a bit orthagonal to this change, but need to turn connect into a service so the switch attempts to connect when it boots.",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "714b4e53_c089b799",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-11T23:11:57Z",
+      "side": 1,
+      "message": "needs to be run through go fmt",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
