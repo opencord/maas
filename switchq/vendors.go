@@ -61,13 +61,24 @@ func NewVendors(spec string) (Vendors, error) {
 }
 
 func (v *VendorsData) Switchq(mac string) (bool, error) {
-	if len(mac) < 8 {
-		return false, nil
-	}
-	rec, ok := v.Vendors[strings.ToUpper(mac[0:8])]
-	if !ok || !rec.Provision {
-		return false, nil
+	// If there is a "full" MAC then attempt to see if that can
+	// be matched. If matched, accept that result and look no
+	// further
+	if len(mac) == 17 {
+		if rec, ok := v.Vendors[strings.ToUpper(mac)]; ok {
+			return rec.Provision, nil
+		}
 	}
 
-	return true, nil
+	// If we have at least a OUI, look to see if that can be
+	// be matched. If matched, accept that result and look no
+	// further.
+	if len(mac) >= 8 {
+		if rec, ok := v.Vendors[strings.ToUpper(mac[0:8])]; ok {
+			return rec.Provision, nil
+		}
+	}
+
+	// No match found, so assume false.
+	return false, nil
 }

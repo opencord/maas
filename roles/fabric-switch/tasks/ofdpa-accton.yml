@@ -14,17 +14,13 @@
 # limitations under the License.
 
 ---
-pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
-pub_ssh_key: "{{ lookup('file', pub_ssh_key_file_location+'/cord_rsa.pub') }}"
+- name: Openflow Accton Agent Debian Archive
+  get_url:
+    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb?raw=true
+    validate_certs: false
+    checksum: "sha256:e0b10051b2032454132c6634a0896883e1548e0c39b847ff10933e559b95a729"
+    dest: /mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb
 
-switch_ouis:
-  - accton:
-    - "cc37ab"
-    - "7072cf"
-    - "c4393a"
-    - "8cea1b"
-    - "a82bb5"
-    - "480fcf"
-  - qct:
-    - "2c600c"
-    - "54ab3a"
+- name: Openflow Agent Installed
+  apt: deb="/mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb" force=true
+  when: not lsb_stat.stat.exists or dist.stdout == "0"

@@ -14,17 +14,13 @@
 # limitations under the License.
 
 ---
-pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
-pub_ssh_key: "{{ lookup('file', pub_ssh_key_file_location+'/cord_rsa.pub') }}"
+- name: Openflow Quanta Agent Debian Archive
+  get_url:
+    url: https://github.com/onfsdn/atrium-docs/raw/master/16A/ONOS/builds/ofdpa-ly8_0.3.0.5.0-EA5-qct-00.03_amd64.deb
+    validate_certs: false
+    checksum: "sha256:1c2aae5e4596b4c73c7ac63209dd1d303d4aaf794daadff7f5de3d476d0335a5"
+    dest: /mnt/onl/data/ofdpa-ly8_0.3.0.5.0-EA5-qct-0.0_amd64.deb
 
-switch_ouis:
-  - accton:
-    - "cc37ab"
-    - "7072cf"
-    - "c4393a"
-    - "8cea1b"
-    - "a82bb5"
-    - "480fcf"
-  - qct:
-    - "2c600c"
-    - "54ab3a"
+- name: Openflow Agent Installed
+  apt: deb="/mnt/onl/data/ofdpa-ly8_0.3.0.5.0-EA5-qct-00.03_amd64.deb" force=true
+  when: not lsb_stat.stat.exists or dist.stdout == "0"

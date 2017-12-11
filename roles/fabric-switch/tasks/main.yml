@@ -15,11 +15,16 @@
 
 ---
 - name: Generate DPID
-  shell: ifconfig ma1 | grep HWaddr | awk '{ print "0x0000"$5 }' | sed s/://g
+  shell: ifconfig | grep HWaddr | head -1 | awk '{ print "0x0000"$5 }' | sed s/://g
   register: dpid
   changed_when: false
 
-- name: Ensure ofdpa Config
+- name: Get switch OUI
+  shell: ifconfig | grep HWaddr | head -1 | awk '{ print $5 }' | sed s/://g | cut -c1-6
+  register: oui
+  changed_when: false
+
+- name: Ensure OFDPA Config
   set_fact:
     switch_id: "{{ dpid.stdout }}"
     controller_ip: "onos-fabric"
@@ -35,22 +40,26 @@
   changed_when: false
   when: ofdpa_exists.stdout != "0"
 
-# Note: This is the version number of OFDPA 3.0 EA4
-- name: Version 2.0.4.0 Openflow Agent
+- name: Install OFDPA commons steps
   include: ofdpa.yml
-  when: ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('version 2.0.4.0') == -1
+  when: ofdpa_exists.stdout == "0" or
+        (ofdpa_version.stdout.find('3.0.4.0') == -1 and ofdpa_version.stdout.find('3.0.5.0') == -1)
 
-- name: Utilities Scripts
-  template:
-    src: "{{ item }}"
-    dest: /root
-    owner: root
-    group: root
-    mode: "0755"
-  with_items:
-    - killit
-    - connect
-  register: utils
+- name: Install OFDPA for Accton switches
+  include: ofdpa-accton.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
+  with_items: "{{ switch_ouis.accton|default([]) }}"
+  when:
+    - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.4.0') == -1
+    # Accton related OUIs
+    - oui.stdout == item
+
+- name: Install OFDPA for QCT switches
+  include: ofdpa-qct.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
+  with_items: "{{ switch_ouis.qct|default([]) }}"
+  when:
+    - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.5.0') == -1
+    # Accton related OUIs
+    - oui.stdout == item
 
 - name: Authorize SSH Key
   become: yes
@@ -59,4 +68,3 @@
     user=root
     state=present
   register: sshkey
-
