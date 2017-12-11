@@ -14,13 +14,6 @@
 # limitations under the License.
 
 ---
-- name: Openflow Agent Debian Archive
-  get_url:
-    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb?raw=true
-    validate_certs: false
-    checksum: "sha256:e0b10051b2032454132c6634a0896883e1548e0c39b847ff10933e559b95a729"
-    dest: /mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb
-
 # We want to kill old agents and stop the old OFDPA service before removing
 - name: OpenFlow Agent Is Not Running
   command: killall ofagentapp
@@ -59,12 +52,19 @@
   changed_when: false
   failed_when: false
 
-- name: Verify Distribute Name
+- name: Verify Distribute Release Name
   shell: grep -i ubuntu /etc/lsb-release | wc -l
   register: dist
   changed_when: false
   failed_when: false
 
-- name: Openflow Agent Installed
-  apt: deb="/mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb" force=true
-  when: not lsb_stat.stat.exists or dist.stdout == "0"
+- name: Utilities Scripts
+  template:
+    src: "{{ item }}"
+    dest: /root
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - killit
+    - connect

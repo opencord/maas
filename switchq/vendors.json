@@ -28,5 +28,10 @@
     "prefix" : "48:0F:CF",
     "vendor" : "Hewlett Packard Enterprise",
     "provision" : true
+  },
+  {
+    "prefix" : "54:AB:3A",
+    "vendor" : "Quanta QCT",
+    "provision" : true
   }
 ]

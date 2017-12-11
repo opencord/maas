@@ -1,0 +1,26 @@
+
+# Copyright 2017-present Open Networking Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- name: Openflow Quanta Agent Debian Archive
+  get_url:
+    url: https://github.com/onfsdn/atrium-docs/raw/master/16A/ONOS/builds/ofdpa-ly8_0.3.0.5.0-EA5-qct-00.03_amd64.deb
+    validate_certs: false
+    checksum: "sha256:1c2aae5e4596b4c73c7ac63209dd1d303d4aaf794daadff7f5de3d476d0335a5"
+    dest: /mnt/onl/data/ofdpa-ly8_0.3.0.5.0-EA5-qct-0.0_amd64.deb
+
+- name: Openflow Agent Installed
+  apt: deb="/mnt/onl/data/ofdpa-ly8_0.3.0.5.0-EA5-qct-00.03_amd64.deb" force=true
+  when: not lsb_stat.stat.exists or dist.stdout == "0"
