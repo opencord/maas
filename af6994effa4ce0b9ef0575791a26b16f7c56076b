@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e7c3966f_302e9aae",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T03:53:15Z",
+      "side": 1,
+      "message": "If you want I can make sure we always get the first line...",
+      "parentUuid": "cbf523fe_89b80d24",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f53e338_da10c85b",
         "filename": "roles/fabric-switch/tasks/main.yml",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-12-11T23:11:57Z",
       "side": 1,
       "message": "if there is more than a single interface?",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c5cd87a2_d98609f6",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T03:53:15Z",
+      "side": 1,
+      "message": "Same as above",
+      "parentUuid": "1f53e338_da10c85b",
       "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "125f954b_922da089",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T03:53:15Z",
+      "side": 1,
+      "message": "Sure, I can do equal instead of not equal..we put originally this because they are QCT OUIs were definitely less...",
+      "parentUuid": "1953ae77_8687b031",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e0633079_968c23e3",
         "filename": "roles/fabric-switch/tasks/ofdpa.yml",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "a9c14aa1_7fe4b1b4",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T03:53:15Z",
+      "side": 1,
+      "message": "Can we make this happen in a second change? We\u0027ve already tried all this, so it won\u0027t hurt the current build",
+      "parentUuid": "e0633079_968c23e3",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "714b4e53_c089b799",
         "filename": "switchq/vendors.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2017-12-11T23:11:57Z",
       "side": 1,
       "message": "needs to be run through go fmt",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e84a3bea_7bf3adc1",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T03:53:15Z",
+      "side": 1,
+      "message": "Not sure I understood...but I haven\u0027t changed this",
+      "parentUuid": "714b4e53_c089b799",
       "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
