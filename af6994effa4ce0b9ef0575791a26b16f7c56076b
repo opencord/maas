@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3188a0c6_bbb7cd97",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-12T16:01:03Z",
+      "side": 1,
+      "message": "probably should run it through `head -1` so we know we at least get one. If there are multiple interfaces that won\u0027t guarantee we get the correct interface, but at least we will only get one.",
+      "parentUuid": "e7c3966f_302e9aae",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f53e338_da10c85b",
         "filename": "roles/fabric-switch/tasks/main.yml",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Same as above",
       "parentUuid": "1f53e338_da10c85b",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "76f1de28_d3aa71d2",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-12T16:01:03Z",
+      "side": 1,
+      "message": "same as above",
+      "parentUuid": "c5cd87a2_d98609f6",
       "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
@@ -142,6 +178,24 @@
     },
     {
       "key": {
+        "uuid": "5ebe6bb2_d1d2d875",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-12T16:01:03Z",
+      "side": 1,
+      "message": "I agree it should be a separate jira and separate change set. it was just a thought as I reviewed this. If you want me to open a jira for this let me know else you can.",
+      "parentUuid": "a9c14aa1_7fe4b1b4",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "714b4e53_c089b799",
         "filename": "switchq/vendors.go",
         "patchSetId": 1
@@ -171,6 +225,41 @@
       "side": 1,
       "message": "Not sure I understood...but I haven\u0027t changed this",
       "parentUuid": "714b4e53_c089b799",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b9873175_a8180b61",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-12T16:01:03Z",
+      "side": 1,
+      "message": "it looks like these lines lost their indent. running go code through `go fmt` will format the code according to the go style guide.",
+      "parentUuid": "e84a3bea_7bf3adc1",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1e2204e_7ce37b21",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-12-12T16:01:03Z",
+      "side": 1,
+      "message": "like this change.",
       "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
