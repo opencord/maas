@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "c74c353a_a763d28d",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T17:58:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3188a0c6_bbb7cd97",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f53e338_da10c85b",
         "filename": "roles/fabric-switch/tasks/main.yml",
         "patchSetId": 1
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "same as above",
       "parentUuid": "c5cd87a2_d98609f6",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0d72521_eab498ec",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T17:58:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76f1de28_d3aa71d2",
       "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
@@ -196,6 +232,24 @@
     },
     {
       "key": {
+        "uuid": "bdbb66ef_bd494c4f",
+        "filename": "roles/fabric-switch/tasks/ofdpa.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T17:58:23Z",
+      "side": 1,
+      "message": "If you could would be great, thanks!",
+      "parentUuid": "5ebe6bb2_d1d2d875",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "714b4e53_c089b799",
         "filename": "switchq/vendors.go",
         "patchSetId": 1
@@ -243,6 +297,24 @@
       "side": 1,
       "message": "it looks like these lines lost their indent. running go code through `go fmt` will format the code according to the go style guide.",
       "parentUuid": "e84a3bea_7bf3adc1",
+      "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16fc5130_dea7f9ad",
+        "filename": "switchq/vendors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2017-12-12T17:58:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9873175_a8180b61",
       "revId": "af6994effa4ce0b9ef0575791a26b16f7c56076b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
