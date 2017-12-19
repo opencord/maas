@@ -47,19 +47,17 @@
 
 - name: Install OFDPA for Accton switches
   include: ofdpa-accton.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
-  with_items: "{{ switch_ouis.accton|default([]) }}"
   when:
     - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.4.0') == -1
     # Accton related OUIs
-    - oui.stdout == item
+    - oui.stdout in switch_ouis['accton']
 
 - name: Install OFDPA for QCT switches
   include: ofdpa-qct.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
-  with_items: "{{ switch_ouis.qct|default([]) }}"
   when:
     - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.5.0') == -1
-    # Accton related OUIs
-    - oui.stdout == item
+    # QCT related OUIs
+    - oui.stdout in switch_ouis['qct']
 
 - name: Authorize SSH Key
   become: yes
