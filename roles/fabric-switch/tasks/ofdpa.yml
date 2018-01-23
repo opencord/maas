@@ -16,7 +16,7 @@
 ---
 - name: Openflow Agent Debian Archive
   get_url:
-    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb?raw=true
+    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.5.5+accton1.7-1_amd64.deb?raw=true
     validate_certs: false
     checksum: "sha256:e0b10051b2032454132c6634a0896883e1548e0c39b847ff10933e559b95a729"
     dest: /mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb
