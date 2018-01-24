@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6530d1af_507561d7",
+        "filename": "roles/maas/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000187
+      },
+      "writtenOn": "2018-01-24T01:00:10Z",
+      "side": 1,
+      "message": "typo - asfvolt16 (not asxvolt16)",
+      "revId": "24ed1a46a6bace5da3a118fc11de956077296296",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
