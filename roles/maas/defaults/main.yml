@@ -23,6 +23,9 @@ switch_boot_images:
   - name: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
     url: 'https://github.com/opencord/OpenNetworkLinux/releases/download/2017-10-19.2200-1211610/ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER'
     checksum: "sha256:2db316ea83f5dc761b9b11cc8542f153f092f3b49d82ffc0a36a2c41290f5421"
+  - name: "ONL-2.0.0_ONL-OS_2018-01-23.1931-1303f20_AMD64_INSTALLED_INSTALLER"
+    url: 'https://github.com/opencord/OpenNetworkLinux/releases/download/20180123-olt-kernel-3.7.10/ONL-2.0.0_ONL-OS_2018-01-23.1931-1303f20_AMD64_INSTALLED_INSTALLER'
+    checksum: "sha256:3130089a32422e531a7bc3d6bac0df6e613f08cd1c889484f5a328b41fc54efa"
 
 # Add specific models of switches here - the value of boot_image should be the
 # name of an image in the switch_boot_images list given above
@@ -33,6 +36,8 @@ switch_models:
     boot_image: "ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-accton_as6712_32x-r0"
     boot_image: "ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER"
+  - name: "onie-installer-x86_64-accton_asxvolt16-r0"
+    boot_image: "ONL-2.0.0_ONL-OS_2018-01-23.1931-1303f20_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-quanta_ly8_rangeley-r0"
     boot_image: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
 
