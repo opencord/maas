@@ -16,9 +16,9 @@
 ---
 - name: Openflow Agent Debian Archive
   get_url:
-    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb?raw=true
+    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.4.0+accton1.8_5-1_amd64.deb?raw=true
     validate_certs: false
-    checksum: "sha256:e0b10051b2032454132c6634a0896883e1548e0c39b847ff10933e559b95a729"
+    checksum: "sha256:4da4e4c71dd33912272142f903de5e1dbb648ab66fd657ce739d2a01862b262c"
     dest: /mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb
 
 # We want to kill old agents and stop the old OFDPA service before removing
