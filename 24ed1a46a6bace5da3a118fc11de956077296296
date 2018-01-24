@@ -16,6 +16,24 @@
       "revId": "24ed1a46a6bace5da3a118fc11de956077296296",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f35708f4_ca655749",
+        "filename": "roles/maas/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-01-24T17:19:06Z",
+      "side": 1,
+      "message": "this is the name the switch uses to fetch the image. It\u0027s not a typo, and it\u0027s not something I can change. BTW, I\u0027ve fixed the problem we had with the interface ma1 not configured. I\u0027ve already uploaded the new image and I\u0027m going to commit a new patch.",
+      "parentUuid": "6530d1af_507561d7",
+      "revId": "24ed1a46a6bace5da3a118fc11de956077296296",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
