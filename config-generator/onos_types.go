@@ -17,10 +17,10 @@ type onosHost struct {
 	Id          string   `json:"id"`
 	Mac         string   `json:"mac"`
 	IpAddresses []string `json:"ipAddresses"`
-	Location    struct {
+	Locations   []struct {
 		ElementID string `json:"elementId`
 		Port      string `json:"port"`
-	} `json:"location"`
+	} `json:"locations"`
 }
 
 type onosHosts struct {
