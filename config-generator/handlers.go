@@ -148,7 +148,7 @@ func markEdgeRouters(dm map[string]*onosDevice, hosts onosHosts) {
 	// Walk the list of know compute nodes (hosts) and if the compute node
 	// is connected to a switch, then that switch is an edge router
 	for _, host := range hosts.Hosts {
-		if device, ok := dm[host.Location.ElementID]; ok {
+		if device, ok := dm[host.Locations[0].ElementID]; ok {
 			(*device).IsEdgeRouter = true
 		}
 	}

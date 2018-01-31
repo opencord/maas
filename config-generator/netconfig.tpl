@@ -14,7 +14,7 @@
     },
     "ports": {
         {{ range $index, $element := .Hosts }}{{ if $index }},
-        {{ end }}"{{ .Location.ElementID }}/{{ .Location.Port }}": {
+        {{ end }}"{{ (index .Locations 0).ElementID }}/{{ (index .Locations 0).Port }}": {
             "interfaces": [
                 {
                     "ips": [ "{{ gateway .IpAddresses }}" ],
