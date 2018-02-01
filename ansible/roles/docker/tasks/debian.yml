@@ -52,7 +52,8 @@
   tags: [docker]
 
 - name: Debian Daemon is reloaded
-  command: systemctl daemon-reload
+  systemd:
+    daemon_reload: yes
   when: copy_result|changed and is_systemd is defined
   tags: [docker]
 
