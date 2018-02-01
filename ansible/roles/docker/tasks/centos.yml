@@ -28,7 +28,8 @@
   tags: [docker]
 
 - name: CentOS Daemon is reloaded
-  command: systemctl daemon-reload
+  systemd:
+    daemon_reload: yes
   changed_when: true
   tags: [docker]
 
