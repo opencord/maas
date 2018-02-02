@@ -14,50 +14,18 @@
 # limitations under the License.
 
 ---
-- name: Generate DPID
-  shell: ifconfig | grep HWaddr | head -1 | awk '{ print "0x0000"$5 }' | sed s/://g
-  register: dpid
+- name: Get platform type
+  shell: cat /etc/onl/platform
+  register: platform
   changed_when: false
 
-- name: Get switch OUI
-  shell: ifconfig | grep HWaddr | head -1 | awk '{ print $5 }' | sed s/://g | cut -c1-6
-  register: oui
-  changed_when: false
-
-- name: Ensure OFDPA Config
-  set_fact:
-    switch_id: "{{ dpid.stdout }}"
-    controller_ip: "onos-fabric"
-
-- name: Verify Openflow Agent
-  shell: which ofagentapp | wc -w
-  register: ofdpa_exists
-  changed_when: false
-
-- name: Openflow Agent Version
-  command: ofagentapp --version
-  register: ofdpa_version
-  changed_when: false
-  when: ofdpa_exists.stdout != "0"
-
-- name: Install OFDPA commons steps
+- name: Manage OFDPA
   include: ofdpa.yml
-  when: ofdpa_exists.stdout == "0" or
-        (ofdpa_version.stdout.find('3.0.4.0') == -1 and ofdpa_version.stdout.find('3.0.5.0') == -1)
+  when: platform.stdout in platforms.accton_switches.names or platform.stdout in platforms.quanta_switches.names
 
-- name: Install OFDPA for Accton switches
-  include: ofdpa-accton.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
-  when:
-    - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.4.0') == -1
-    # Accton related OUIs
-    - oui.stdout in switch_ouis['accton']
-
-- name: Install OFDPA for QCT switches
-  include: ofdpa-qct.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
-  when:
-    - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.5.0') == -1
-    # QCT related OUIs
-    - oui.stdout in switch_ouis['qct']
+- name: Manage Accton OLT
+  include: accton-olt.yml
+  when: platform.stdout in platforms.accton_olts.names
 
 - name: Authorize SSH Key
   become: yes
