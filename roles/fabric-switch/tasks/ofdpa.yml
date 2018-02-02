@@ -1,4 +1,4 @@
-
+---
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,50 +13,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-# We want to kill old agents and stop the old OFDPA service before removing
-- name: OpenFlow Agent Is Not Running
-  command: killall ofagentapp
-  failed_when: false
+- name: Verify Openflow Agent
+  shell: which ofagentapp | wc -w
+  register: ofdpa_exists
   tags:
-   - skip_ansible_lint # there's no harm to run killall if process is not running
+    - skip_ansible_lint # We're just gathering info
 
-- name: Old OFDPA Is Not Running
-  command: killall -9 brcm-indigo-ofdpa-ofagent
-  failed_when: false
+- name: Install OFDPA for Accton switches
+  include: ofdpa-accton.yml
+  when:
+    - platform in platforms.accton_switches.names
+    - ofdpa_exists.stdout == "0"
+
+- name: Install OFDPA for Quanta switches
+  include: ofdpa-quanta.yml
+  when:
+    - platform in platforms.quanta_switches.names
+    - ofdpa_exists.stdout == "0"
+
+- name: Generate DPID
+  shell: ifconfig | grep HWaddr | head -1 | awk '{ print "0x0000"$5 }' | sed s/://g
+  register: dpid
   tags:
-   - skip_ansible_lint # there's no harm to run killall if process is not running
+    - skip_ansible_lint # We're just gathering info
 
-- name: Verify Service Exists
-  stat:
-    path: /etc/init.d/ofdpa
-  register: ofdpa_stat
-  changed_when: false
-  failed_when: false
-
-- name: OpenFlow Agent Stopped
-  service: name=ofdpa state=stopped
-  when: ofdpa_stat.stat.exists
-
-- name: OFDPA 3.0 EA0 Is Not Present
-  apt:
-    name: ofdpa-3.0-ea0
-    state: absent
-    force: yes
-    purge: yes
-
-- name: Verify Distribution Release File
-  stat:
-    path: /etc/lsb-release
-  register: lsb_stat
-  changed_when: false
-  failed_when: false
-
-- name: Verify Distribute Release Name
-  shell: grep -i ubuntu /etc/lsb-release | wc -l
-  register: dist
-  changed_when: false
-  failed_when: false
+- name: Ensure OFDPA Config
+  set_fact:
+    switch_id: "{{ dpid.stdout }}"
+    controller_ip: "onos-fabric"
 
 - name: Utilities Scripts
   template:

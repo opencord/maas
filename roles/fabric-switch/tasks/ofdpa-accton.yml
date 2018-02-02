@@ -1,4 +1,4 @@
-
+---
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-- name: Openflow Accton Agent Debian Archive
+- name: Copy Accton OFDPA Debian Archive
   get_url:
-    url: https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb?raw=true
+    url: "{{ platforms.accton_switches.file_url }}"
     validate_certs: false
-    checksum: "sha256:e0b10051b2032454132c6634a0896883e1548e0c39b847ff10933e559b95a729"
-    dest: /mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb
+    checksum: "{{ platforms.accton_switches.checksum }}"
+    dest: "{{ deb_tmp_inst_dir }}{{ platforms.accton_switches.file_name }}"
 
-- name: Openflow Agent Installed
-  apt: deb="/mnt/onl/data/ofdpa_3.0.4.0+accton1.0~1-1_amd64.deb" force=true
-  when: not lsb_stat.stat.exists or dist.stdout == "0"
+- name: Install Accton OFDPA
+  apt: deb="{{ deb_tmp_inst_dir }}{{ platforms.accton_switches.file_name }}" force=true

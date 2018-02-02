@@ -17,14 +17,25 @@
 pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
 pub_ssh_key: "{{ lookup('file', pub_ssh_key_file_location+'/cord_rsa.pub') }}"
 
-switch_ouis:
-  accton:
-    - "cc37ab"
-    - "7072cf"
-    - "c4393a"
-    - "8cea1b"
-    - "a82bb5"
-    - "480fcf"
-  qct:
-    - "2c600c"
-    - "54ab3a"
+deb_tmp_inst_dir: "/tmp/"
+
+platforms:
+  accton_olts:
+    file_url: "http://onos-fabric/voltha-bal.deb"
+    file_name: "voltha-bal.deb"
+    names:
+      - "x86-64-accton-asxvolt16-r0"
+  accton_switches:
+    file_url: "https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa_3.0.5.5%2Baccton1.7-1_amd64.deb?raw=true"
+    file_name: "ofdpa_3.0.5.5+accton1.7-1_amd64.deb"
+    checksum: "sha256:db228b6e79fb15f77497b59689235606b60abc157e72fc3356071bcc8dc4c01f"
+    names:
+      - "x86-64-accton-as5712-32x-r0"
+      - "x86-64-accton-as5812-32x-r0"
+      - "x86-64-accton-as6712-32x-r0"
+  quanta_switches:
+    file_url: "https://github.com/onfsdn/atrium-docs/blob/master/16A/ONOS/builds/ofdpa-ly8_0.3.0.5.0-EA5-qct-01.01_amd64.deb?raw=true"
+    file_name: "ofdpa-ly8_0.3.0.5.0-EA5-qct-01.01_amd64.deb"
+    checksum: "sha256:f8201530b1452145c1a0956ea1d3c0402c3568d090553d0d7b3c91a79137da9e"
+    names:
+      - "x86-64-quanta-ly8-rangeley-r0"
