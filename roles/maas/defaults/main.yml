@@ -17,9 +17,6 @@ switch_image_dir: "/var/www/html"
 
 # Add switch boot images to be downloaded to this list
 switch_boot_images:
-  - name: "ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER"
-    url: 'https://github.com/opencord/OpenNetworkLinux/releases/download/2017-01-04.0024-8d23df5/ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER'
-    checksum: "sha256:4ed90086cafc3899ddb10ab7bac8677d8ece27de3ed28ed385c12aba8d53c0a9"
   - name: "ONL-2.0.0_ONL-OS_2018-01-24.0118-1303f20_AMD64_INSTALLED_INSTALLER"
     url: 'https://github.com/opencord/OpenNetworkLinux/releases/download/20180124-olt-kernel-3.7.10/ONL-2.0.0_ONL-OS_2018-01-24.0118-1303f20_AMD64_INSTALLED_INSTALLER'
     checksum: "sha256:1ac830d5636ef7a4a9cec52beb6cf3ac63dd959bb3dfd928ee526fbc52675364"
@@ -31,11 +28,11 @@ switch_boot_images:
 # name of an image in the switch_boot_images list given above
 switch_models:
   - name: "onie-installer-x86_64-accton_as5712_54x-r0"
-    boot_image: "ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER"
+    boot_image: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-accton_as5812_54x-r0"
-    boot_image: "ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER"
+    boot_image: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-accton_as6712_32x-r0"
-    boot_image: "ONL-2.0.0_ONL-OS_2017-01-04.0024-8d23df5_AMD64_INSTALLED_INSTALLER"
+    boot_image: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-accton_asxvolt16-r0"
     boot_image: "ONL-2.0.0_ONL-OS_2018-01-24.0118-1303f20_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-quanta_ly8_rangeley-r0"
