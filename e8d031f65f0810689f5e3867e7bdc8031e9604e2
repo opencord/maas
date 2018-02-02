@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b3b7cf1d_1fa61c14",
+        "filename": "roles/fabric-switch/tasks/main.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-02-02T03:36:58Z",
+      "side": 1,
+      "message": "Use `slurp`: http://docs.ansible.com/ansible/latest/slurp_module.html\n\nSomething like:\n\n    - name: Get Platform type\n      slurp:\n         src: /etc/onl/platform\n      register: platform\n\nThen use it with:\n \n    ( platform[\u0027content\u0027] | b64decode )",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 21
+      },
+      "revId": "e8d031f65f0810689f5e3867e7bdc8031e9604e2",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
