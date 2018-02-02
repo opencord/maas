@@ -23,11 +23,11 @@
     platform: "{{ etc_onl_platform.content | b64decode | trim }}"
 
 - name: Manage OFDPA
-  include: ofdpa.yml platform="{{ platform }}"
+  include_tasks: ofdpa.yml platform="{{ platform }}"
   when: platform in platforms.accton_switches.names or platform in platforms.quanta_switches.names
 
 - name: Manage Accton OLT
-  include: olt-accton.yml
+  include_tasks: olt-accton.yml
   when: platform in platforms.accton_olts.names
 
 - name: Authorize SSH Key

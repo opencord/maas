@@ -201,13 +201,13 @@
     - interface_config
 
 - name: Update Mellanox Driver
-  include: mlnx_driver.yml
+  include_tasks: mlnx_driver.yml
   when: mlnx_nic_present.stdout != "0" and mlnx5_version.stdout != '4.0-2.0.0'
   tags:
     - interface_config
 
 - name: Update i40e Driver
-  include: i40e_driver.yml
+  include_tasks: i40e_driver.yml
   when: intel_nic_present.stdout != "0" and i40e_version.stdout != '1.4.25'
   tags:
     - interface_config
@@ -225,6 +225,6 @@
 
 - name: Ensure Network Configuration
   become: yes
-  include: networking.yml
+  include_tasks: networking.yml
   tags:
     - interface_config

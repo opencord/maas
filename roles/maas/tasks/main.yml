@@ -251,12 +251,12 @@
     state: present
 
 - name: Restart MAAS Services
-  include: restart-maas.yml
+  include_tasks: restart-maas.yml
   tags:
     - maas_restart
 
 - name: Ensure MAAS Configuration
-  include: config-maas.yml
+  include_tasks: config-maas.yml
 
 - name: Custom MAAS Configuration Template
   become: yes
@@ -331,7 +331,7 @@
   when: ns_nameserver.changed or ns_search.changed
 
 - name: Restart MAAS Services
-  include: restart-maas.yml
+  include_tasks: restart-maas.yml
   tags:
     - maas_restart
 
@@ -342,7 +342,7 @@
     state: import
 
 - name: Ensure VirtualBox Power Management
-  include: virtualbox.yml
+  include_tasks: virtualbox.yml
   when: virtualbox_support is defined
 
 - name: Ensure MAAS Ansible Config Directory
