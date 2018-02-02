@@ -1,4 +1,4 @@
-
+---
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,51 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-- name: Generate DPID
-  shell: ifconfig | grep HWaddr | head -1 | awk '{ print "0x0000"$5 }' | sed s/://g
-  register: dpid
-  changed_when: false
+- name: Get platform type
+  slurp:
+    src: /etc/onl/platform
+  register: etc_onl_platform
 
-- name: Get switch OUI
-  shell: ifconfig | grep HWaddr | head -1 | awk '{ print $5 }' | sed s/://g | cut -c1-6
-  register: oui
-  changed_when: false
-
-- name: Ensure OFDPA Config
+- name: Set platform var
   set_fact:
-    switch_id: "{{ dpid.stdout }}"
-    controller_ip: "onos-fabric"
+    platform: "{{ etc_onl_platform.content | b64decode | trim }}"
 
-- name: Verify Openflow Agent
-  shell: which ofagentapp | wc -w
-  register: ofdpa_exists
-  changed_when: false
+- name: Manage OFDPA
+  include: ofdpa.yml platform="{{ platform }}"
+  when: platform in platforms.accton_switches.names or platform in platforms.quanta_switches.names
 
-- name: Openflow Agent Version
-  command: ofagentapp --version
-  register: ofdpa_version
-  changed_when: false
-  when: ofdpa_exists.stdout != "0"
-
-- name: Install OFDPA commons steps
-  include: ofdpa.yml
-  when: ofdpa_exists.stdout == "0" or
-        (ofdpa_version.stdout.find('3.0.4.0') == -1 and ofdpa_version.stdout.find('3.0.5.0') == -1)
-
-- name: Install OFDPA for Accton switches
-  include: ofdpa-accton.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
-  when:
-    - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.4.0') == -1
-    # Accton related OUIs
-    - oui.stdout in switch_ouis['accton']
-
-- name: Install OFDPA for QCT switches
-  include: ofdpa-qct.yml lsb_stat="{{ lsb_stat }}" dist="{{ dist }}"
-  when:
-    - ofdpa_exists.stdout == "0" or ofdpa_version.stderr.find('3.0.5.0') == -1
-    # QCT related OUIs
-    - oui.stdout in switch_ouis['qct']
+- name: Manage Accton OLT
+  include: olt-accton.yml
+  when: platform in platforms.accton_olts.names
 
 - name: Authorize SSH Key
   become: yes
