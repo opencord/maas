@@ -14,8 +14,8 @@
 # limitations under the License.
 
 
-- include: debian.yml
+- include_tasks: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- include: centos.yml
+- include_tasks: centos.yml
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
