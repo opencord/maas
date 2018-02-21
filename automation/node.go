@@ -24,28 +24,37 @@ type MaasNodeStatus int
 
 // MAAS Node Statuses
 const (
-	Invalid             MaasNodeStatus = -1
-	New                 MaasNodeStatus = 0
-	Commissioning       MaasNodeStatus = 1
-	FailedCommissioning MaasNodeStatus = 2
-	Missing             MaasNodeStatus = 3
-	Ready               MaasNodeStatus = 4
-	Reserved            MaasNodeStatus = 5
-	Deployed            MaasNodeStatus = 6
-	Retired             MaasNodeStatus = 7
-	Broken              MaasNodeStatus = 8
-	Deploying           MaasNodeStatus = 9
-	Allocated           MaasNodeStatus = 10
-	FailedDeployment    MaasNodeStatus = 11
-	Releasing           MaasNodeStatus = 12
-	FailedReleasing     MaasNodeStatus = 13
-	DiskErasing         MaasNodeStatus = 14
-	FailedDiskErasing   MaasNodeStatus = 15
+	Invalid                  MaasNodeStatus = -1
+	New                      MaasNodeStatus = 0
+	Commissioning            MaasNodeStatus = 1
+	FailedCommissioning      MaasNodeStatus = 2
+	Missing                  MaasNodeStatus = 3
+	Ready                    MaasNodeStatus = 4
+	Reserved                 MaasNodeStatus = 5
+	Deployed                 MaasNodeStatus = 6
+	Retired                  MaasNodeStatus = 7
+	Broken                   MaasNodeStatus = 8
+	Deploying                MaasNodeStatus = 9
+	Allocated                MaasNodeStatus = 10
+	FailedDeployment         MaasNodeStatus = 11
+	Releasing                MaasNodeStatus = 12
+	FailedReleasing          MaasNodeStatus = 13
+	DiskErasing              MaasNodeStatus = 14
+	FailedDiskErasing        MaasNodeStatus = 15
+	RescueMode               MaasNodeStatus = 16
+	EnteringRescueMode       MaasNodeStatus = 17
+	FailedEnteringRescueMode MaasNodeStatus = 18
+	ExitingRescueMode        MaasNodeStatus = 19
+	FailedExitingRescueMode  MaasNodeStatus = 20
+	Testing                  MaasNodeStatus = 21
+	FailedTesting            MaasNodeStatus = 22
 )
 
 var names = []string{"New", "Commissioning", "FailedCommissioning", "Missing", "Ready", "Reserved",
 	"Deployed", "Retired", "Broken", "Deploying", "Allocated", "FailedDeployment",
-	"Releasing", "FailedReleasing", "DiskErasing", "FailedDiskErasing"}
+	"Releasing", "FailedReleasing", "DiskErasing", "FailedDiskErasing","RescueMode",
+	"EnteringRescueMode", "FailedEnteringRescueMode", "ExitingRescueMode", "FailedExitingRescueMode",
+	"Testing", "FailedTesting"}
 
 func (v MaasNodeStatus) String() string {
 	return names[v]
@@ -135,19 +144,18 @@ func (n *MaasNode) IPs() []string {
 
 // MACs get the MAC Addresses
 func (n *MaasNode) MACs() []string {
-	macsObj, _ := n.GetMap()["macaddress_set"]
-	macs, _ := macsObj.GetArray()
-	if len(macs) == 0 {
+	ifaceObj, _ := n.GetMap()["interface_set"]
+	ifaces, _ := ifaceObj.GetArray()
+	if len(ifaces) == 0 {
 		return []string{}
 	}
-	result := make([]string, len(macs))
-	for i, mac := range macs {
-		obj, _ := mac.GetMap()
-		addr, _ := obj["mac_address"]
-		s, _ := addr.GetString()
-		result[i] = s
+	result := make([]string, len(ifaces))
+	for i, iface := range ifaces {
+		obj, _ := iface.GetMap()
+		macAddressObj, _ := obj["mac_address"]
+		macAddress,_ := macAddressObj.GetString()
+		result[i] = macAddress
 	}
-
 	return result
 }
 

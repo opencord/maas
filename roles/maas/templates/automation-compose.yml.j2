@@ -132,7 +132,6 @@ services:
 {% endif %}
       - "AUTOMATION_LOG_FORMAT=text"
       - "AUTOMATION_LOG_LEVEL=warn"
-      - "AUTOMATION_MAAS_API_VERSION=1.0"
       - "AUTOMATION_MAAS_URL=http://{{ mgmt_ip_address.stdout }}/MAAS"
       - "AUTOMATION_QUERY_INTERVAL=30s"
       - "AUTOMATION_MAC_TO_NAME_MAPPINGS=@/mappings/mappings.json"

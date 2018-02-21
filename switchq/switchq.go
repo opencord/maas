@@ -30,7 +30,10 @@ import (
 	"time"
 )
 
-const appName = "SWITCHQ"
+const(
+	appName        = "SWITCHQ"
+	massApiVersion = "2.0"
+)
 
 type Config struct {
 	VendorsURL      string `default:"file:///switchq/vendors.json" envconfig:"VENDORS_URL" desc:"URL that specifies supported vendor OUI information"`
@@ -383,7 +386,7 @@ func main() {
 	if len(context.config.MaasURL) > 0 {
 
 		// Attempt to connect to MAAS
-		authClient, err := maas.NewAuthenticatedClient(context.config.MaasURL, context.config.MaasKey, "1.0")
+		authClient, err := maas.NewAuthenticatedClient(context.config.MaasURL, context.config.MaasKey, massApiVersion)
 		checkError(err, "Unable to connect to MAAS at '%s' : %s", context.config.MaasURL, err)
 
 		context.maasClient = maas.NewMAAS(*authClient)
