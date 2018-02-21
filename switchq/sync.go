@@ -73,20 +73,21 @@ func process(deviceList []maas.JSONObject) (byName map[string]*MatchRec, byMac m
 		}
 		all[i].Name = name
 
-		mac_set_arr, err := device["macaddress_set"].GetArray()
-		if len(mac_set_arr) != 1 {
-			return nil, nil, fmt.Errorf("Expecting a single MAC address, recived %d", len(mac_set_arr))
+		iface_arr, err := device["interface_set"].GetArray()
+		if len(iface_arr) != 1 {
+			return nil, nil, fmt.Errorf("Expecting a single interface, recived %d", len(iface_arr))
 		}
 
-		mac_obj, err := mac_set_arr[0].GetMap()
+		iface_obj, err := iface_arr[0].GetMap()
 		if err != nil {
 			return nil, nil, err
 		}
 
-		mac, err := mac_obj["mac_address"].GetString()
+		mac, err := iface_obj["mac_address"].GetString()
 		if err != nil {
 			return nil, nil, err
 		}
+
 		mac = strings.ToUpper(mac)
 		all[i].MAC = mac
 
@@ -106,7 +107,7 @@ func (c *AppContext) syncToMaas(request chan []AddressRec) {
 	for list := range request {
 		// Get current device list and convert it to some maps for quick indexing
 		devices := c.maasClient.GetSubObject("devices")
-		deviceObjects, err := devices.CallGet("list", url.Values{})
+		deviceObjects, err := devices.CallGet("", url.Values{})
 		if err != nil {
 			log.Errorf("Unable to synchronize switches to MAAS, unable to get current devices : %s",
 				err)
@@ -230,7 +231,7 @@ func (c *AppContext) syncToMaas(request chan []AddressRec) {
 
 			// The device does not currently exist in MAAS, so add it
 			log.Infof("Adding device '%s (%s)' to MAAS", rec.Name, rec.MAC)
-			deviceObj, err := devices.CallPost("new", url.Values{
+			deviceObj, err := devices.CallPost("", url.Values{
 				"hostname":      []string{rec.Name},
 				"mac_addresses": []string{rec.MAC},
 			})

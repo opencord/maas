@@ -79,7 +79,7 @@ var Transitions = map[string]map[string][]Action{
 	"Deployed": {
 		"New":                 []Action{Reset, Commission},
 		"Deployed":            []Action{Provision, Done},
-		"Ready":               []Action{Reset, Aquire},
+		"Ready":               []Action{Reset, Allocate},
 		"Allocated":           []Action{Reset, Deploy},
 		"Retired":             []Action{Reset, AdminState},
 		"Reserved":            []Action{Reset, AdminState},
@@ -87,12 +87,14 @@ var Transitions = map[string]map[string][]Action{
 		"DiskErasing":         []Action{Reset, Wait},
 		"Deploying":           []Action{Reset, Wait},
 		"Commissioning":       []Action{Reset, Wait},
+		"Testing"            : []Action{Reset, Wait},
 		"Missing":             []Action{Reset, Fail},
 		"FailedReleasing":     []Action{Reset, Fail},
 		"FailedDiskErasing":   []Action{Reset, Fail},
 		"FailedDeployment":    []Action{Reset, Fail},
 		"Broken":              []Action{Reset, Fail},
 		"FailedCommissioning": []Action{Reset, Fail},
+		"FailedTesting":       []Action{Reset, Fail},
 	},
 }
 
@@ -105,10 +107,14 @@ const (
         (Commissioning)->(Ready)
         (Ready)->(Deploying)
         (Ready)->(Allocated)
+		(Allocated)->(Testing)
         (Allocated)->(Deploying)
+        (Testing)->(Deploying)
+		(Testing)->(FailedTesting)
         (Deploying)->(Deployed)
         (Deploying)->(FailedDeployment)
         (FailedDeployment)->(Broken)
+		(FailedTesting)->(Broken)
         (Deployed)->(Releasing)
         (Releasing)->(FailedReleasing)
         (FailedReleasing)->(Broken)
@@ -140,12 +146,11 @@ func updateNodeName(client *maas.MAASObject, node MaasNode, options ProcessingOp
 	for _, mac := range macs {
 		if name, ok := options.Mappings[mac]; ok {
 			if current != name {
-				nodesObj := client.GetSubObject("nodes")
-				nodeObj := nodesObj.GetSubObject(node.ID())
+				machineObj := client.GetSubObject("machines").GetSubObject(node.ID())
 				log.Infof("RENAME '%s' to '%s'\n", node.Hostname(), name)
 
 				if !options.Preview {
-					nodeObj.Update(url.Values{"hostname": []string{name}})
+					machineObj.Update(url.Values{"hostname": []string{name}})
 				}
 			}
 		}
@@ -265,11 +270,10 @@ var Deploy = func(client *maas.MAASObject, node MaasNode, options ProcessingOpti
 	}
 
 	if !options.Preview {
-		nodesObj := client.GetSubObject("nodes")
-		myNode := nodesObj.GetSubObject(node.ID())
+		machineObj := client.GetSubObject("machines").GetSubObject(node.ID())
 		// Start the node with the trusty distro. This should really be looked up or
 		// a parameter default
-		_, err := myNode.CallPost("start", url.Values{"distro_series": []string{"trusty"}})
+		_, err := machineObj.CallPost("deploy", url.Values{"distro_series": []string{"xenial"}})
 		if err != nil {
 			log.Errorf("DEPLOY '%s' : '%s'", node.Hostname(), err)
 			return err
@@ -278,10 +282,11 @@ var Deploy = func(client *maas.MAASObject, node MaasNode, options ProcessingOpti
 	return nil
 }
 
-// Aquire aquire a machine to a specific operator
-var Aquire = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	log.Infof("AQUIRE: %s", node.Hostname())
-	nodesObj := client.GetSubObject("nodes")
+// Acquire a machine to a specific operator
+// Acquire is renamed to allocate for maas 2.0
+var Allocate = func(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
+	log.Infof("ALLOCATE: %s", node.Hostname())
+	machinesObj := client.GetSubObject("machines")
 
 	if options.AlwaysRename {
 		updateNodeName(client, node, options)
@@ -371,10 +376,10 @@ var Aquire = func(client *maas.MAASObject, node MaasNode, options ProcessingOpti
 				}
 			}
 		}
-		_, err = nodesObj.CallPost("acquire",
+		_, err = machinesObj.CallPost("allocate",
 			url.Values{"name": []string{node.Hostname()}})
 		if err != nil {
-			log.Errorf("AQUIRE '%s' : '%s'", node.Hostname(), err)
+			log.Errorf("ALLOCATE '%s' : '%s'", node.Hostname(), err)
 			return err
 		}
 	}
@@ -393,10 +398,9 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 		// Attempt to turn the node off
 		log.Infof("POWER DOWN: %s", node.Hostname())
 		if !options.Preview {
-			//POST /api/1.0/nodes/{system_id}/ op=stop
-			nodesObj := client.GetSubObject("nodes")
-			nodeObj := nodesObj.GetSubObject(node.ID())
-			_, err := nodeObj.CallPost("stop", url.Values{"stop_mode": []string{"soft"}})
+			//POST /api/2.0/machines/{system_id}/ op=stop
+			machineObj := client.GetSubObject("machines").GetSubObject(node.ID())
+			_, err := machineObj.CallPost("power_off", url.Values{"stop_mode": []string{"soft"}})
 			if err != nil {
 				log.Errorf("Commission '%s' : changing power start to off : '%s'", node.Hostname(), err)
 			}
@@ -407,12 +411,11 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 		// We are off so move to commissioning
 		log.Infof("COMISSION: %s", node.Hostname())
 		if !options.Preview {
-			nodesObj := client.GetSubObject("nodes")
-			nodeObj := nodesObj.GetSubObject(node.ID())
+			machineObj := client.GetSubObject("machines").GetSubObject(node.ID())
 
 			updateNodeName(client, node, options)
 
-			_, err := nodeObj.CallPost("commission", url.Values{})
+			_, err := machineObj.CallPost("commission", url.Values{})
 			if err != nil {
 				log.Errorf("Commission '%s' : '%s'", node.Hostname(), err)
 			}
@@ -450,7 +453,14 @@ var Commission = func(client *maas.MAASObject, node MaasNode, options Processing
 					"power_pass":    power.PowerPassword,
 					"power_address": power.PowerAddress,
 				}
-				node.UpdatePowerParameters(power.Name, params)
+				machineNodeObj := client.GetSubObject("machines").GetSubObject(node.ID())
+				machineObj, err := machineNodeObj.Get();
+				if err != nil {
+					log.Errorf("Unable to get %s machine object %s ",node.ID(),err)
+					return err
+				}
+				machineNode := MaasNode{machineObj}
+				machineNode.UpdatePowerParameters(power.Name, params)
 			default:
 				log.Warningf("Unsupported power type discovered '%s'", power.Name)
 			}
@@ -511,11 +521,11 @@ func ProcessActions(actions []Action, client *maas.MAASObject, node MaasNode, op
 
 // ProcessNode something
 func ProcessNode(client *maas.MAASObject, node MaasNode, options ProcessingOptions) error {
-	substatus, err := node.GetInteger("substatus")
+	status, err := node.GetInteger("status")
 	if err != nil {
 		return err
 	}
-	actions, err := findActions("Deployed", MaasNodeStatus(substatus).String())
+	actions, err := findActions("Deployed", MaasNodeStatus(status).String())
 	if err != nil {
 		return err
 	}
