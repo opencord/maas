@@ -27,7 +27,10 @@ import (
 	maas "github.com/juju/gomaasapi"
 )
 
-const appName = "AUTOMATION"
+const (
+	appName        = "AUTOMATION"
+	maasApiVersion = "2.0"
+)
 
 type Config struct {
 	PowerHelperUser   string        `default:"cord" envconfig:"POWER_HELPER_USER" desc:"user when integrating with virtual box power mgmt"`
@@ -41,7 +44,6 @@ type Config struct {
 	ApiKeyFile        string        `default:"/secrets/maas_api_key" envconfig:"MAAS_API_KEY_FILE" desc:"file to hold the secret"`
 	ShowApiKey        bool          `default:"false" envconfig:"MAAS_SHOW_API_KEY" desc:"Show API in clear text in logs"`
 	MaasUrl           string        `default:"http://localhost/MAAS" envconfig:"MAAS_URL" desc:"URL to access MAAS server"`
-	ApiVersion        string        `default:"1.0" envconfig:"MAAS_API_VERSION" desc:"API version to use with MAAS server"`
 	QueryInterval     time.Duration `default:"15s" envconfig:"MAAS_QUERY_INTERVAL" desc:"frequency to query MAAS service for nodes"`
 	PreviewOnly       bool          `default:"false" envconfig:"PREVIEW_ONLY" desc:"display actions that would be taken, but don't execute them"`
 	AlwaysRename      bool          `default:"true" envconfig:"ALWAYS_RENAME" desc:"attempt to rename hosts at every stage or workflow"`
@@ -71,7 +73,7 @@ func checkWarn(err error, message string, v ...interface{}) bool {
 // fetchNodes do a HTTP GET to the MAAS server to query all the nodes
 func fetchNodes(client *maas.MAASObject) ([]MaasNode, error) {
 	nodeListing := client.GetSubObject("nodes")
-	listNodeObjects, err := nodeListing.CallGet("list", url.Values{})
+	listNodeObjects, err := nodeListing.CallGet("", url.Values{})
 	if checkWarn(err, "unable to get the list of all nodes: %s", err) {
 		return nil, err
 	}
@@ -208,7 +210,6 @@ func main() {
 	    MAAS_SHOW_API_KEY:    %t
 	    MAAS_API_KEY:         %s
 	    MAAS_API_KEY_FILE:    %s
-	    MAAS_API_VERSION:     %s
 	    MAAS_QUERY_INTERVAL:  %s
 	    HOST_FILTER_SPEC:     %+v
 	    MAC_TO_NAME_MAPPINGS: %+v
@@ -219,7 +220,7 @@ func main() {
 		config.PowerHelperUser, config.PowerHelperHost, config.PowerHelperScript,
 		config.ProvisionUrl, config.ProvisionTtl,
 		config.MaasUrl, config.ShowApiKey,
-		pubKey, config.ApiKeyFile, config.ApiVersion, config.QueryInterval,
+		pubKey, config.ApiKeyFile, config.QueryInterval,
 		filterPrefix+string(filterAsJson), mappingsPrefix+string(mappingsAsJson),
 		config.PreviewOnly, config.AlwaysRename,
 		config.LogLevel, config.LogFormat)
@@ -242,7 +243,7 @@ func main() {
 		}
 	}
 
-	authClient, err := maas.NewAuthenticatedClient(config.MaasUrl, config.ApiKey, config.ApiVersion)
+	authClient, err := maas.NewAuthenticatedClient(config.MaasUrl, config.ApiKey, maasApiVersion)
 	checkError(err, "Unable to use specified client key, '%s', to authenticate to the MAAS server: %s",
 		pubKey, err)
 
