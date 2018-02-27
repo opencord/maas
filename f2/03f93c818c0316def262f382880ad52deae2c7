@@ -1,0 +1,8 @@
+Code-Review+1: David Bainbridge <dbainbri@ciena.com>
+Code-Review+2: Luca Prete <luca@opennetworking.org>
+Verified+1: Luca Prete <luca@opennetworking.org>
+Submitted-by: Luca Prete <luca@opennetworking.org>
+Submitted-at: Tue, 27 Feb 2018 17:47:28 +0000
+Reviewed-on: https://gerrit.opencord.org/8442
+Project: maas
+Branch: refs/heads/cord-1604
