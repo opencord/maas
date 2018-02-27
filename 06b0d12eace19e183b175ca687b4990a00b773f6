@@ -22,6 +22,30 @@
       "revId": "06b0d12eace19e183b175ca687b4990a00b773f6",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f5f2b6e_a5c25afd",
+        "filename": "automation/state.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1000415
+      },
+      "writtenOn": "2018-02-27T07:02:43Z",
+      "side": 1,
+      "message": "I only added the testing related state machines. While I\u0027m working on task, I haven\u0027t seen anything about rescue mode. So I didn\u0027t add rescue mode to state machine also I couldn\u0027t find the rescue mode state flows.",
+      "parentUuid": "6ecbe1df_7e3a8b52",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 5
+      },
+      "revId": "06b0d12eace19e183b175ca687b4990a00b773f6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
