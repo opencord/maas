@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ecbe1df_7e3a8b52",
+        "filename": "automation/state.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2018-02-27T00:01:58Z",
+      "side": 1,
+      "message": "This comment right here is actually a state machine diagram when used with yuml.me. As you updated the state machine this diagram should be updated as well.",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 5
+      },
+      "revId": "06b0d12eace19e183b175ca687b4990a00b773f6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
