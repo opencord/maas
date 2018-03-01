@@ -99,17 +99,6 @@
     group=maas
     mode="0644"
 
-- name: Ensure Connect Switch Ansible Playbook
-  become: yes
-  copy:
-    dest=/etc/maas/ansible/{{ item }}
-    src=files/{{ item }}
-    owner=maas
-    group=maas
-    mode="0644"
-  with_items:
-    - connect-switch.yml
-
 - name: Ensure Dynamic Inventory Script
   become: yes
   template:
