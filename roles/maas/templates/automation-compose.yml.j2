@@ -182,6 +182,8 @@ services:
     labels:
       - "lab.solution=CORD"
       - "lab.component=generator"
+    volumes:
+      - "/etc/maas/templates:/service/template"
     environment:
       - "CONFIGGEN_PORT=4245"
       - "CONFIGGEN_LISTEN=0.0.0.0"
@@ -189,5 +191,6 @@ services:
       - "CONFIGGEN_USERNAME=karaf"
       - "CONFIGGEN_PASSWORD=karaf"
       - "CONFIGGEN_LOG_LEVEL=warn"
+      - "CONFIGGEN_NET_CONFIG_URL=/service/template/netconfig.tpl"
     restart: unless-stopped
 

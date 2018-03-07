@@ -19,11 +19,51 @@ import (
 	"net/http"
 	"strings"
 	"text/template"
+	"errors"
 )
 
 type GenerationOptions struct {
 	SwitchCount int `json:"switchcount"`
 	HostCount   int `json:"hostcount"`
+}
+
+
+var vlan = func(ips []string) string {
+	// Find the first v4 address, as determined by
+	// not having a ':' in the IP
+	for _, ip := range ips {
+		if strings.Index(ip, ":") == -1 {
+			return strings.Split(ip, ".")[2]
+		}
+	}
+	return "0"
+}
+
+var gateway = func(ips []string) string {
+	// Find the first v4 address, as determined by
+	// not having a ':' in the IP
+	for _, ip := range ips {
+		if strings.Index(ip, ":") == -1 {
+			parts := strings.Split(ip, ".")
+			targetIp := ""
+			for _, v := range parts[:len(parts)-1] {
+				targetIp = targetIp + v + "."
+			}
+			return targetIp + "254/24"
+		}
+	}
+	return "0.0.0.254/24"
+}
+
+var add = func(a, b int) int {
+	return a + b
+}
+
+var funcMap = template.FuncMap{
+	// The name "inc" is what the function will be called in the template text.
+	"add":     add,
+	"gateway": gateway,
+	"vlan":    vlan,
 }
 
 func (c *Config) configGenHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,39 +131,14 @@ func (c *Config) configGenHandler(w http.ResponseWriter, r *http.Request) {
 		Hosts:   hosts.Hosts,
 	}
 
-	funcMap := template.FuncMap{
-		// The name "inc" is what the function will be called in the template text.
-		"add": func(a, b int) int {
-			return a + b
-		},
-		"gateway": func(ips []string) string {
-			// Find the first v4 address, as determined by
-			// not having a ':' in the IP
-			for _, ip := range ips {
-				if strings.Index(ip, ":") == -1 {
-					parts := strings.Split(ip, ".")
-					targetIp := ""
-					for _, v := range parts[:len(parts)-1] {
-						targetIp = targetIp + v + "."
-					}
-					return targetIp + "254/24"
-				}
-			}
-			return "0.0.0.254/24"
-		},
-		"vlan": func(ips []string) string {
-			// Find the first v4 address, as determined by
-			// not having a ':' in the IP
-			for _, ip := range ips {
-				if strings.Index(ip, ":") == -1 {
-					return strings.Split(ip, ".")[2]
-				}
-			}
-			return "0"
-		},
+	name, err := getFileNameFromNetConfigUrl(c.NetConfigURL)
+	if err != nil {
+		log.Errorf("Unable to get file name from NetConfigURL: %s", err)
+		http.Error(w, "Template path is not valid", http.StatusInternalServerError)
+		return
 	}
 
-	tpl, err := template.New("netconfig.tpl").Funcs(funcMap).ParseFiles("netconfig.tpl")
+	tpl, err := template.New(name).Funcs(funcMap).ParseFiles(c.NetConfigURL)
 	if err != nil {
 		log.Errorf("Unable to parse template: %s", err)
 		http.Error(w, "Template parse error", http.StatusInternalServerError)
@@ -179,4 +194,12 @@ func (c *Config) fetch(path string, data interface{}) error {
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(data)
 	return err
+}
+
+func getFileNameFromNetConfigUrl(configURL string) (string,error) {
+	if len(configURL) == 0 {
+		return "",errors.New("NetConfigURL is not set properly")
+	}
+	values := strings.Split(configURL,"/")
+	return values[len(values) - 1],nil
 }

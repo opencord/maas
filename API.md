@@ -346,6 +346,7 @@ deleted.
 |CONFIGGEN_LOGFORMAT|"text"|Format of the log messages|
 |CONFIGGEN_CONFIGSERVERPORT|"1337"|port on which to listen for configuration generation requests|
 |CONFIGGEN_CONFIGSERVERIP|"127.0.0.1"|IP on which to listen for configuration generation requests|
+|CONFINGEN_NETWORKCONFIGURATIONURL|"/service/template/netconfig.tpl"|URL specifies the network configuration path.
 
 ### REST Resources
 |URI|Operation|Description|

@@ -28,14 +28,14 @@ import (
 const appName = "CONFIGGEN"
 
 type Config struct {
-	Port       int    `default:"1337" desc:"port on which to listen for requests"`
-	Listen     string `default:"0.0.0.0" desc:"IP address on which to listen for requests"`
-	Controller string `default:"http://%s:%s@127.0.0.1:8181" desc:"connection string with which to connect to ONOS"`
-	Username   string `default:"karaf" desc:"username with which to connect to ONOS"`
-	Password   string `default:"karaf" desc:"password with which to connect to ONOS"`
-	LogLevel   string `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
-	LogFormat  string `default:"text" envconfig:"LOG_FORMAT" desc:"log output format, text or json"`
-
+	Port         int    `default:"1337" desc:"port on which to listen for requests"`
+	Listen       string `default:"0.0.0.0" desc:"IP address on which to listen for requests"`
+	Controller   string `default:"http://%s:%s@127.0.0.1:8181" desc:"connection string with which to connect to ONOS"`
+	Username     string `default:"karaf" desc:"username with which to connect to ONOS"`
+	Password     string `default:"karaf" desc:"password with which to connect to ONOS"`
+	LogLevel     string `default:"warning" envconfig:"LOG_LEVEL" desc:"detail level for logging"`
+	LogFormat    string `default:"text" envconfig:"LOG_FORMAT" desc:"log output format, text or json"`
+	NetConfigURL string `default:"/service/template/netconfig.tpl" envconfig:"NET_CONFIG_URL" desc:"URL specifies the network configuration path."`
 	connect string
 }
 
@@ -78,16 +78,17 @@ func main() {
 	log.Level = level
 
 	log.Infof(`Configuration:
-        LISTEN:     %s
-        PORT:       %d
-        CONTROLLER: %s
-        USERNAME:   %s
-        PASSWORD:   %s
-        LOG_LEVEL:  %s
-        LOG_FORMAT: %s`,
+        LISTEN:         %s
+        PORT:           %d
+        CONTROLLER:     %s
+        USERNAME:       %s
+        PASSWORD:       %s
+        LOG_LEVEL:      %s
+        LOG_FORMAT:     %s
+        NET_CONFIG_URL: %s`,
 		config.Listen, config.Port, config.Controller,
 		config.Username, config.Password,
-		config.LogLevel, config.LogFormat)
+		config.LogLevel, config.LogFormat, config.NetConfigURL)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/config/", config.configGenHandler).Methods("POST")
