@@ -121,15 +121,15 @@
 
 - name: Discover Management Interfaces
   netinfo:
-    include-names: "{{ compute_node.management.include.names }}"
-    include-module-types: "{{ compute_node.management.include.module_types }}"
-    include-bus-types: "{{ compute_node.management.include.bus_types }}"
+    include-names: "{{ compute_node.management.include| default({}).names | default(omit) }}"
+    include-module-types: "{{ compute_node.management.include | default({}).module_types | default(omit) }}"
+    include-bus-types: "{{ compute_node.management.include | default({}).bus_types | default(omit) }}"
     ignore-names: "{{ ignore_names_combined | default(omit) }}"
     ignore-module-types: "{{ ignore_module_types_combined | default(omit) }}"
-    ignore-bus-types: "{{ compute_node.management.ignore.bus_types }}"
-    exclude-names: "{{ compute_node.management.exclude.names }}"
-    exclude-module-types: "{{ compute_node.management.exclude.module_types }}"
-    exclude-bus-types: "{{ compute_node.management.exclude.bus_types }}"
+    ignore-bus-types: "{{ compute_node.management.ignore | default({}).bus_types | default(omit) }}"
+    exclude-names: "{{ compute_node.management.exclude | default({}).names | default(omit) }}"
+    exclude-module-types: "{{ compute_node.management.exclude | default({}).module_types | default(omit) }}"
+    exclude-bus-types: "{{ compute_node.management.exclude | default({}).bus_types | default(omit) }}"
     debug: on
 
 - name: Gather Management Interfaces
