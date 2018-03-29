@@ -60,16 +60,15 @@
   changed_when: false
   when: "not already_encrypted"
 
-- name: Update Compute Node Password
+- name: Extract Encrypted Compute Node Password
   set_fact:
-    compute_node_update:
-      password: "enc:{{encrypted.stdout}}"
+    encrypted_password: "enc:{{encrypted.stdout}}"
   when: "not already_encrypted"
 
-- name: Merge Compute Node Properties
+- name: Copy Encrypted Compute Node Password
   set_fact:
-    compute_node: "{{compute_node|combine(compute_node_update,recursive=True)}}"
-  when: "not already_encrypted"
+    encrypted_password: "{{compute_node.password}}"
+  when: "already_encrypted"
 
 - name: Ensure Docker Insecure Repository
   become: yes
@@ -103,7 +102,7 @@
   become: yes
   user:
     name: "{{ ansible_user_id }}"
-    password: "{{compute_node.password.split(':',1)[1]}}"
+    password: "{{encrypted_password.split(':',1)[1]}}"
   when: '"{{ ansible_user_id }}" == "ubuntu"'
   tags:
     - set_compute_node_password
