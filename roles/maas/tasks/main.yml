@@ -47,7 +47,7 @@
 - name: Ensure Docker Ansible Support
   become: yes
   pip:
-    name: "docker==2.4.2"
+    name: "docker==3.2.1"
 
 - name: Stop Containers
   become: yes
