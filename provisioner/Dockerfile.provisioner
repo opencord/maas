@@ -20,7 +20,7 @@ WORKDIR /go
 ADD . /go/src/gerrit.opencord.org/maas/cord-provisioner
 RUN go build -o /build/entry-point gerrit.opencord.org/maas/cord-provisioner
 
-FROM alpine:3.6
+FROM alpine:3.7
 MAINTAINER Open Networking Laboratory <info@onlab.us>
 
 # Base image information borrowed by official golang wheezy Dockerfile
