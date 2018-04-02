@@ -1,4 +1,4 @@
-
+---
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
----
 
 - name: Prereqs and SSL support for apt for SSL
   become: yes
@@ -50,8 +47,8 @@
   pip:
     name: "{{ item }}"
   with_items:
-    - "docker==2.4.2"
-    - "docker-compose==1.15.0"
+    - "docker==3.2.1"
+    - "docker-compose==1.20.1"
 
 - name: Make current user part of the Docker group
   become: yes
