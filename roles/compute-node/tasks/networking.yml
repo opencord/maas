@@ -391,6 +391,7 @@
     address: "{{ compute_node.addresses.external }}"
     gateway: "{{ compute_node.gateway.external }}"
     broadcast: "{{ compute_node.broadcast.external }}"
+    dns-nameservers: "8.8.8.8 8.8.4.4"
     description: "External interface from POD to Internet (uplink)"
   register: net_changed
   when: compute_node.interfaces.external and compute_node.addresses.external != "dhcp"
