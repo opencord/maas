@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ec82d35b_5c516fc9",
+        "filename": "roles/compute-node/tasks/networking.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1000266
+      },
+      "writtenOn": "2018-05-06T09:05:15Z",
+      "side": 1,
+      "message": "after test, upstream_dns variable will be undefined here",
+      "range": {
+        "startLine": 394,
+        "startChar": 22,
+        "endLine": 394,
+        "endChar": 40
+      },
+      "revId": "498acdc3b9fffd2607598d343ea0add9587f98f6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
