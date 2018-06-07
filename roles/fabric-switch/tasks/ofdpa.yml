@@ -31,6 +31,12 @@
     - platform in platforms.quanta_switches.names
     - ofdpa_exists.stdout == "0"
 
+- name: Install OFDPA for Quanta IX1 switches
+  include: ofdpa-quanta-ix1.yml
+  when:
+    - platform in platforms.quanta_ix1_switches.names
+    - ofdpa_exists.stdout == "0"
+
 - name: Generate DPID
   shell: ifconfig | grep HWaddr | head -1 | awk '{ print "0x0000"$5 }' | sed s/://g
   register: dpid

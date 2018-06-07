@@ -37,6 +37,8 @@ switch_models:
     boot_image: "ONL-2.0.0_ONL-OS_2018-01-24.0118-1303f20_AMD64_INSTALLED_INSTALLER"
   - name: "onie-installer-x86_64-quanta_ly8_rangeley-r0"
     boot_image: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
+  - name: "onie-installer-x86_64-quanta_ix1_rangeley-r0"
+    boot_image: "ONL-2.0.0_ONL-OS_2017-10-19.2200-1211610_AMD64_INSTALLED_INSTALLER"
 
 pub_ssh_key_file_location: "{{ pub_ssh_key_location | default ('/etc/maas/.ssh') }}"
 

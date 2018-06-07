@@ -33,5 +33,10 @@
     "prefix" : "54:AB:3A",
     "vendor" : "Quanta QCT",
     "provision" : true
+  },
+  {
+    "prefix" : "A8:1E:84",
+    "vendor" : "Quanta QCT",
+    "provision" : true
   }
 ]

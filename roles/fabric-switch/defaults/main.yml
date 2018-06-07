@@ -39,3 +39,8 @@ platforms:
     checksum: "sha256:f8201530b1452145c1a0956ea1d3c0402c3568d090553d0d7b3c91a79137da9e"
     names:
       - "x86-64-quanta-ly8-rangeley-r0"
+  quanta_ix1_switches:
+    file_url: "https://www.dropbox.com/s/ei4ob7cgc1xeohv/ofdpa-ix1_0.3.0.5.0-EA5-qct-01.00_amd64.deb?dl=0"
+    file_name: "ofdpa-ix1_0.3.0.5.0-EA5-qct-01.00_amd64.deb"
+    names:
+      - "x86-64-quanta-ix1-rangeley-r0"
